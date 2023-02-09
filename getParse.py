@@ -1,3 +1,5 @@
+from flask import Flask
+
 import parzu_class as parzu
 import sys
 
@@ -9,8 +11,14 @@ def get_parse(text: str):
     #    print(sentence)
     return sentences
 
-# input should be a string
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return("Hello World!")
+
 if __name__ == "__main__":
-    input_text = sys.argv[1]
-    for sentence in get_parse(input_text):
-        print(sentence)
+    app.run(debug=True)
+#    input_text = sys.argv[1]
+#    for sentence in get_parse(input_text):
+#        print(sentence)
