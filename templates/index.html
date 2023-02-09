@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+
+{% block head %}
+
+{% endblock %}
+
+
+{% block body %}
+    <form action="/" method="POST">
+        <textarea id="textInput" name="inputText" placeholder="Type..." rows="8" cols="100"></textarea>
+        <button type="submit" >Submit</button>
+    </form>
+    <p>{{ dataToRender }}</p>
+{% endblock %}

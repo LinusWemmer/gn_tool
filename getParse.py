@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request
 
 import parzu_class as parzu
 import sys
@@ -7,15 +7,19 @@ def get_parse(text: str):
     options = parzu.process_arguments()
     ParZu = parzu.Parser(options)
     sentences = ParZu.main(text)
-    #for sentence in sentences:
-    #    print(sentence)
     return sentences
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["POST", "GET"])
 def index():
-    return("Hello World!")
+    if request.method == "POST":
+        input_text = request.form["inputText"]
+        parse = get_parse(input_text)
+        return render_template("index.html", dataToRender=parse)
+    else:
+        return render_template("index.html")
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
