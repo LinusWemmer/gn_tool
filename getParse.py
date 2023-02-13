@@ -7,6 +7,7 @@ def get_parse(text: str):
     options = parzu.process_arguments()
     ParZu = parzu.Parser(options)
     sentences = ParZu.main(text)
+    print(sentences)
     return sentences
 
 def mark_nouns(sentences: list):
@@ -32,6 +33,15 @@ def index():
         return render_template("index.html", dataToRender=mark_nouns(parse))
     else:
         return render_template("index.html")
+    
+@app.route("/parse", methods=["POST"])
+def parse_text():
+    if request.method == "POST":
+        input_text = request.form["inputText"]
+        parse = get_parse(input_text)
+        print(mark_nouns(parse))
+        return render_template("index.html", dataToRender=mark_nouns(parse))
+    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

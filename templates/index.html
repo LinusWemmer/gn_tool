@@ -7,9 +7,9 @@
 
 
 {% block body %}
-    <form action="/" method="POST">
+    <form action="/parse" method="POST">
         <textarea id="textInput" name="inputText" placeholder="Type..." rows="8" cols="100"></textarea>
         <button type="submit" >Submit</button>
     </form>
-    <p>{{ dataToRender }}</p>
+    <p>{{ dataToRender|safe }}</p>
 {% endblock %}
