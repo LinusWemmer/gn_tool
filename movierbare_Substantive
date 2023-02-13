@@ -1,6 +1,6 @@
-Mensch ?
-Mann ?
-Mitglied ?
+% Mensch ?
+% Mann ?
+% Mitglied ?
 Präsident
 Trainer
 % Tor (?)
@@ -29,14 +29,14 @@ Kollege
 Sprecher
 Gott
 Soldat
-Fan ?
+% Fan ?
 Ministerpräsident
 Täter
 Lehrer
 Meister
 Gemeinderat
 Experte
-Rat (?)
+Rat 
 Geschäftsführer
 König
 Einwohner
@@ -53,7 +53,7 @@ Müller
 Stadtrat
 Nachfolger
 Pfarrer
-Hund
+% Hund
 Bauer
 Schauspieler
 Manager
@@ -67,7 +67,7 @@ Minister
 Gastgeber
 Nürnberger
 Leser
-Bayer (?)
+Bayer 
 Bewohner
 Bischof
 Direktor
@@ -161,7 +161,7 @@ Zähler
 Schiedsrichter
 Landwirt
 Aufsteiger
-Aufsichtsrat (?)
+Aufsichtsrat
 Führer
 Interessent
 % Löwe
@@ -188,9 +188,9 @@ Jäger
 Ansprechpartner
 Serbe
 Abenteuer
-Kicker ?
+Kicker
 Vizepräsident
-Zeug
+% Zeug
 Beobachter
 Russe
 % Kammer (?)
@@ -236,7 +236,7 @@ Aktionär
 Torwart
 Premierminister
 Reiter
-%Klassiker
+% Klassiker
 Rentner
 Niedersachse
 Verteidigungsminister
@@ -254,9 +254,9 @@ Bündner
 Käufer 
 Braunschweiger
 Senator
-Kaufmann (?)
+%% Kaufmann (?)
 %All (?)
-Heide (?)
+Heide 
 Betriebsrat
 Betreuer
 Schweizer
@@ -322,7 +322,7 @@ Einbrecher
 Kämpfer
 Springer
 Geste
-Master (?)
+Master
 Kommunist
 Chinese
 Räuber
@@ -356,7 +356,7 @@ Betrachter
 Abteilungsleiter
 Staatschef 
 % Nebel (?)
-Analyst (?)
+Analyst 
 Stuttgarter
 Grieche
 Außenseiter
@@ -369,7 +369,7 @@ Kroate
 Gitarrist 
 Zivilist 
 Turner
-Papa (?)
+% Papa (?)
 Verleger
 Kurde
 Londoner 
@@ -377,7 +377,7 @@ Regierungsrat
 Sachse 
 %Hase (?)
 Kamerad
-Major (?)
+Major
 Anfänger 
 Potsdamer
 Pädagoge
@@ -388,12 +388,12 @@ Doktor
 Parlamentarier
 Gutachter 
 Absolvent
-Landsmann (?)
+% Landsmann (?)
 Brasilianer
 Begleiter
 Vermieter
 Sozialist
-Sir ?
+% Sir ?
 Herrscher
 Insasse 
 Vorarlberger 
@@ -421,7 +421,7 @@ Maurer
 Liebhaber
 Sammler
 Psychologe
-Sportfreund (?)
+Sportfreund
 Justizminister
 Empfänger
 Rechner 
@@ -467,7 +467,7 @@ Kläger
 Schreiber 
 Parteifreund
 Nationalsozialist 
-Ur
+% Ur
 Düsseldorfer 
 Schar 
 Aktivist
@@ -484,7 +484,7 @@ Landesrat
 Kommunalpolitiker 
 Repräsentant
 Beisitzer
-Clown (?)
+% Clown (?)
 Macher 
 Bäcker 
 Mitspieler
@@ -513,93 +513,93 @@ Gläubiger
 Pirat 
 Mandant
 % Ruder (?)
-Fell (?)
-Islamist (?)
-Cheftrainer (?)
+% Fell (?)
+Islamist 
+Cheftrainer
 Hauptdarsteller
-Auftraggeber (?)
+Auftraggeber 
 Musikant
 Sekretär
-Kumpel (?)
-Lieferant (?)
-Part (?)
-Ökonom (?)
+% Kumpel (?)
+Lieferant 
+% Part (?)
+Ökonom 
 Erzähler
 Schwimmer
-Folter (?)
-Kommandeur (?)
-Motorradfahrer (?)
-Retter (?)
+% Folter (?)
+Kommandeur 
+Motorradfahrer 
+Retter
 Starter
 Kantonsrat
-Teenager (?)
-Baumeister (?)
+Teenager 
+Baumeister 
 Finne
-Staatsbürger (?)
+Staatsbürger 
 Kassierer
-Prager (?)
-Raucher (?)
+Prager 
+Raucher 
 Archäologe
 Leichtathlet
 Däne
 Anrufer
-Araber (?)
-Verkehrsteilnehmer (?)
+Araber 
+Verkehrsteilnehmer 
 Münchner
 Pate
-Prophet (?)
+Prophet 
 Obere
 Gemeindepräsident
-Legionär (?)
-Angel (?)
-Dekan (?)
-Taube (?)
-Rate (?)
-Limburger (?)
+Legionär 
+Angel 
+Dekan 
+%Taube (?)
+% Rate (?)
+Limburger 
 Übungsleiter
-Extremist (?)
+Extremist
 Migrant
-Anrainer (?)
-Mathematiker (?)
+Anrainer 
+Mathematiker 
 Handballer
-Riese (?)
-Anführer (?)
-Warte (?)
-Bundesbürger (?)
-Polster (?)
-Naturfreund (?)
+Riese 
+Anführer 
+Warte 
+Bundesbürger
+%Polster (?)
+Naturfreund 
 Komplize
 Organist
-Chefarzt (?)
-Hausarzt (?)
-Philharmoniker (?)
-Spielmacher (?)
-Abwehrspieler (?)
-Marktführer (?)
-Leader (?)
+Chefarzt 
+Hausarzt 
+Philharmoniker 
+Spielmacher 
+Abwehrspieler 
+Marktführer 
+Leader 
 Kellner
-Schläger (?)
+Schläger 
 Chorleiter
-Schlagzeuger (?)
-Verbrecher (?)
-Bart (?)
-Herausforderer (?)
-Krämer (?)
-Liebling (?)
+Schlagzeuger 
+Verbrecher 
+% Bart 
+Herausforderer 
+Krämer 
+%Liebling (?)
 Mitbegründer
-Innensenator (?)
-Insider (?)
-Affe (?)
+Innensenator 
+Insider 
+% Affe (?)
 Diener
 Schatzmeister
 Gatte
-Gesprächspartner (?)
-Server (?)
-Umweltschützer (?)
-Rekordmeister (?)
+Gesprächspartner 
+%Server (?)
+Umweltschützer 
+Rekordmeister 
 Pächter
 Australier
-Pendler (?)
+Pendler 
 Streicher (?)
 Mitschüler
 Eishockeyspieler (?)
