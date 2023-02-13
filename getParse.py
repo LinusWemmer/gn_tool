@@ -11,6 +11,7 @@ def get_parse(text: str):
 
 def mark_nouns(sentences: list):
     nouns = ""
+    sentence_number = 0
     for sentence in sentences:
         words = sentence.split("\n")
         words = words[:-2]
@@ -19,12 +20,15 @@ def mark_nouns(sentences: list):
             print(word_parse)
             print(word_parse[3])
             if word_parse[3] == "N":
-                nouns += "<b>" + word_parse[1] + "</b> "
+                input_form = f"""<input type="checkbox" id="noun{sentence_number}|{word_parse[0]}" name="noun{sentence_number}|{word_parse[0]}" value="select"> 
+                <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
+                nouns += input_form
             elif word_parse[3] == "$.":
                 nouns = nouns[:-1] + word_parse[1]
             else:
                nouns += word_parse[1] + " "
             print(nouns)
+        sentence_number += 1
     return nouns
 
 app = Flask(__name__)
