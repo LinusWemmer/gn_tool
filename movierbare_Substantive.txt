@@ -600,206 +600,206 @@ Rekordmeister
 Pächter
 Australier
 Pendler 
-Streicher (?)
+Streicher 
 Mitschüler
-Eishockeyspieler (?)
+Eishockeyspieler 
 Apotheker
-Attentäter (?)
+Attentäter 
 Oberstaatsanwalt
-Fahnder (?)
-Ratte (?)
-Boxer (?)
-Ire (?)
-Gastronom (?)
-Regierungssprecher (?)
+Fahnder 
+% Ratte (?)
+Boxer 
+Ire 
+Gastronom 
+Regierungssprecher 
 Muslim
-Banker (?)
-Zwerg (?)
-Palme (?)
-Leistungsträger (?)
+Banker 
+Zwerg 
+% Palme (?)
+Leistungsträger
 Kassenprüfer
 Übersetzer
-Brenner (?)
+% Brenner (?)
 Taxifahrer
 Drehbuchautor
-Wiesbadener (?)
+Wiesbadener 
 Pensionist
 Interpret
 Belgier
 Zauber
-Amtsinhaber (?)
-Schauer (?)
-Walker (?)
-Pokalsieger (?)
-Ständerat (?)
+Amtsinhaber
+% Schauer (?)
+Walker
+Pokalsieger 
+Ständerat 
 Projektleiter
-Moskauer (?)
+Moskauer 
 Tierarzt
 Norweger
 Zeichner
-Ratgeber (?)
-Chemiker (?)
-Sektionsleiter (?)
-Machthaber (?)
-Bauarbeiter (?)
-Appenzeller (?)
+Ratgeber 
+Chemiker 
+Sektionsleiter
+Machthaber 
+Bauarbeiter 
+Appenzeller 
 Soziologe
-Flieger (?)
-Killer (?)
-Pfadfinder (?)
-Ringer (?)
-Millionär (?)
-Ortschef (?)
-Amtskollege (?)
-Protestant (?)
+% Flieger 
+Killer 
+Pfadfinder 
+Ringer 
+Millionär
+Ortschef 
+Amtskollege 
+Protestant 
 Publizist
-Schöpfer (?)
-Lokführer (?)
-Bassist (?)
-Tun (?)
-Garant (?)
-Entführer (?)
-Mitbewerber (?)
-Konzernchef (?)
-Nationaltrainer (?)
+Schöpfer 
+Lokführer 
+Bassist 
+%Tun (?)
+%Garant (?)
+Entführer 
+Mitbewerber 
+Konzernchef 
+Nationaltrainer 
 Erzieher
-Neustädter (?)
+Neustädter 
 Friseur
-Geldgeber (?)
+Geldgeber 
 Beifahrer
-Dortmunder (?)
-Ehrenbürger (?)
-Vorläufer (?)
+Dortmunder
+Ehrenbürger 
+Vorläufer 
 Sklave
 Rumäne
-Augsburger (?)
+Augsburger 
 Afrikaner
-Krieger (?)
-Artist (?)
-Stammspieler (?)
-Betrüger (?)
-Astronaut (?)
-Kommentator (?)
-Spaziergänger (?)
+Krieger 
+%Artist (?)
+Stammspieler 
+Betrüger 
+Astronaut 
+Kommentator 
+Spaziergänger 
 Freie
-Schub (?)
-Pol
-Gönner (?)
-Hausbesitzer (?)
-Mach
-Vampir (?)
-Prüfer (?)
-Take (?)
+% Schub 
+%Pol
+Gönner 
+Hausbesitzer 
+% Mach
+Vampir 
+Prüfer 
+% Take (?)
 Vizekanzler
-Halter (?)
-Eifer (?)
-Zöllner (?)
+Halter 
+% Eifer (?)
+Zöllner 
 Schwager
-Wanderfreund (?)
-Töpfer (?)
-Zwangsarbeiter (?)
-Abnehmer (?)
+Wanderfreund 
+Töpfer 
+Zwangsarbeiter 
+Abnehmer 
 Sozialarbeiter
-Iraker (?)
+Iraker 
 Geiger
-Grundschüler (?)
-Begründer (?)
-Schulrat (?)
-Klagenfurter (?)
+Grundschüler 
+Begründer 
+Schulrat 
+Klagenfurter 
 Landeschef
-Astronom (?)
-Hausmeister (?)
+Astronom 
+Hausmeister 
 Facharzt
-Pilger (?)
-Einzelhändler (?)
-Bläser (?)
-Hauptgeschäftsführer (?)
+Pilger 
+Einzelhändler 
+Bläser 
+Hauptgeschäftsführer 
 Sultan (?)
-Kalb (?)
+%Kalb (?)
 Biologe
-Sozialhilfeempfänger (?)
-Reiseveranstalter (?)
-Esel (?)
-Dienstleister (?)
-Straftäter (?)
-Meteorologe (?)
-Portugiese (?)
-Anwender (?)
-Verursacher (?)
-Nationalist (?)
-Preuße (?)
+Sozialhilfeempfänger 
+Reiseveranstalter 
+% Esel (?)
+Dienstleister 
+Straftäter 
+Meteorologe 
+Portugiese 
+Anwender
+Verursacher 
+Nationalist 
+Preuße
 Lokalmatador
-Hotelier (?)
-Wettbewerber (?)
+Hotelier 
+Wettbewerber 
 Kultusminister
-Pommer (?)
-Abonnent (?)
-Ausrichter (?)
+Pommer 
+Abonnent 
+Ausrichter 
 Kanzlerkandidat
 Skifahrer
 Grafiker
-Veteran (?)
-Unterstützer (?)
-Genfer (?)
-Psychiater (?)
+Veteran 
+Unterstützer 
+Genfer 
+Psychiater 
 Gefährt
-Vetter (?)
-Kieler (?)
-Südtiroler (?)
-Panter (?)
-Busfahrer (?)
-Urheber (?)
+% Vetter (?)
+Kieler 
+Südtiroler 
+%Panter (?)
+Busfahrer 
+Urheber 
 Abiturient
-Darmstädter (?)
-Chirurg (?)
-Genfer (?)
-Polizeipräsident (?)
+Darmstädter 
+Chirurg 
+Genfer 
+Polizeipräsident 
 Klient
-Rennfahrer (?)
-Argentinier (?)
-Revolutionär (?)
-Wissenschafter (?)
-User (?)
+Rennfahrer 
+Argentinier 
+Revolutionär 
+Wissenschafter 
+User 
 Sprinter
 Pfleger
-Züchter (?)
-Seelsorger (?)
-Magdeburger (?)
-Alane (?)
-Gastwirt (?)
-Münchener (?)
-Kieler (?)
-Dramatiker (?)
-Zeitzeuge (?)
-Warschauer (?)
-Kurier (?)
-Hochschullehrer (?)
-Prediger (?)
+Züchter 
+Seelsorger 
+Magdeburger 
+% Alane (?)
+Gastwirt
+Münchener
+Kieler 
+Dramatiker 
+Zeitzeuge 
+Warschauer 
+Kurier 
+Hochschullehrer 
+Prediger 
 Anwärter
-Denker (?)
-Gratulant (?)
-Wächter (?)
-Detektiv (?)
-Schreiner (?)
-Mohr (?)
-Hacker (?)
-Komiker (?)
-Notar (?)
+Denker
+Gratulant 
+Wächter 
+Detektiv 
+Schreiner 
+% Mohr (?)
+Hacker 
+Komiker 
+Notar 
 Akademiker
-Jünger (?)
+Jünger 
 Lebensgefährte
 Gymnasiast
 Entertainer
-Same (?)
+Same 
 Staatsminister
 Zar
-Inder (?)
+Inder 
 Schirmherr
-Freiburger (?)
-Hoffnungsträger (?)
+Freiburger 
+Hoffnungsträger
 Koordinator
 Naturschützer (?)
-Kost (?)
+%Kost (?)
 Taucher (?)
 Pfarrgemeinderat (?)
 Bote (?)
