@@ -25,3 +25,16 @@ class Marking_tool():
                 children.append(word_parse[0])
                 children.extend(self.find_children(word_parse[0]))
         return children
+    
+    def get_marking_form(self, sentence_number) -> str:
+        nouns = ""
+        for word_parse in self.parse_list:
+            if word_parse[3] == "N":
+                input_form = f"""<input type="checkbox" id="noun{sentence_number}|{word_parse[0]}" name="noun{sentence_number}|{word_parse[0]}" value="select"> 
+                <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
+                nouns += input_form
+            elif word_parse[3] == "$.":
+                nouns = nouns[:-1] + word_parse[1]
+            else:
+               nouns += word_parse[1] + " "
+        return nouns

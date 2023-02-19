@@ -18,16 +18,17 @@ def mark_nouns(sentences: list):
         words = words[:-2]
         marking_tool = Marking_tool(words)
         marking_tool.find_nounphrase()
-        for word in words:
-            word_parse = word.split("\t")
-            if word_parse[3] == "N":
-                input_form = f"""<input type="checkbox" id="noun{sentence_number}|{word_parse[0]}" name="noun{sentence_number}|{word_parse[0]}" value="select"> 
-                <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
-                nouns += input_form
-            elif word_parse[3] == "$.":
-                nouns = nouns[:-1] + word_parse[1]
-            else:
-               nouns += word_parse[1] + " "
+        nouns += marking_tool.get_marking_form(sentence_number)
+        #for word in words:
+        #    word_parse = word.split("\t")
+        #    if word_parse[3] == "N":
+        #        input_form = f"""<input type="checkbox" id="noun{sentence_number}|{word_parse[0]}" name="noun{sentence_number}|{word_parse[0]}" value="select"> 
+        #        <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
+        #        nouns += input_form
+        #    elif word_parse[3] == "$.":
+        #        nouns = nouns[:-1] + word_parse[1]
+        #    else:
+        #       nouns += word_parse[1] + " "
         sentence_number += 1
     return nouns
 
