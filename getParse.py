@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect
+from marking_tool import Marking_tool
 
 import parzu_class as parzu
 import sys
@@ -15,6 +16,8 @@ def mark_nouns(sentences: list):
     for sentence in sentences:
         words = sentence.split("\n")
         words = words[:-2]
+        marking_tool = Marking_tool(words)
+        marking_tool.find_nounphrase()
         for word in words:
             word_parse = word.split("\t")
             if word_parse[3] == "N":
