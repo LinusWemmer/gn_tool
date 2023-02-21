@@ -59,8 +59,7 @@ def neutralize_marked():
         marking_tool = sentence_data.get_marking_tool(int(selected_noun[0]))
         marking_tool.neutralize_nounphrase(selected_noun[2])
         neutralized_text += marking_tool.get_sentence()
-        return render_template("index.html", outputText = neutralized_text)
-    return redirect("/")
+    return render_template("index.html", outputText = neutralized_text)
 
 if __name__ == "__main__":
     app.run(debug=True)
