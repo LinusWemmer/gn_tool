@@ -1,4 +1,4 @@
-class Marking_tool():
+class Marking_tool:
     def __init__(self, words):
         # List of the 
         self.words = words
