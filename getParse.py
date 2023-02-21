@@ -1,13 +1,17 @@
 from flask import Flask, render_template, request, url_for, redirect
 from marking_tool import Marking_tool
+from sentence_data import Sentence_Data
 
 import parzu_class as parzu
 import sys
+
+sentence_data = Sentence_Data()
 
 def get_parse(text: str):
     options = parzu.process_arguments()
     ParZu = parzu.Parser(options)
     sentences = ParZu.main(text)
+    sentence_data.clear_marking_tools
     return sentences
 
 def mark_nouns(sentences: list):
@@ -18,17 +22,8 @@ def mark_nouns(sentences: list):
         words = words[:-2]
         marking_tool = Marking_tool(words)
         marking_tool.find_nounphrase()
+        sentence_data.add_marking_tool(sentence_number, marking_tool)
         nouns += marking_tool.get_marking_form(sentence_number)
-        #for word in words:
-        #    word_parse = word.split("\t")
-        #    if word_parse[3] == "N":
-        #        input_form = f"""<input type="checkbox" id="noun{sentence_number}|{word_parse[0]}" name="noun{sentence_number}|{word_parse[0]}" value="select"> 
-        #        <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
-        #        nouns += input_form
-        #    elif word_parse[3] == "$.":
-        #        nouns = nouns[:-1] + word_parse[1]
-        #    else:
-        #       nouns += word_parse[1] + " "
         sentence_number += 1
     return nouns
 
@@ -55,11 +50,13 @@ def parse_text():
 @app.route("/mark", methods=["POST"])
 def neutralize_marked():
     selected_nouns = request.form
+    for selected_noun in selected_nouns:
+        #TODO: Add try/catch here, but should work without.
+        marking_tool = sentence_data.get_marking_tool(int(selected_noun[0]))
+        marking_tool.neutralize_nounphrase(selected_noun[2])
+        print(marking_tool.get_sentence())
     print(selected_nouns)
     return redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)
-#    input_text = sys.argv[1]
-#    for sentence in get_parse(input_text):
-#        print(sentence)

@@ -10,12 +10,31 @@ class Marking_tool:
             self.parse_list.append(word.split("\t"))
         self.nounphrases = {}
 
+    def get_sentence(self) -> str:
+        sentence = ""
+        for word_parse in self.parse_list:
+            sentence += word_parse[1] + " "
+        return sentence
+
     def find_nounphrase(self):
         for word_parse in self.parse_list:
             if word_parse[3] == "N":
                 self.nounphrases[word_parse[0]] = self.find_children(word_parse[0])
                 print(self.nounphrases)
     
+    def get_nounphrase(self, pos):
+        return self.nounphrases.get(pos)
+    
+    def neutralize_word(self, pos):
+        self.parse_list[int(pos)-1][1] += "e"
+    
+    def neutralize_nounphrase(self, pos):
+        #if self.parse_list[pos][5].... 
+        self.parse_list[int(pos)-1][1] += "e"
+        for child in self.nounphrases.get(pos):
+            self.neutralize_word(child)
+
+
     def find_children(self, pos: int):
         children = []
         for word_parse in self.parse_list:
@@ -30,7 +49,7 @@ class Marking_tool:
         nouns = ""
         for word_parse in self.parse_list:
             if word_parse[3] == "N":
-                input_form = f"""<input type="checkbox" id="noun{sentence_number}|{word_parse[0]}" name="noun{sentence_number}|{word_parse[0]}" value="select"> 
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select"> 
                 <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
                 nouns += input_form
             elif word_parse[3] == "$.":
