@@ -11,8 +11,5 @@
         <textarea id="textInput" name="inputText" placeholder="Type..." rows="8" cols="100"></textarea>
         <button type="submit" >Submit</button>
     </form>
-    <form action="/mark" method="POST">
-        <p>{{ dataToRender|safe }}</p>
-        <button type="submit" >Submit</button>
-    </form>
+    {{ dataToRender|safe }}
 {% endblock %}
