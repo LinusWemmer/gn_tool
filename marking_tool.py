@@ -56,8 +56,4 @@ class Marking_tool:
                 nouns = nouns[:-1] + word_parse[1]
             else:
                nouns += word_parse[1] + " "
-        form = f"""<form action="/mark" method="POST">
-        <p>{nouns}</p>
-        <button type="submit" >Submit</button>
-    </form>"""
-        return form
+        return nouns
