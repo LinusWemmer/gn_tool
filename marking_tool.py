@@ -1,4 +1,6 @@
-class Marking_tool:
+
+# The Marking_tool class is a class
+class Marking_Tool:
     def __init__(self, words):
         # List of the 
         self.words = words
@@ -38,9 +40,7 @@ class Marking_tool:
     def find_children(self, pos: int):
         children = []
         for word_parse in self.parse_list:
-            if word_parse[6] == pos:
-                #This is recursive, maybe to expensive.
-                #Can it even happen in german that a noun phrase is that long/recursive?
+            if word_parse[6] == pos and word_parse[3] != "N":
                 children.append(word_parse[0])
                 children.extend(self.find_children(word_parse[0]))
         return children

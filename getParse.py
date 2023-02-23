@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect
-from marking_tool import Marking_tool
+from marking_tool import Marking_Tool
 from sentence_data import Sentence_Data
 
 import parzu_class as parzu
@@ -20,7 +20,7 @@ def mark_nouns(sentences: list):
     for sentence in sentences:
         words = sentence.split("\n")
         words = words[:-2]
-        marking_tool = Marking_tool(words)
+        marking_tool = Marking_Tool(words)
         marking_tool.find_nounphrase()
         sentence_data.add_marking_tool(sentence_number, marking_tool)
         nouns += marking_tool.get_marking_form(sentence_number)
@@ -43,6 +43,7 @@ def parse_text():
         parse = get_parse(input_text)
         print(parse)
         marked_nouns = (mark_nouns(parse))
+
         return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
         <p>{marked_nouns}</p>
         <button type="submit" >Submit</button>
