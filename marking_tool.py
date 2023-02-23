@@ -1,5 +1,10 @@
 
-# The Marking_tool class is a class
+# The Marking_tool class is a class that stores the parsing data for a sentence.
+# It also has functionality to work with the data:
+#   - finding nounphrases
+#   - getting the sentence from the parse
+#   - converting a nounphrase into the inklusive form based on the de-e System.
+
 class Marking_Tool:
     def __init__(self, words):
         # List of the 
@@ -12,17 +17,27 @@ class Marking_Tool:
             self.parse_list.append(word.split("\t"))
         self.nounphrases = {}
 
+    # Returns the sentence underlying the pars.
     def get_sentence(self) -> str:
         sentence = ""
         for word_parse in self.parse_list:
             sentence += word_parse[1] + " "
         return sentence
 
+    # Finds all "nounphrases" of the sentence and stores them in a dict.
     def find_nounphrase(self):
         for word_parse in self.parse_list:
             if word_parse[3] == "N":
                 self.nounphrases[word_parse[0]] = self.find_children(word_parse[0])
                 print(self.nounphrases)
+
+    def find_children(self, pos: int):
+        children = []
+        for word_parse in self.parse_list:
+            if word_parse[6] == pos and word_parse[3] != "N":
+                children.append(word_parse[0])
+                children.extend(self.find_children(word_parse[0]))
+        return children
     
     def get_nounphrase(self, pos):
         return self.nounphrases.get(pos)
@@ -36,14 +51,6 @@ class Marking_Tool:
         for child in self.nounphrases.get(pos):
             self.neutralize_word(child)
 
-
-    def find_children(self, pos: int):
-        children = []
-        for word_parse in self.parse_list:
-            if word_parse[6] == pos and word_parse[3] != "N":
-                children.append(word_parse[0])
-                children.extend(self.find_children(word_parse[0]))
-        return children
     
     def get_marking_form(self, sentence_number) -> str:
         nouns = ""
