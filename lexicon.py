@@ -17,6 +17,31 @@ class Lexicon:
                 "POS": "jeders",
                 "DAT": "jederm",
                 "AKK": "jedey"}
+    
+    MALE_NOUNS = open("movierbare_Substantive.txt", "r")
 
+    FEMALE_NOUNS = open("movierbare_Substantive_feminin.txt", "r")
+
+    NEUTRAL_NOUNS = open("movierbare_Substantive_inklusivum.txt", "r")
+
+
+    # A faster algorithm would probably give a List of nouns to check,
+    # and return a list of nouns that are personal designations.
+    def check_role_noun(noun:str, gender:str) -> bool:
+        length = 800
+        if gender == "m":
+            lines = Lexicon.MALE_NOUNS.readlines(length)
+            for line in lines:
+                if line[:-1] == noun:
+                    return True
+        if gender == "f":
+            lines = Lexicon.FEMALE_NOUNS.readlines(length)
+            for line in lines:
+                if line[:-1] == noun:
+                    return True    
+        return False
+    
     def __init__(self):
         pass
+
+print(Lexicon.check_role_noun("Autorin", "f"))
