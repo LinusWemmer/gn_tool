@@ -14,6 +14,8 @@ def get_parse(text: str):
     sentence_data.clear_marking_tools
     return sentences
 
+
+#TODO: fix this, find if role noun.
 def mark_nouns(sentences: list):
     nouns = ""
     sentence_number = 0
@@ -21,14 +23,11 @@ def mark_nouns(sentences: list):
         words = sentence.split("\n")
         words = words[:-2]
         marking_tool = Marking_Tool(words)
-        marking_tool.find_nounphrase()
+        # marking_tool.find_nounphrase()
         sentence_data.add_marking_tool(sentence_number, marking_tool)
         nouns += marking_tool.get_marking_form(sentence_number)
         sentence_number += 1
     return nouns
-
-def get_dependencies(pos: int, words: list):
-    children = ""
 
 app = Flask(__name__)
 

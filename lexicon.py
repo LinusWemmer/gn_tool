@@ -29,19 +29,23 @@ class Lexicon:
     # and return a list of nouns that are personal designations.
     def check_role_noun(noun:str, gender:str) -> bool:
         length = 800
-        if gender == "m":
+        if gender == "M":
             lines = Lexicon.MALE_NOUNS.readlines(length)
             for line in lines:
                 if line[:-1] == noun:
+                    Lexicon.MALE_NOUNS.seek(0)
                     return True
-        if gender == "f":
+            Lexicon.MALE_NOUNS.seek(0)
+        if gender == "F":
             lines = Lexicon.FEMALE_NOUNS.readlines(length)
             for line in lines:
                 if line[:-1] == noun:
-                    return True    
+                    Lexicon.FEMALE_NOUNS.seek(0)
+                    return True
+            Lexicon.FEMALE_NOUNS.seek(0)    
         return False
     
     def __init__(self):
         pass
 
-print(Lexicon.check_role_noun("Autorin", "f"))
+#print(Lexicon.check_role_noun("Schüler", "M"))

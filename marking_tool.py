@@ -1,3 +1,4 @@
+from lexicon import Lexicon
 
 # The Marking_tool class is a class that stores the parsing data for a sentence.
 # It also has functionality to work with the data:
@@ -25,11 +26,14 @@ class Marking_Tool:
         return sentence
 
     # Finds all "nounphrases" of the sentence and stores them in a dict.
-    def find_nounphrase(self):
-        for word_parse in self.parse_list:
-            if word_parse[3] == "N":
-                self.nounphrases[word_parse[0]] = self.find_children(word_parse[0])
-                print(self.nounphrases)
+    def find_nounphrase(self, word_parse) -> bool:
+        #for word_parse in self.parse_list:
+        #    if word_parse[3] == "N":
+        if Lexicon.check_role_noun(word_parse[2], word_parse[5][0]):
+            self.nounphrases[word_parse[0]] = self.find_children(word_parse[0])
+            print(self.nounphrases)
+            return True
+        return False
 
     def find_children(self, pos: int):
         children = []
@@ -55,12 +59,12 @@ class Marking_Tool:
     def get_marking_form(self, sentence_number) -> str:
         nouns = ""
         for word_parse in self.parse_list:
-            if word_parse[3] == "N":
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select"> 
+            if word_parse[3] == "N" and self.find_nounphrase(word_parse):
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select">
                 <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
                 nouns += input_form
             elif word_parse[3] == "$.":
-                nouns = nouns[:-1] + word_parse[1]
+                nouns = nouns[:-1] + word_parse[1] + " "
             else:
                nouns += word_parse[1] + " "
         return nouns
