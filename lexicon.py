@@ -3,26 +3,41 @@ class Lexicon:
     PRONOUNS = {"NOM": "en",
                 "POS": "ens",
                 "DAT": "em",
-                "AKK": "en"}
+                "ACC": "en"}
     
     ARTIKEL_DER = {"NOM": "de",
                 "POS": "ders",
                 "DAT": "derm",
-                "AKK": "de"}
+                "ACC": "de"}
     ARTIKEL_EIN = {"NOM": "ein",
                 "POS": "einers",
                 "DAT": "einerm",
-                "AKK": "ein"}
+                "ACC": "ein"}
     ARTIKEL_JEDER = {"NOM": "jedey",
                 "POS": "jeders",
                 "DAT": "jederm",
-                "AKK": "jedey"}
+                "ACC": "jedey"}
     
     MALE_NOUNS = open("movierbare_Substantive.txt", "r")
 
     FEMALE_NOUNS = open("movierbare_Substantive_feminin.txt", "r")
 
     NEUTRAL_NOUNS = open("movierbare_Substantive_inklusivum.txt", "r")
+
+    def neutralize_noun(noun_root:str, feats:list) -> str:
+        if feats[2] == "Sg":
+            if feats[1] == ("Nom" or "Dat" or "Acc"):
+                return noun_root + "e"
+            elif feats[1] == ("Gen"):
+                return noun_root + "es"
+            else:
+                #something went wrong
+                pass
+        elif feats[3] == "Pl":
+            pass
+        else:
+            #something went wrong
+            pass
 
 
     # A faster algorithm would probably give a List of nouns to check,

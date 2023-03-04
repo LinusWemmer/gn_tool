@@ -22,6 +22,7 @@ class Marking_Tool:
     def get_sentence(self) -> str:
         sentence = ""
         for word_parse in self.parse_list:
+            print(word_parse)
             sentence += word_parse[1] + " "
         return sentence
 
@@ -56,10 +57,11 @@ class Marking_Tool:
         self.parse_list[int(pos)-1][1] += "e"
     
     def neutralize_nounphrase(self, pos):
-        #if self.parse_list[pos][5].... 
-        self.parse_list[int(pos)-1][1] += "e"
-        for child in self.nounphrases.get(pos):
-            self.neutralize_word(child)
+        feats = self.parse_list[pos][5].split("|")
+        print(feats)
+        self.parse_list[pos][1] = Lexicon.neutralize_noun(self.parse_list[pos][2], feats)
+        #for child in self.nounphrases.get(pos):
+        #    self.neutralize_word(child)
 
     # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
