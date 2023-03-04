@@ -26,14 +26,20 @@ class Marking_Tool:
         return sentence
 
     # Finds all "nounphrases" of the sentence and stores them in a dict.
-    def find_nounphrase(self, word_parse) -> bool:
-        #for word_parse in self.parse_list:
-        #    if word_parse[3] == "N":
+    # Returns True if the word is a role noun, otherwise false.
+    def find_nounphrase(self, word_parse):
         if Lexicon.check_role_noun(word_parse[2], word_parse[5][0]):
             self.nounphrases[word_parse[0]] = self.find_children(word_parse[0])
             print(self.nounphrases)
             return True
         return False
+    
+    # Finds all nounphrases of the sentence that come role nouns
+    def find_nounphrases(self):
+        for word_parse in self.parse_list:
+            if word_parse[3] == "N":
+                self.find_nounphrase(word_parse)
+
 
     def find_children(self, pos: int):
         children = []
@@ -55,13 +61,14 @@ class Marking_Tool:
         for child in self.nounphrases.get(pos):
             self.neutralize_word(child)
 
-    
+    # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
+        #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
             if word_parse[3] == "N" and self.find_nounphrase(word_parse):
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select">
-                <label for="noun{sentence_number }|{word_parse[0]}">{"<mark>" + word_parse[1] + "</mark>"}</label> """
+                <label for="noun{sentence_number }|{word_parse[0]}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
             elif word_parse[3] == "$.":
                 nouns = nouns[:-1] + word_parse[1] + " "
