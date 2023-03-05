@@ -1,22 +1,22 @@
 class Lexicon:
     # This class holds all the necessary information to construct the inclusivum
-    PRONOUNS = {"NOM": "en",
-                "POS": "ens",
-                "DAT": "em",
-                "ACC": "en"}
+    PRONOUNS = {"Nom": "en",
+                "Gen": "ens",
+                "Dat": "em",
+                "Ac": "en"}
     
-    ARTIKEL_DER = {"NOM": "de",
-                "POS": "ders",
-                "DAT": "derm",
-                "ACC": "de"}
+    ARTIKEL_DER = {"Nom": "de",
+                "Gen": "ders",
+                "Dat": "derm",
+                "Aac": "de"}
     ARTIKEL_EIN = {"NOM": "ein",
-                "POS": "einers",
-                "DAT": "einerm",
-                "ACC": "ein"}
+                "Gen": "einers",
+                "Dat": "einerm",
+                "Acc": "ein"}
     ARTIKEL_JEDER = {"NOM": "jedey",
-                "POS": "jeders",
-                "DAT": "jederm",
-                "ACC": "jedey"}
+                "Gen": "jeders",
+                "Dat": "jederm",
+                "Ac": "jedey"}
     
     MALE_NOUNS = open("movierbare_Substantive.txt", "r")
 
@@ -27,7 +27,7 @@ class Lexicon:
     def neutralize_noun(noun_root:str, feats:list) -> str:
         if feats[2] == "Sg":
             if feats[1] == ("Nom" or "Dat" or "Acc"):
-                return noun_root + "e"
+                return noun_root + "re" if noun_root[-1] == "e" else noun_root + "e"
             elif feats[1] == ("Gen"):
                 return noun_root + "es"
             else:
@@ -37,6 +37,26 @@ class Lexicon:
             pass
         else:
             #something went wrong
+            pass
+
+    def neutralize_word(parse_list) -> str:
+        # neutralize Adjectives
+        if parse_list[3] == "ADJA":
+            return parse_list[1]
+        # neutralize Articles
+        elif parse_list[3] == "ART":
+            feats = parse_list[5].split("|")
+            # Case Definitive Articles
+            if feats[0] == "Def":
+                return Lexicon.ARTIKEL_DER.get(feats[2])
+            # Case Indifinitive Artikels
+            elif feats[0] == "Indef":
+                return Lexicon.ARTIKEL_EIN.get(feats[2])
+            # Case Jeder Paradigm
+            else: 
+                pass
+        # neutralize Pronouns
+        elif parse_list[3] == "PRO":
             pass
 
 

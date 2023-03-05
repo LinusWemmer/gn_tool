@@ -56,6 +56,7 @@ def neutralize_marked():
     neutralized_text = ""
     for selected_noun in selected_nouns:
         #TODO: Add try/catch here, but should work without.
+        #TODO: This should be changed to work even when nothin is marked.
         marking_tool = sentence_data.get_marking_tool(int(selected_noun[0]))
         marking_tool.neutralize_nounphrase(int(selected_noun[2])-1)
         neutralized_text += marking_tool.get_sentence()
