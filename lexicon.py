@@ -3,12 +3,13 @@ class Lexicon:
     PRONOUNS = {"Nom": "en",
                 "Gen": "ens",
                 "Dat": "em",
-                "Ac": "en"}
+                "Acc": "en"}
     
     ARTIKEL_DER = {"Nom": "de",
                 "Gen": "ders",
                 "Dat": "derm",
-                "Aac": "de"}
+                "Acc": "de"}
+    
     ARTIKEL_EIN = {"NOM": "ein",
                 "Gen": "einers",
                 "Dat": "einerm",
@@ -26,7 +27,8 @@ class Lexicon:
 
     def neutralize_noun(noun_root:str, feats:list) -> str:
         if feats[2] == "Sg":
-            if feats[1] == ("Nom" or "Dat" or "Acc"):
+            print(feats[1])
+            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc":
                 return noun_root + "re" if noun_root[-1] == "e" else noun_root + "e"
             elif feats[1] == ("Gen"):
                 return noun_root + "es"
@@ -48,7 +50,8 @@ class Lexicon:
             feats = parse_list[5].split("|")
             # Case Definitive Articles
             if feats[0] == "Def":
-                return Lexicon.ARTIKEL_DER.get(feats[2])
+                article =  Lexicon.ARTIKEL_DER.get(feats[2])
+                return article.capitalize() if parse_list[0] == "1" else article
             # Case Indifinitive Artikels
             elif feats[0] == "Indef":
                 return Lexicon.ARTIKEL_EIN.get(feats[2])

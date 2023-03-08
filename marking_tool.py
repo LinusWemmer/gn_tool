@@ -61,6 +61,7 @@ class Marking_Tool:
     def neutralize_nounphrase(self, pos:int):
         feats = self.parse_list[pos][5].split("|")
         print(feats)
+        print(Lexicon.neutralize_noun(self.parse_list[pos][2], feats))
         self.parse_list[pos][1] = Lexicon.neutralize_noun(self.parse_list[pos][2], feats)
         print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
