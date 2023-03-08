@@ -60,7 +60,9 @@ class Lexicon:
                 pass
         # neutralize Pronouns
         elif parse_list[3] == "PRO":
-            pass
+            feats = parse_list[5].split("|")
+            pronoun = Lexicon.PRONOUNS.get(feats[3])
+            return pronoun.capitalize() if parse_list[0] == "1" else pronoun
 
 
     # A faster algorithm would probably give a List of nouns to check,

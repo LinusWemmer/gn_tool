@@ -29,11 +29,10 @@ class Marking_Tool:
     # Finds all "nounphrases" of the sentence and stores them in a dict.
     # Returns True if the word is a role noun, otherwise false.
     def find_nounphrase(self, word_parse):
-        if Lexicon.check_role_noun(word_parse[2], word_parse[5][0]):
-            self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0])
-            print(self.nounphrases)
-            return True
-        return False
+        self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0])
+        print(self.nounphrases)
+        
+        
     
     # Finds all nounphrases of the sentence that come role nouns
     def find_nounphrases(self):
@@ -54,18 +53,19 @@ class Marking_Tool:
         return self.nounphrases.get(pos)
     
     def neutralize_word(self, pos:int):
-        print(self.parse_list[pos-1])
-        self.parse_list[pos-1][1] = Lexicon.neutralize_word(self.parse_list[pos-1])
+        print(self.parse_list[pos])
+        self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         
     
     def neutralize_nounphrase(self, pos:int):
         feats = self.parse_list[pos][5].split("|")
-        print(feats)
-        print(Lexicon.neutralize_noun(self.parse_list[pos][2], feats))
-        self.parse_list[pos][1] = Lexicon.neutralize_noun(self.parse_list[pos][2], feats)
+        if self.parse_list[pos][3] == "N":
+            self.parse_list[pos][1] = Lexicon.neutralize_noun(self.parse_list[pos][2], feats)
+        elif self.parse_list[pos][3] == "PRO":
+            self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
-            self.neutralize_word(child)
+            self.neutralize_word(child-1)
 
     # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
@@ -73,7 +73,13 @@ class Marking_Tool:
         nouns = ""
         for word_parse in self.parse_list:
             #TODO: PPOSAT; PRONOUNS
-            if word_parse[3] == "N" and self.find_nounphrase(word_parse):
+            if word_parse[3] == "N" and Lexicon.check_role_noun(word_parse[2], word_parse[5][0]):
+                self.find_nounphrase(word_parse)
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select">
+                <label for="noun{sentence_number }|{word_parse[0]}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                nouns += input_form
+            elif word_parse[3] == "PRO":
+                self.find_nounphrase(word_parse)
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select">
                 <label for="noun{sentence_number }|{word_parse[0]}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
