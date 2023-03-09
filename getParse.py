@@ -56,8 +56,6 @@ def neutralize_marked():
     for selected_noun in selected_nouns:
         marking_tool = sentence_data.get_marking_tool(int(selected_noun[0]))
         marking_tool.neutralize_nounphrase(int(selected_noun[2])-1)
-        #sentence_data.add_marking_tool(marking_tool)
-        #neutralized_text += marking_tool.get_sentence()
     neutralized_text = sentence_data.get_text()
     return render_template("index.html", outputText = neutralized_text)
 

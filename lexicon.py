@@ -10,14 +10,16 @@ class Lexicon:
                 "Dat": "derm",
                 "Acc": "de"}
     
-    ARTIKEL_EIN = {"NOM": "ein",
+    ARTIKEL_EIN = {"Nom": "ein",
                 "Gen": "einers",
                 "Dat": "einerm",
                 "Acc": "ein"}
-    ARTIKEL_JEDER = {"NOM": "jedey",
-                "Gen": "jeders",
-                "Dat": "jederm",
-                "Ac": "jedey"}
+    ARTIKEL_JEDER = {"Nom": "ey",
+                "Gen": "ers",
+                "Dat": "erm",
+                "Ac": "ey"} # jedey jeders jederm jedey
+    
+    JEDER_PARADIGM = ["jedwed", "jed", "jen", "dies", "welch", "solch", "manch"]
     
     MALE_NOUNS = open("movierbare_Substantive.txt", "r")
 
@@ -54,10 +56,18 @@ class Lexicon:
                 return article.capitalize() if parse_list[0] == "1" else article
             # Case Indifinitive Artikels
             elif feats[0] == "Indef":
-                return Lexicon.ARTIKEL_EIN.get(feats[2])
+                article = ""
+                if parse_list[1][0] == "e" or parse_list[1][0] == "E":
+                    article = Lexicon.ARTIKEL_EIN.get(feats[2])
+                else:
+                    article = parse_list[1][0] + Lexicon.ARTIKEL_EIN.get(feats[2])
+                return article.capitalize() if parse_list[0] == "1" else article
             # Case Jeder Paradigm
             else: 
-                pass
+                for start in Lexicon.JEDER_PARADIGM:
+                    if parse_list[1].startswith(start):
+                        article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                        return article.capitalize() if parse_list[0] == "1" else article
         # neutralize Pronouns
         elif parse_list[3] == "PRO":
             feats = parse_list[5].split("|")
