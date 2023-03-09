@@ -10,6 +10,12 @@ class Sentence_Data:
     def get_marking_tool(self, sentence_number: int) -> Marking_Tool:
         return self.marking_tools.get(sentence_number)
     
+    def get_text(self) -> str:
+        text = ""
+        for sentence_number, marking_tool in self.marking_tools.items():
+            text += marking_tool.get_sentence()
+        return text
+    
     def get_marking_tools(self):
         return self.marking_tools
 

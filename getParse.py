@@ -53,13 +53,12 @@ def parse_text():
 @app.route("/mark", methods=["POST"])
 def neutralize_marked():
     selected_nouns = request.form
-    neutralized_text = ""
     for selected_noun in selected_nouns:
-        #TODO: Add try/catch here, but should work without.
-        #TODO: This should be changed to work even when nothin is marked.
         marking_tool = sentence_data.get_marking_tool(int(selected_noun[0]))
         marking_tool.neutralize_nounphrase(int(selected_noun[2])-1)
-        neutralized_text += marking_tool.get_sentence()
+        #sentence_data.add_marking_tool(marking_tool)
+        #neutralized_text += marking_tool.get_sentence()
+    neutralized_text = sentence_data.get_text()
     return render_template("index.html", outputText = neutralized_text)
 
 if __name__ == "__main__":
