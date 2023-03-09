@@ -79,19 +79,26 @@ class Lexicon:
     # and return a list of nouns that are personal designations.
     def check_role_noun(noun:str, gender:str) -> bool:
         length = 800
+        i = 0
         if gender == "M":
-            lines = Lexicon.MALE_NOUNS.readlines(length)
+            lines = Lexicon.MALE_NOUNS.readlines()
             for line in lines:
+                if i > 800:
+                    return False
                 if line[:-1] == noun:
                     Lexicon.MALE_NOUNS.seek(0)
                     return True
+                i +=1
             Lexicon.MALE_NOUNS.seek(0)
         if gender == "F":
-            lines = Lexicon.FEMALE_NOUNS.readlines(length)
+            lines = Lexicon.FEMALE_NOUNS.readlines()
             for line in lines:
+                if i > 800:
+                    return False
                 if line[:-1] == noun:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     return True
+                i +=1
             Lexicon.FEMALE_NOUNS.seek(0)    
         return False
     
