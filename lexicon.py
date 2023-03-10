@@ -81,28 +81,22 @@ class Lexicon:
         length = 800
         i = 0
         if gender == "M":
-            lines = Lexicon.MALE_NOUNS.readlines()
-            for line in lines:
-                if i > 800:
-                    return False
+            for i, line in enumerate(Lexicon.MALE_NOUNS):
                 if line[:-1] == noun:
                     Lexicon.MALE_NOUNS.seek(0)
-                    return True
-                i +=1
-            Lexicon.MALE_NOUNS.seek(0)
-        if gender == "F":
-            lines = Lexicon.FEMALE_NOUNS.readlines()
-            for line in lines:
-                if i > 800:
+                    return i
+                elif i > length:
+                    Lexicon.MALE_NOUNS.seek(0)
                     return False
+        if gender == "F":
+            for i, line in enumerate(Lexicon.FEMALE_NOUNS):
                 if line[:-1] == noun:
                     Lexicon.FEMALE_NOUNS.seek(0)
-                    return True
-                i +=1
-            Lexicon.FEMALE_NOUNS.seek(0)    
+                    return i
+                elif i > length:
+                    Lexicon.FEMALE_NOUNS.seek(0)
+                    return False    
         return False
     
     def __init__(self):
         pass
-
-#print(Lexicon.check_role_noun("Schüler", "M"))
