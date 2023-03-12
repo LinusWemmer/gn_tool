@@ -57,10 +57,10 @@ class Marking_Tool:
         self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         
     
-    def neutralize_nounphrase(self, pos:int):
+    def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
         if self.parse_list[pos][3] == "N":
-            self.parse_list[pos][1] = Lexicon.neutralize_noun(self.parse_list[pos][2], feats)
+            self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
         elif self.parse_list[pos][3] == "PRO":
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         print(self.nounphrases)
@@ -72,16 +72,20 @@ class Marking_Tool:
         #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
-            #TODO: PPOSAT; PRONOUNS
-            if word_parse[3] == "N" and Lexicon.check_role_noun(word_parse[2], word_parse[5][0]):
-                self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select">
-                <label for="noun{sentence_number }|{word_parse[0]}">{"<u>" + word_parse[1] + "</u>"}</label> """
-                nouns += input_form
+            #TODO: PPOSAT
+            if word_parse[3] == "N":
+                line = Lexicon.check_role_noun(word_parse[2], word_parse[5][0])
+                if line:
+                    self.find_nounphrase(word_parse)
+                    input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select">
+                    <label for="noun{sentence_number }|{word_parse[0]}|{line}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                    nouns += input_form
+                else: 
+                    nouns += word_parse[1] + " "
             elif word_parse[3] == "PRO":
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}" name="{sentence_number}|{word_parse[0]}" value="select">
-                <label for="noun{sentence_number }|{word_parse[0]}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
+                <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
             elif word_parse[3] == "$.":
                 nouns = nouns[:-1] + word_parse[1] + " "

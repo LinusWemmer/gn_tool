@@ -27,13 +27,21 @@ class Lexicon:
 
     NEUTRAL_NOUNS = open("movierbare_Substantive_inklusivum.txt", "r")
 
-    def neutralize_noun(noun_root:str, feats:list) -> str:
+    def neutralize_noun(feats:list, index:int) -> str:
         if feats[2] == "Sg":
-            print(feats[1])
+            noun = ""
+            for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
+                if i == index:
+                    noun = line[:-1]
+                    Lexicon.NEUTRAL_NOUNS.seek(0)
+                    break
+                elif i > index:
+                    Lexicon.NEUTRAL_NOUNS.seek(0)
+                    break
             if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc":
-                return noun_root + "re" if noun_root[-1] == "e" else noun_root + "e"
+                return noun
             elif feats[1] == ("Gen"):
-                return noun_root + "es"
+                return noun + "s"
             else:
                 #something went wrong
                 pass

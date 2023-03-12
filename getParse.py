@@ -54,8 +54,10 @@ def parse_text():
 def neutralize_marked():
     selected_nouns = request.form
     for selected_noun in selected_nouns:
-        marking_tool = sentence_data.get_marking_tool(int(selected_noun[0]))
-        marking_tool.neutralize_nounphrase(int(selected_noun[2])-1)
+        print(selected_noun)
+        noun_data = selected_noun.split("|")
+        marking_tool = sentence_data.get_marking_tool(int(noun_data[0]))
+        marking_tool.neutralize_nounphrase(int(noun_data[1])-1, int(noun_data[2]))
     neutralized_text = sentence_data.get_text()
     return render_template("index.html", outputText = neutralized_text)
 
