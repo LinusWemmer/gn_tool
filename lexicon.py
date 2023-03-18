@@ -10,16 +10,21 @@ class Lexicon:
                 "Dat": "derm",
                 "Acc": "de"}
     
-    ARTIKEL_EIN = {"Nom": "ein",
-                "Gen": "einers",
-                "Dat": "einerm",
-                "Acc": "ein"}
+    # ein einers einerm ein
+    ARTIKEL_EIN = {"Nom": "",
+                "Gen": "ers",
+                "Dat": "erm",
+                "Acc": ""}
+    
+    # jedey jeders jederm jedey
     ARTIKEL_JEDER = {"Nom": "ey",
                 "Gen": "ers",
                 "Dat": "erm",
-                "Ac": "ey"} # jedey jeders jederm jedey
+                "Ac": "ey"} 
     
     JEDER_PARADIGM = ["jedwed", "jed", "jen", "dies", "welch", "solch", "manch"]
+
+    EIN_PARADIGM = ["ein", "kein", "mein", "dein", "sein", "ihr", "ens"]
     
     MALE_NOUNS = open("movierbare_Substantive.txt", "r")
 
@@ -62,25 +67,37 @@ class Lexicon:
             if feats[0] == "Def":
                 article =  Lexicon.ARTIKEL_DER.get(feats[2])
                 return article.capitalize() if parse_list[0] == "1" else article
-            # Case Indifinitive Artikels
+            # Case Indifinitive Artikels, only ein  // IGNORE 
             elif feats[0] == "Indef":
                 article = ""
-                if parse_list[1][0] == "e" or parse_list[1][0] == "E":
-                    article = Lexicon.ARTIKEL_EIN.get(feats[2])
-                else:
-                    article = parse_list[1][0] + Lexicon.ARTIKEL_EIN.get(feats[2])
+                #if parse_list[1][0] == "e" or parse_list[1][0] == "E":
+                article = Lexicon.ARTIKEL_EIN.get(feats[2])
+                #else:
+                #    article = parse_list[1][0] + Lexicon.ARTIKEL_EIN.get(feats[2])
                 return article.capitalize() if parse_list[0] == "1" else article
             # Case Jeder Paradigm
-            else: 
+            else:
+                #case = Lexicon.getCase(parse_list)
+                word = parse_list[1][0].lower() + parse_list[1][1:] 
                 for start in Lexicon.JEDER_PARADIGM:
-                    if parse_list[1].startswith(start):
+                    if word.startswith(start):
                         article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
                         return article.capitalize() if parse_list[0] == "1" else article
+                for start in Lexicon.EIN_PARADIGM:
+                    if word.startswith(start):
+                        article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
+                        return article.capitalize() if parse_list[0] == "1" else article
+                raise Exception(f"The Article seems to be not convertable:{parse_list[1]}")
         # neutralize Pronouns
         elif parse_list[3] == "PRO":
             feats = parse_list[5].split("|")
             pronoun = Lexicon.PRONOUNS.get(feats[3])
             return pronoun.capitalize() if parse_list[0] == "1" else pronoun
+        
+    #def getCase(parse_list):
+    #    pos_tag = parse_list[4]
+    #    if pos_tag == "PPOSAT":
+    #        return "EIN"
 
 
     # A faster algorithm would probably give a List of nouns to check,

@@ -63,3 +63,7 @@ def neutralize_marked():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+# TODO: Dort ist ein netter Schüler (nette, adjektive)
+# TODO: Plural.
+# TODO: Der Lehrer , der dort ist , ist nett
