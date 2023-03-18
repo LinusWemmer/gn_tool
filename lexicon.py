@@ -78,6 +78,9 @@ class Lexicon:
 
     # TODO: probaply the different cases should be put into their own methods for readability.
     def neutralize_word(parse_list) -> str:
+        # For Plural Cases, I think this doesn't have to be changed. Check with testing.
+        if parse_list[5].endswith("Pl"):
+            return parse_list[1]
         # neutralize Adjectives
         if parse_list[3] == "ADJA":
             return parse_list[1]
