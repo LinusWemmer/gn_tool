@@ -67,13 +67,9 @@ class Lexicon:
             if feats[0] == "Def":
                 article =  Lexicon.ARTIKEL_DER.get(feats[2])
                 return article.capitalize() if parse_list[0] == "1" else article
-            # Case Indifinitive Artikels, only ein  // IGNORE 
+            # Case Indifinitive Artikels, only ein
             elif feats[0] == "Indef":
-                article = ""
-                #if parse_list[1][0] == "e" or parse_list[1][0] == "E":
-                article = Lexicon.ARTIKEL_EIN.get(feats[2])
-                #else:
-                #    article = parse_list[1][0] + Lexicon.ARTIKEL_EIN.get(feats[2])
+                article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
                 return article.capitalize() if parse_list[0] == "1" else article
             # Case Jeder Paradigm
             else:
