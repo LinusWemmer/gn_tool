@@ -33,6 +33,7 @@ class Lexicon:
     NEUTRAL_NOUNS = open("movierbare_Substantive_inklusivum.txt", "r")
 
     def neutralize_noun(feats:list, index:int) -> str:
+        # Case: Noun is in Singular
         if feats[2] == "Sg":
             noun = ""
             for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
@@ -48,14 +49,34 @@ class Lexicon:
             elif feats[1] == ("Gen"):
                 return noun + "s"
             else:
-                #something went wrong
-                pass
-        elif feats[3] == "Pl":
-            pass
+                raise Exception(f"Somehow the word doesn't have a case: {feats}")
+        # Case: Noun is Plural
+        elif feats[2] == "Pl":
+            noun = ""
+            for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
+                if i == index:
+                    noun = line[:-1]
+                    Lexicon.NEUTRAL_NOUNS.seek(0)
+                    break
+                elif i > index:
+                    Lexicon.NEUTRAL_NOUNS.seek(0)
+                    break
+            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen"):
+                if noun.endswith("re"):
+                    return noun[:-2] + "rne"
+                else:
+                    return noun + "rne"
+            if feats[1] ==  "Dat":
+                if noun.endswith("re"):
+                    return noun[:-2] + "rnen"
+                else:
+                    return noun + "rnen"
+            else:
+                raise Exception(f"Somehow the word doesn't have a case: {feats}")
         else:
-            #something went wrong
-            pass
+            raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
 
+    # TODO: probaply the different cases should be put into their own methods for readability.
     def neutralize_word(parse_list) -> str:
         # neutralize Adjectives
         if parse_list[3] == "ADJA":
@@ -89,15 +110,7 @@ class Lexicon:
             feats = parse_list[5].split("|")
             pronoun = Lexicon.PRONOUNS.get(feats[3])
             return pronoun.capitalize() if parse_list[0] == "1" else pronoun
-        
-    #def getCase(parse_list):
-    #    pos_tag = parse_list[4]
-    #    if pos_tag == "PPOSAT":
-    #        return "EIN"
 
-
-    # A faster algorithm would probably give a List of nouns to check,
-    # and return a list of nouns that are personal designations.
     def check_role_noun(noun:str, gender:str) -> bool:
         length = 800
         i = 0
