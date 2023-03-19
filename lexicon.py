@@ -20,7 +20,7 @@ class Lexicon:
     ARTIKEL_JEDER = {"Nom": "ey",
                 "Gen": "ers",
                 "Dat": "erm",
-                "Ac": "ey"} 
+                "Acc": "ey"} 
     
     JEDER_PARADIGM = ["jedwed", "jed", "jen", "dies", "welch", "solch", "manch"]
 
@@ -83,6 +83,17 @@ class Lexicon:
             return parse_list[1]
         # neutralize Adjectives
         if parse_list[3] == "ADJA":
+            feats = parse_list[5].split("|")
+            # Weak Flexion, after article
+            if feats[4] == "Wk" or feats[4] == "_":
+                if feats[2] == "Acc":
+                    print(feats)
+                    adjective = parse_list[1][:-1] if feats[1] == "Masc" else parse_list[1]
+                    return adjective.capitalize() if parse_list[0] == "1" else adjective
+            # Strong Flexion, on it's own
+            if feats[4] == "St":
+                adjective =  parse_list[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
+                return adjective.capitalize() if parse_list[0] == "1" else adjective
             return parse_list[1]
         # neutralize Articles
         elif parse_list[3] == "ART":
