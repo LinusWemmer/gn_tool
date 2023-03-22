@@ -61,6 +61,8 @@ class Marking_Tool:
         feats = self.parse_list[pos][5].split("|")
         if self.parse_list[pos][3] == "N":
             self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
+        elif self.parse_list[pos][4] == "PPOSAT":
+            self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
         elif self.parse_list[pos][3] == "PRO":
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         print(self.nounphrases)
@@ -72,8 +74,13 @@ class Marking_Tool:
         #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
-            #TODO: PPOSAT
-            if word_parse[3] == "N":
+            if word_parse[4] == "PPOSAT":
+                #TODO: this can be cut to optimize time.
+                self.find_nounphrase(word_parse)
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
+                <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                nouns += input_form
+            elif word_parse[3] == "N":
                 line = Lexicon.check_role_noun(word_parse[2], word_parse[5][0])
                 if line:
                     self.find_nounphrase(word_parse)

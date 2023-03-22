@@ -75,6 +75,11 @@ class Lexicon:
                 raise Exception(f"Somehow the word doesn't have a case: {feats}")
         else:
             raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
+        
+    def neutralize_possesive_pronoun(parse_list) -> str:
+        feats = parse_list[5].split("|")
+        pronoun = "ense" if feats[0] == "Fem" else "ens"
+        return pronoun.capitalize() if parse_list[0] == "1" else pronoun
 
     # TODO: probaply the different cases should be put into their own methods for readability.
     def neutralize_word(parse_list) -> str:
