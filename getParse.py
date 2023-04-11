@@ -66,4 +66,5 @@ if __name__ == "__main__":
 
 # TODO: Personal Pronouns if Lehre ist neutralized but not PPOSAT (e.g. with Seiney Lehrere ist nett.)
 # TODO: Plural.
-# TODO: Der Lehrer , der dort ist , ist nett
+# TODO: Der Lehrer , der dort ist , ist nett. Issue: pronoun, but shorter.
+# TODO: Adjektive im Plural

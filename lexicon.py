@@ -74,7 +74,18 @@ class Lexicon:
             else:
                 raise Exception(f"Somehow the word doesn't have a case: {feats}")
         else:
-            raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
+            #If somehow a word is neither Plural/Singular, we pretend it is singular.
+            noun = ""
+            for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
+                if i == index:
+                    noun = line[:-1]
+                    Lexicon.NEUTRAL_NOUNS.seek(0)
+                    break
+                elif i > index:
+                    Lexicon.NEUTRAL_NOUNS.seek(0)
+                    break
+            return noun
+            #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
         
     def neutralize_possesive_pronoun(parse_list) -> str:
         feats = parse_list[5].split("|")
@@ -83,6 +94,7 @@ class Lexicon:
 
     # TODO: probaply the different cases should be put into their own methods for readability.
     def neutralize_word(parse_list) -> str:
+        print(parse_list[1])
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
         if parse_list[5].endswith("Pl"):
             return parse_list[1]
@@ -97,6 +109,9 @@ class Lexicon:
                     return adjective.capitalize() if parse_list[0] == "1" else adjective
             # Strong Flexion, on it's own
             if feats[4] == "St":
+                # If we for some reason don't get a case, pretend it is nominative.
+                if feats[2] == "_":
+                    feats[2] = "Nom"
                 adjective =  parse_list[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
                 return adjective.capitalize() if parse_list[0] == "1" else adjective
             return parse_list[1]
