@@ -91,6 +91,49 @@ class Lexicon:
         feats = parse_list[5].split("|")
         pronoun = "ense" if feats[0] == "Fem" else "ens"
         return pronoun.capitalize() if parse_list[0] == "1" else pronoun
+    
+    def neutralize_article(parse_list) -> str:
+        feats = parse_list[5].split("|")
+        # Case Definitive Articles
+        if feats[0] == "Def":
+            article =  Lexicon.ARTIKEL_DER.get(feats[2])
+            return article.capitalize() if parse_list[0] == "1" else article
+        # Case Indifinitive Artikels, only ein
+        elif feats[0] == "Indef":
+            article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
+            return article.capitalize() if parse_list[0] == "1" else article
+        # Case Jeder Paradigm
+        else:
+            #case = Lexicon.getCase(parse_list)
+            word = parse_list[1][0].lower() + parse_list[1][1:] 
+            # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
+            for start in Lexicon.JEDER_PARADIGM:
+                if word.startswith(start):
+                    article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                    return article.capitalize() if parse_list[0] == "1" else article
+            # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
+            for start in Lexicon.EIN_PARADIGM:
+                if word.startswith(start):
+                    article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
+                    return article.capitalize() if parse_list[0] == "1" else article
+            raise Exception(f"The Article seems to be not convertable:{parse_list[1]}")
+
+    def neutralize_adjectives(parse_list) -> str:
+        feats = parse_list[5].split("|")
+        # Weak Flexion, after article
+        if feats[4] == "Wk" or feats[4] == "_":
+            if feats[2] == "Acc":
+                print(feats)
+                adjective = parse_list[1][:-1] if feats[1] == "Masc" else parse_list[1]
+                return adjective.capitalize() if parse_list[0] == "1" else adjective
+        # Strong Flexion, on it's own
+        if feats[4] == "St":
+            # If we for some reason don't get a case, pretend it is nominative.
+            if feats[2] == "_":
+                feats[2] = "Nom"
+            adjective =  parse_list[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
+            return adjective.capitalize() if parse_list[0] == "1" else adjective
+        return parse_list[1]
 
     # TODO: probaply the different cases should be put into their own methods for readability.
     def neutralize_word(parse_list) -> str:
@@ -100,45 +143,10 @@ class Lexicon:
             return parse_list[1]
         # neutralize Adjectives
         if parse_list[3] == "ADJA":
-            feats = parse_list[5].split("|")
-            # Weak Flexion, after article
-            if feats[4] == "Wk" or feats[4] == "_":
-                if feats[2] == "Acc":
-                    print(feats)
-                    adjective = parse_list[1][:-1] if feats[1] == "Masc" else parse_list[1]
-                    return adjective.capitalize() if parse_list[0] == "1" else adjective
-            # Strong Flexion, on it's own
-            if feats[4] == "St":
-                # If we for some reason don't get a case, pretend it is nominative.
-                if feats[2] == "_":
-                    feats[2] = "Nom"
-                adjective =  parse_list[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
-                return adjective.capitalize() if parse_list[0] == "1" else adjective
-            return parse_list[1]
+            return Lexicon.neutralize_adjectives(parse_list)
         # neutralize Articles
         elif parse_list[3] == "ART":
-            feats = parse_list[5].split("|")
-            # Case Definitive Articles
-            if feats[0] == "Def":
-                article =  Lexicon.ARTIKEL_DER.get(feats[2])
-                return article.capitalize() if parse_list[0] == "1" else article
-            # Case Indifinitive Artikels, only ein
-            elif feats[0] == "Indef":
-                article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
-                return article.capitalize() if parse_list[0] == "1" else article
-            # Case Jeder Paradigm
-            else:
-                #case = Lexicon.getCase(parse_list)
-                word = parse_list[1][0].lower() + parse_list[1][1:] 
-                for start in Lexicon.JEDER_PARADIGM:
-                    if word.startswith(start):
-                        article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                        return article.capitalize() if parse_list[0] == "1" else article
-                for start in Lexicon.EIN_PARADIGM:
-                    if word.startswith(start):
-                        article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
-                        return article.capitalize() if parse_list[0] == "1" else article
-                raise Exception(f"The Article seems to be not convertable:{parse_list[1]}")
+            return Lexicon.neutralize_article(parse_list)
         # neutralize Pronouns
         elif parse_list[3] == "PRO":
             feats = parse_list[5].split("|")
