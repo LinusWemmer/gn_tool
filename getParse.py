@@ -6,10 +6,10 @@ import parzu_class as parzu
 import sys
 
 sentence_data = Sentence_Data()
+options = parzu.process_arguments()
+ParZu = parzu.Parser(options)
 
 def get_parse(text: str):
-    options = parzu.process_arguments()
-    ParZu = parzu.Parser(options)
     sentences = ParZu.main(text)
     sentence_data.clear_marking_tools
     return sentences
