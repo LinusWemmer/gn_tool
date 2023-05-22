@@ -145,6 +145,7 @@ class Lexicon:
             pronoun = Lexicon.PRONOUNS.get(feats[3])
             return pronoun.capitalize() if parse_list[0] == "1" else pronoun
 
+    # This function checks if a certain noun is a role noun (refers to a person) that can be gendered
     def check_role_noun(noun:str, gender:str) -> bool:
         length = 800
         i = 0
