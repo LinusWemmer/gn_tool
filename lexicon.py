@@ -92,8 +92,17 @@ class Lexicon:
         pronoun = "ense" if feats[0] == "Fem" else "ens"
         return pronoun.capitalize() if parse_list[0] == "1" else pronoun
     
+    # TODO: if smth gets neutralized, then sein has to become seiney
     def neutralize_article(parse_list) -> str:
         feats = parse_list[5].split("|")
+        # Personal Pronouns: if not the main neutralization, then word instead has to be declinated accordingly
+        if parse_list[4] == "PPOSAT":
+            word = parse_list[1][0].lower() + parse_list[1][1:]
+            for start in Lexicon.EIN_PARADIGM:
+                if word.startswith(start):
+                    article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                    return article.capitalize() if parse_list[0] == "1" else article
+            return word
         # Case Definitive Articles
         if feats[0] == "Def":
             article =  Lexicon.ARTIKEL_DER.get(feats[2])
@@ -135,7 +144,6 @@ class Lexicon:
             return adjective.capitalize() if parse_list[0] == "1" else adjective
         return parse_list[1]
 
-    # TODO: probaply the different cases should be put into their own methods for readability.
     def neutralize_word(parse_list) -> str:
         print(parse_list[1])
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
