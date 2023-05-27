@@ -15,7 +15,6 @@ def get_parse(text: str):
     return sentences
 
 
-#TODO: fix this, find if role noun.
 def mark_nouns(sentences: list):
     nouns = ""
     sentence_number = 0
@@ -64,9 +63,11 @@ def neutralize_marked():
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: Personal Pronouns if Lehre ist neutralized but not PPOSAT (e.g. with Seiney Lehrere ist nett.)
+# TODO: Personal Pronouns if Lehre ist neutralized but not PPOSAT (e.g. with Sein Lehrere ist nett.)
 # Issue: neutralization has to be different, depending on if the word itself has to be neutralized
 # or the word it is dependent on
+# TODO: flexion wrong 
+# TODO: einer von uns beiden muss kommen
 # TODO: Plural.
 # TODO: Der Lehrer , der dort ist , ist nett. Issue: pronoun, but shorter.
 # TODO: Adjektive im Plural

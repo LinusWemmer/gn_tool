@@ -18,7 +18,7 @@ class Marking_Tool:
             self.parse_list.append(word.split("\t"))
         self.nounphrases = {}
 
-    # Returns the sentence underlying the pars.
+    # Returns the sentence underlying the parse.
     def get_sentence(self) -> str:
         sentence = ""
         for word_parse in self.parse_list:
@@ -84,6 +84,7 @@ class Marking_Tool:
                 line = Lexicon.check_role_noun(word_parse[2], word_parse[5][0])
                 if line:
                     self.find_nounphrase(word_parse)
+                    #TODO: insert substantivized adjectives
                     input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select">
                     <label for="noun{sentence_number }|{word_parse[0]}|{line}">{"<u>" + word_parse[1] + "</u>"}</label> """
                     nouns += input_form

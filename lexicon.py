@@ -95,14 +95,6 @@ class Lexicon:
     # TODO: if smth gets neutralized, then sein has to become seiney
     def neutralize_article(parse_list) -> str:
         feats = parse_list[5].split("|")
-        # Personal Pronouns: if not the main neutralization, then word instead has to be declinated accordingly
-        if parse_list[4] == "PPOSAT":
-            word = parse_list[1][0].lower() + parse_list[1][1:]
-            for start in Lexicon.EIN_PARADIGM:
-                if word.startswith(start):
-                    article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                    return article.capitalize() if parse_list[0] == "1" else article
-            return word
         # Case Definitive Articles
         if feats[0] == "Def":
             article =  Lexicon.ARTIKEL_DER.get(feats[2])
@@ -113,7 +105,6 @@ class Lexicon:
             return article.capitalize() if parse_list[0] == "1" else article
         # Case Jeder Paradigm
         else:
-            #case = Lexicon.getCase(parse_list)
             word = parse_list[1][0].lower() + parse_list[1][1:] 
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
             for start in Lexicon.JEDER_PARADIGM:
@@ -162,7 +153,9 @@ class Lexicon:
             return pronoun.capitalize() if parse_list[0] == "1" else pronoun
 
     # This function checks if a certain noun is a role noun (refers to a person) that can be gendered
-    def check_role_noun(noun:str, gender:str) -> bool:
+    # Returns line number in the list of role nouns if this is the case, otherwise false
+    def check_role_noun(noun:str, gender:str):
+        print(f"{noun}, {gender}")
         length = 800
         i = 0
         if gender == "M":
@@ -170,7 +163,7 @@ class Lexicon:
                 if line[:-1] == noun:
                     Lexicon.MALE_NOUNS.seek(0)
                     return i
-                elif i > length:
+                elif i >= length:
                     Lexicon.MALE_NOUNS.seek(0)
                     return False
         if gender == "F":
@@ -178,7 +171,7 @@ class Lexicon:
                 if line[:-1] == noun:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     return i
-                elif i > length:
+                elif i >= length:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     return False    
         return False
