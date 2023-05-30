@@ -68,6 +68,7 @@ if __name__ == "__main__":
 # or the word it is dependent on
 # TODO: flexion wrong 
 # TODO: einer von uns beiden muss kommen
+# TODO: dessen?
 # TODO: Plural.
 # TODO: Der Lehrer , der dort ist , ist nett. Issue: pronoun, but shorter.
 # TODO: Adjektive im Plural

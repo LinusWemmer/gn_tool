@@ -152,9 +152,15 @@ class Lexicon:
             if parse_list[4] == "PPER":
                 pronoun = Lexicon.PRONOUNS.get(feats[3])
                 return pronoun.capitalize() if parse_list[0] == "1" else pronoun
-            if parse_list[4] == "PIS":
+            elif parse_list[4] == "PIS":
                 pronoun = parse_list[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
                 return pronoun.capitalize() if parse_list[0] == "1" else pronoun
+            elif parse_list[4] == "PRELS":
+                pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+                return pronoun.capitalize() if parse_list[0] == "1" else pronoun
+        else:
+            return parse_list[1]
+
 
     # This function checks if a certain noun is a role noun (refers to a person) that can be gendered
     # Returns line number in the list of role nouns if this is the case, otherwise false
