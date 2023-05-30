@@ -24,6 +24,8 @@ class Marking_Tool:
         sentence = ""
         for word_parse in self.parse_list:
             print(word_parse)
+            if word_parse[3].startswith("$"):
+                sentence = sentence[:-1]
             sentence += word_parse[1] + " "
         return sentence
 

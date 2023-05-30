@@ -70,5 +70,4 @@ if __name__ == "__main__":
 # TODO: einer von uns beiden muss kommen
 # TODO: dessen?
 # TODO: Plural.
-# TODO: Der Lehrer , der dort ist , ist nett. Issue: pronoun, but shorter.
 # TODO: Adjektive im Plural
