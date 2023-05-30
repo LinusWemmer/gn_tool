@@ -1,4 +1,5 @@
 from lexicon import Lexicon
+import re
 
 # The Marking_tool class is a class that stores the parsing data for a sentence.
 # It also has functionality to work with the data:
@@ -74,8 +75,9 @@ class Marking_Tool:
         #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
-            if word_parse[4] == "PPOSAT":
-                #TODO: this can be cut to optimize time.
+            if word_parse[4] == "PPOSAT" and not re.match(r"(M|m|D|d)ein", word_parse[1]):
+                # A possesive pronoun should only be selectable to be neutralized if it is in third person
+                # Parzu doesn't tag this, so we have to filter out the other cases manually.
                 self.find_nounphrase(word_parse)
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """

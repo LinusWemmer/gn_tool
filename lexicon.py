@@ -159,7 +159,6 @@ class Lexicon:
     # This function checks if a certain noun is a role noun (refers to a person) that can be gendered
     # Returns line number in the list of role nouns if this is the case, otherwise false
     def check_role_noun(noun:str, gender:str):
-        print(f"{noun}, {gender}")
         length = 800
         i = 0
         if gender == "M":
