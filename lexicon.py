@@ -87,79 +87,92 @@ class Lexicon:
             return noun
             #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
         
-    def neutralize_possesive_pronoun(parse_list) -> str:
-        feats = parse_list[5].split("|")
+    def neutralize_possesive_pronoun(word_parse) -> str:
+        feats = word_parse[5].split("|")
         pronoun = "ense" if feats[0] == "Fem" else "ens"
-        return pronoun.capitalize() if parse_list[0] == "1" else pronoun
+        return pronoun.capitalize() if word_parse[0] == "1" else pronoun
     
     # TODO: if smth gets neutralized, then sein has to become seiney
-    def neutralize_article(parse_list) -> str:
-        feats = parse_list[5].split("|")
+    def neutralize_article(word_parse) -> str:
+        feats = word_parse[5].split("|")
         # Case Definitive Articles
         if feats[0] == "Def":
             article =  Lexicon.ARTIKEL_DER.get(feats[2])
-            return article.capitalize() if parse_list[0] == "1" else article
+            return article.capitalize() if word_parse[0] == "1" else article
         # Case Indifinitive Artikels, only ein
         elif feats[0] == "Indef":
             article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
-            return article.capitalize() if parse_list[0] == "1" else article
+            return article.capitalize() if word_parse[0] == "1" else article
         # Case Jeder Paradigm
         else:
-            word = parse_list[1][0].lower() + parse_list[1][1:] 
+            word = word_parse[1][0].lower() + word_parse[1][1:] 
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
             for start in Lexicon.JEDER_PARADIGM:
                 if word.startswith(start):
                     article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                    return article.capitalize() if parse_list[0] == "1" else article
+                    return article.capitalize() if word_parse[0] == "1" else article
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
             for start in Lexicon.EIN_PARADIGM:
                 if word.startswith(start):
                     article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
-                    return article.capitalize() if parse_list[0] == "1" else article
-            raise Exception(f"The Article seems to be not convertable:{parse_list[1]}")
+                    return article.capitalize() if word_parse[0] == "1" else article
+            raise Exception(f"The Article seems to be not convertable:{word_parse[1]}")
 
-    def neutralize_adjectives(parse_list) -> str:
-        feats = parse_list[5].split("|")
-        # Weak Flexion, after article
-        if feats[4] == "Wk" or feats[4] == "_":
+    def neutralize_adjectives(word_parse, article_parse) -> str:
+        feats = word_parse[5].split("|")
+        article = article_parse[1]
+        # Weak Flexion, after article der/die/das (de), also "Jeder"-list
+        if article_parse[5].split("|")[0] == "Def":
             if feats[2] == "Acc":
-                print(feats)
-                adjective = parse_list[1][:-1] if feats[1] == "Masc" else parse_list[1]
-                return adjective.capitalize() if parse_list[0] == "1" else adjective
+                adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
+                return adjective.capitalize() if word_parse[0] == "1" else adjective
+            return word_parse[1]
+        for word in Lexicon.JEDER_PARADIGM:
+            if article.startswith(word) or article.startswith(word.capitalize()):
+                if feats[2] == "Acc":
+                    adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
+                    return adjective.capitalize() if word_parse[0] == "1" else adjective
+                return word_parse[1]
+        # Mixed Flexion:
+        for word in Lexicon.EIN_PARADIGM:
+            if article.startswith(word) or article.startswith(word.capitalize()):
+                if feats[2] == "Acc" or "Nom":
+                    print(feats)
+                    adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
+                    return adjective.capitalize() if word_parse[0] == "1" else adjective
+                return word_parse[1]
         # Strong Flexion, on it's own
-        if feats[4] == "St":
-            # If we for some reason don't get a case, pretend it is nominative.
-            if feats[2] == "_":
-                feats[2] = "Nom"
-            adjective =  parse_list[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
-            return adjective.capitalize() if parse_list[0] == "1" else adjective
-        return parse_list[1]
+        # If we for some reason don't get a case, pretend it is nominative.
+        if feats[2] == "_":
+            feats[2] = "Nom"
+        adjective =  word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
+        return adjective.capitalize() if word_parse[0] == "1" else adjective
 
-    def neutralize_word(parse_list) -> str:
-        print(parse_list[1])
+    def neutralize_word(word_parse) -> str:
+        print(word_parse[1])
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
-        if parse_list[5].endswith("Pl"):
-            return parse_list[1]
+        if "Pl" in word_parse[5]:
+            return word_parse[1]
         # neutralize Adjectives
-        if parse_list[3] == "ADJA":
-            return Lexicon.neutralize_adjectives(parse_list)
+        #if word_parse[3] == "ADJA":
+        #    return Lexicon.neutralize_adjectives(word_parse)
         # neutralize Articles
-        elif parse_list[3] == "ART":
-            return Lexicon.neutralize_article(parse_list)
+        elif word_parse[3] == "ART":
+            return Lexicon.neutralize_article(word_parse)
         # neutralize Pronouns
-        elif parse_list[3] == "PRO":
-            feats = parse_list[5].split("|")
-            if parse_list[4] == "PPER":
+        elif word_parse[3] == "PRO":
+            feats = word_parse[5].split("|")
+            if word_parse[4] == "PPER":
                 pronoun = Lexicon.PRONOUNS.get(feats[3])
-                return pronoun.capitalize() if parse_list[0] == "1" else pronoun
-            elif parse_list[4] == "PIS":
-                pronoun = parse_list[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                return pronoun.capitalize() if parse_list[0] == "1" else pronoun
-            elif parse_list[4] == "PRELS":
+                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            elif word_parse[4] == "PIS":
+                pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            elif word_parse[4] == "PRELS":
                 pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
-                return pronoun.capitalize() if parse_list[0] == "1" else pronoun
+                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
         else:
-            return parse_list[1]
+            return word_parse[1]
 
 
     # This function checks if a certain noun is a role noun (refers to a person) that can be gendered

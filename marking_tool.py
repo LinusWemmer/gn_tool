@@ -52,25 +52,34 @@ class Marking_Tool:
                 children.extend(self.find_children(word_parse[0]))
         return children
     
-    def get_nounphrase(self, pos):
+    def get_nounphrase(self, pos:int):
         return self.nounphrases.get(pos)
     
-    def neutralize_word(self, pos:int):
-        print(self.parse_list[pos])
-        self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
+    def neutralize_word(self, pos:int, article_pos:int):
+        word_parse = self.parse_list[pos]
+        if word_parse[3] == "ADJA":
+            # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
+            # flection, the parent has to included when neutralizing the word.
+            self.parse_list[pos][1] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
+        else:
+            self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         
     
     def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
+        # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
             self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
+        # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
+        # Neutralized Pronouns
         elif self.parse_list[pos][3] == "PRO":
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
-            self.neutralize_word(child-1)
+            article = min(self.nounphrases.get(pos+1))
+            self.neutralize_word(child-1, article)
 
     # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
