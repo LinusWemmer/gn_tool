@@ -86,7 +86,7 @@ class Marking_Tool:
         #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
-            if word_parse[4] == "PPOSAT" and not re.match(r"(M|m|D|d)ein", word_parse[1]):
+            if word_parse[4] == "PPOSAT" and not re.match(r"((M|m|D|d)ein)|((U|u)ns)|((E|e)u(re|er))", word_parse[1]):
                 # A possesive pronoun should only be selectable to be neutralized if it is in third person
                 # Parzu doesn't tag this, so we have to filter out the other cases manually.
                 self.find_nounphrase(word_parse)

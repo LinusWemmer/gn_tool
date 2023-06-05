@@ -63,11 +63,15 @@ def neutralize_marked():
 if __name__ == "__main__":
     app.run(debug=True)
 
-# TODO: Personal Pronouns if Lehre ist neutralized but not PPOSAT (e.g. with Sein Lehrere ist nett.)
-# Issue: neutralization has to be different, depending on if the word itself has to be neutralized
-# or the word it is dependent on
-# TODO: flexion wrong 
+# TODO: zum/zurm/zur
+# TODO: Der Schüler , der dort steht , ist nett.
+# TODO: mark all
 # TODO: einer von uns beiden muss kommen
 # TODO: dessen?
+# Bindestrich erkennen
+# anderenerm
+# viel
+# TODO: Alle wissen, dass das Buch unserers->ens ist. ->ens
 # TODO: Plural.
 # TODO: Adjektive im Plural
+# TODO: Parzu error with Plural (Kim hilf Aktivisten)

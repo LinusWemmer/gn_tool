@@ -1,3 +1,5 @@
+import re
+
 class Lexicon:
     # This class holds all the necessary information to construct the inclusivum
     PRONOUNS = {"Nom": "en",
@@ -9,6 +11,16 @@ class Lexicon:
                 "Gen": "ders",
                 "Dat": "derm",
                 "Acc": "de"}
+    
+    ARTIKEL_UNSER = {"Nom": "unse",
+                "Gen": "unserers",
+                "Dat": "unsererm",
+                "Acc": "unse"}
+    
+    ARTIKEL_EUER = {"Nom": "eue",
+                "Gen": "eurers",
+                "Dat": "eurerm",
+                "Acc": "eue"}
     
     # ein einers einerm ein
     ARTIKEL_EIN = {"Nom": "",
@@ -92,7 +104,6 @@ class Lexicon:
         pronoun = "ense" if feats[0] == "Fem" else "ens"
         return pronoun.capitalize() if word_parse[0] == "1" else pronoun
     
-    # TODO: if smth gets neutralized, then sein has to become seiney
     def neutralize_article(word_parse) -> str:
         feats = word_parse[5].split("|")
         # Case Definitive Articles
@@ -116,6 +127,12 @@ class Lexicon:
                 if word.startswith(start):
                     article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
                     return article.capitalize() if word_parse[0] == "1" else article
+            if re.match(r"(U|u)(nser|nsre|nsere)", word):
+                article = Lexicon.ARTIKEL_UNSER.get(feats[1])
+                return article.capitalize() if word_parse[0] == "1" else article
+            elif re.match(r"(E|e)(uer|ure)", word):
+                article = Lexicon.ARTIKEL_EUER.get(feats[1])
+                return article.capitalize() if word_parse[0] == "1" else article
             raise Exception(f"The Article seems to be not convertable:{word_parse[1]}")
 
     def neutralize_adjectives(word_parse, article_parse) -> str:
