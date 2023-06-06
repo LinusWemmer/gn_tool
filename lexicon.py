@@ -164,6 +164,26 @@ class Lexicon:
             feats[2] = "Nom"
         adjective =  word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
         return adjective.capitalize() if word_parse[0] == "1" else adjective
+    
+    # Neutralize Prepostions if they are compound articles with prepositions, e.g. zur/im/beim
+    def neutralize_preposition(word_parse) -> str:
+        feats = word_parse[5]
+        # The different shortforms have to be hardcoded, boring
+        if word_parse[1]=="beim" or word_parse[1]== "Beim":
+            preposition = "bei derm"
+            return preposition.capitalize() if word_parse[0] == "1" else preposition
+        if word_parse[1]== "am" or word_parse[1]=="Am":
+            preposition = "an derm"
+            return preposition.capitalize() if word_parse[0] == "1" else preposition
+        if word_parse[1]== "zum" or word_parse[1]=="zur" or word_parse[1]=="Zum" or word_parse[1]=="Zur":
+            preposition = "zurm"
+            return preposition.capitalize() if word_parse[0] == "1" else preposition
+        if word_parse[1]== word_parse[1]=="im" or word_parse[1]=="Im":
+            preposition = "in derm"
+            return preposition.capitalize() if word_parse[0] == "1" else preposition
+        if word_parse[1]== word_parse[1]=="vom" or word_parse[1]=="Vorm":
+            preposition = "von derm"
+            return preposition.capitalize() if word_parse[0] == "1" else preposition
 
     def neutralize_word(word_parse) -> str:
         print(word_parse[1])
@@ -188,6 +208,8 @@ class Lexicon:
             elif word_parse[4] == "PRELS":
                 pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
                 return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+        elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
+            return Lexicon.neutralize_preposition(word_parse)
         else:
             return word_parse[1]
 

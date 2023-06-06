@@ -71,7 +71,6 @@ if __name__ == "__main__":
 # Bindestrich erkennen
 # anderenerm
 # viel
-# TODO: Alle wissen, dass das Buch unserers->ens ist. ->ens
 # TODO: Plural.
 # TODO: Adjektive im Plural
 # TODO: Parzu error with Plural (Kim hilf Aktivisten)

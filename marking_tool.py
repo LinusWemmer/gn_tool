@@ -34,8 +34,6 @@ class Marking_Tool:
     def find_nounphrase(self, word_parse):
         self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0])
         print(self.nounphrases)
-        
-        
     
     # Finds all nounphrases of the sentence that come role nouns
     def find_nounphrases(self):
@@ -74,7 +72,7 @@ class Marking_Tool:
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
         # Neutralized Pronouns
-        elif self.parse_list[pos][3] == "PRO":
+        else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
@@ -108,7 +106,12 @@ class Marking_Tool:
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
-            elif word_parse[3] == "$.":
+            elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
+                self.find_nounphrase(word_parse)
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
+                <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                nouns += input_form
+            elif word_parse[3] == "$." or word_parse[3] == "$,":
                 nouns = nouns[:-1] + word_parse[1] + " "
             else:
                nouns += word_parse[1] + " "
