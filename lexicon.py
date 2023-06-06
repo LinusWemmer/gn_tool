@@ -200,7 +200,9 @@ class Lexicon:
         elif word_parse[3] == "PRO":
             feats = word_parse[5].split("|")
             if word_parse[4] == "PPER":
-                pronoun = Lexicon.PRONOUNS.get(feats[3])
+                pronoun = word_parse[1]
+                if feats[0] == "3":
+                    pronoun = Lexicon.PRONOUNS.get(feats[3])
                 return pronoun.capitalize() if word_parse[0] == "1" else pronoun
             elif word_parse[4] == "PIS":
                 pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
