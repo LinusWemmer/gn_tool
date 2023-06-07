@@ -11,7 +11,7 @@ ParZu = parzu.Parser(options)
 
 def get_parse(text: str):
     sentences = ParZu.main(text)
-    sentence_data.clear_marking_tools
+    sentence_data.clear_marking_tools()
     return sentences
 
 
