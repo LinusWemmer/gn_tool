@@ -138,26 +138,13 @@ class Lexicon:
     def neutralize_adjectives(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
         article = article_parse[1]
+        print(article)
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
-        if article_parse[5].split("|")[0] == "Def":
+        if article_parse[3] == "ART" or article_parse[4] == "APPRART":
             if feats[2] == "Acc":
                 adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
                 return adjective.capitalize() if word_parse[0] == "1" else adjective
             return word_parse[1]
-        for word in Lexicon.JEDER_PARADIGM:
-            if article.startswith(word) or article.startswith(word.capitalize()):
-                if feats[2] == "Acc":
-                    adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
-                    return adjective.capitalize() if word_parse[0] == "1" else adjective
-                return word_parse[1]
-        # Mixed Flexion:
-        for word in Lexicon.EIN_PARADIGM:
-            if article.startswith(word) or article.startswith(word.capitalize()):
-                if feats[2] == "Acc" or "Nom":
-                    print(feats)
-                    adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
-                    return adjective.capitalize() if word_parse[0] == "1" else adjective
-                return word_parse[1]
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
@@ -184,6 +171,7 @@ class Lexicon:
         if word_parse[1]== word_parse[1]=="vom" or word_parse[1]=="Vorm":
             preposition = "von derm"
             return preposition.capitalize() if word_parse[0] == "1" else preposition
+        return word_parse[1]
 
     def neutralize_word(word_parse) -> str:
         print(word_parse[1])

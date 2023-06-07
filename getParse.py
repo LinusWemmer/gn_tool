@@ -62,8 +62,7 @@ def neutralize_marked():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-# TODO: zum/zurm/zur
+    
 # TODO: Der Schüler , der dort steht , ist nett.
 # TODO: mark all
 # TODO: einer von uns beiden muss kommen
