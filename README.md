@@ -32,6 +32,10 @@ Usage:
 
 You can run the program locally by running getParse.py. You should then find the program running on localhost:5000.
 
+Possible Errors:
+---------------
+Small errors can occur in the software due to errors in the parsing from ParZu, these issues cannot be fixed.
+
 ParZu - The Zurich Dependency Parser for German
 ===============================================
 
