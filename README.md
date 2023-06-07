@@ -10,6 +10,7 @@ Clevertagger: https://github.com/rsennrich/clevertagger
 Zmorge: https://pub.cl.uzh.ch/users/sennrich/zmorge/ (The tool was programmed with zmorge-20150315-smor_newlemma.ca, so I recommend using that instance).
 
 The software was developed using the following:
+
     Linux (32 and 64 bit)
     SWI-Prolog 9.04 
     Python 3.8
