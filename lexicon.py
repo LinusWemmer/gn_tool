@@ -108,6 +108,8 @@ class Lexicon:
         feats = word_parse[5].split("|")
         # Case Definitive Articles
         if feats[0] == "Def":
+            if feats[2] == "_":
+                feats[2] = "Nom"
             article =  Lexicon.ARTIKEL_DER.get(feats[2])
             return article.capitalize() if word_parse[0] == "1" else article
         # Case Indifinitive Artikels, only ein
