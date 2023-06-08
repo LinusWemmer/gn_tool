@@ -106,18 +106,18 @@ class Lexicon:
     def neutralize_sub_adj(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
         article = article_parse[1]
-        # Weak Flexion, after article der/die/das (de), also "Jeder"-list
+        if feats[1] == "_":
+            feats[1] = "Nom"
+        # Weak Flexion, after article
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
-            if feats[2] == "Acc":
-                adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
-                return adjective.capitalize() if word_parse[0] == "1" else adjective
-            return word_parse[1]
+            if feats[1] == "Nom" or feats[1] == "Acc": 
+                return word_parse[2]
+            else:
+                return word_parse[2] + "n"
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
-        if feats[2] == "_":
-            feats[2] = "Nom"
-        adjective =  word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
-        return adjective.capitalize() if word_parse[0] == "1" else adjective
+        noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        return noun.capitalize()
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")

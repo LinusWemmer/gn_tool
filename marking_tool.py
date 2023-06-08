@@ -68,7 +68,9 @@ class Marking_Tool:
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
             if line == -1:
-                article_pos = min(self.nounphrases.get(pos+1))
+                article_pos = pos+1
+                if self.nounphrases.get(pos+1):
+                    article_pos = min(self.nounphrases.get(pos+1))
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             else:
                 self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
