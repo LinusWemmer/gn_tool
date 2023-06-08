@@ -63,13 +63,15 @@ def neutralize_marked():
 if __name__ == "__main__":
     app.run(debug=True)
     
-# TODO: Der Schüler , der dort steht , ist nett.
 # TODO: mark all
 # TODO: einer von uns beiden muss kommen
 # TODO: dessen?
 # Bindestrich erkennen
 # anderenerm
 # viel
+# composite articles and prepositions should be handled seperatly
+# Studierende müssen Semesterbeiträge zahlen.
+# TODO: Keiner von uns weiß was davon.
 # TODO: Plural.
 # TODO: Adjektive im Plural
 # TODO: Parzu error with Plural (Kim hilf Aktivisten)

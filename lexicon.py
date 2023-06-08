@@ -44,7 +44,11 @@ class Lexicon:
 
     NEUTRAL_NOUNS = open("movierbare_Substantive_inklusivum.txt", "r")
 
+    PART_NOUNS = open("substantivierte_adjektive.txt", "r")
+
     def neutralize_noun(feats:list, index:int) -> str:
+        if index == -1:
+            pass
         # Case: Noun is in Singular
         if feats[2] == "Sg":
             noun = ""
@@ -207,7 +211,9 @@ class Lexicon:
 
 
     # This function checks if a certain noun is a role noun (refers to a person) that can be gendered
-    # Returns line number in the list of role nouns if this is the case, otherwise false
+    # Returns line number in the list of role nouns if this is the case,
+    # -1 if it is a substantivised adjective,
+    # otherwise false
     def check_role_noun(noun:str, gender:str):
         length = 800
         i = 0
@@ -227,6 +233,15 @@ class Lexicon:
                 elif i >= length:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     return False    
+        else:
+            for i, line in enumerate(Lexicon.PART_NOUNS):
+                if noun.startswith(line[:-1]):
+                    Lexicon.PART_NOUNS.seek(0)
+                    return -1
+            if re.match(r".*sprachige", noun):
+                Lexicon.PART_NOUNS.seek(0)
+                return -1    
+            Lexicon.PART_NOUNS.seek(0)
         return False
     
     def __init__(self):
