@@ -67,7 +67,11 @@ class Marking_Tool:
         feats = self.parse_list[pos][5].split("|")
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
-            self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
+            if line == -1:
+                article_pos = min(self.nounphrases.get(pos+1))
+                self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+            else:
+                self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
         # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
@@ -76,8 +80,8 @@ class Marking_Tool:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
-            article = min(self.nounphrases.get(pos+1))
-            self.neutralize_word(child-1, article)
+            article_pos = min(self.nounphrases.get(pos+1))
+            self.neutralize_word(child-1, article_pos)
 
     # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
@@ -95,7 +99,6 @@ class Marking_Tool:
                 line = Lexicon.check_role_noun(word_parse[2], word_parse[5][0])
                 if line:
                     self.find_nounphrase(word_parse)
-                    #TODO: insert substantivized adjectives
                     input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select">
                     <label for="noun{sentence_number }|{word_parse[0]}|{line}">{"<u>" + word_parse[1] + "</u>"}</label> """
                     nouns += input_form

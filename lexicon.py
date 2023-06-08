@@ -102,6 +102,22 @@ class Lexicon:
                     break
             return noun
             #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
+
+    def neutralize_sub_adj(word_parse, article_parse) -> str:
+        feats = word_parse[5].split("|")
+        article = article_parse[1]
+        # Weak Flexion, after article der/die/das (de), also "Jeder"-list
+        if article_parse[3] == "ART" or article_parse[4] == "APPRART":
+            if feats[2] == "Acc":
+                adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
+                return adjective.capitalize() if word_parse[0] == "1" else adjective
+            return word_parse[1]
+        # Strong Flexion, on it's own
+        # If we for some reason don't get a case, pretend it is nominative.
+        if feats[2] == "_":
+            feats[2] = "Nom"
+        adjective =  word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
+        return adjective.capitalize() if word_parse[0] == "1" else adjective
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
@@ -144,7 +160,6 @@ class Lexicon:
     def neutralize_adjectives(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
         article = article_parse[1]
-        print(article)
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
             if feats[2] == "Acc":
@@ -215,6 +230,7 @@ class Lexicon:
     # -1 if it is a substantivised adjective,
     # otherwise false
     def check_role_noun(noun:str, gender:str):
+        Lexicon.PART_NOUNS.seek(0)
         length = 800
         i = 0
         if gender == "M":
@@ -224,7 +240,7 @@ class Lexicon:
                     return i
                 elif i >= length:
                     Lexicon.MALE_NOUNS.seek(0)
-                    return False
+                    break
         if gender == "F":
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
                 if line[:-1] == noun:
@@ -232,7 +248,7 @@ class Lexicon:
                     return i
                 elif i >= length:
                     Lexicon.FEMALE_NOUNS.seek(0)
-                    return False    
+                    break   
         else:
             for i, line in enumerate(Lexicon.PART_NOUNS):
                 if noun.startswith(line[:-1]):
