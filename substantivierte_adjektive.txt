@@ -31,3 +31,6 @@ Behinderte
 Fremde
 Arbeitslose
 Abhängige
+Erstere
+Letztere
+Interessierte
