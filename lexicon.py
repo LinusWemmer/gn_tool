@@ -231,6 +231,8 @@ class Lexicon:
     # otherwise false
     def check_role_noun(noun:str, gender:str):
         Lexicon.PART_NOUNS.seek(0)
+        Lexicon.MALE_NOUNS.seek(0)
+        Lexicon.FEMALE_NOUNS.seek(0)
         length = 800
         i = 0
         if gender == "M":
