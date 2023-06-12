@@ -162,8 +162,11 @@ class Lexicon:
         article = article_parse[1]
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
-            if feats[2] == "Acc":
-                adjective = word_parse[1][:-1] if feats[1] == "Masc" else word_parse[1]
+            if feats[2] == "Acc" or feats[2] == "Nom":
+                adjective = word_parse[2] + "e"
+                return adjective.capitalize() if word_parse[0] == "1" else adjective
+            else:
+                adjective = word_parse[2] + "er"
                 return adjective.capitalize() if word_parse[0] == "1" else adjective
             return word_parse[1]
         # Strong Flexion, on it's own
@@ -199,9 +202,6 @@ class Lexicon:
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
         if "Pl" in word_parse[5]:
             return word_parse[1]
-        # neutralize Adjectives
-        #if word_parse[3] == "ADJA":
-        #    return Lexicon.neutralize_adjectives(word_parse)
         # neutralize Articles
         elif word_parse[3] == "ART":
             return Lexicon.neutralize_article(word_parse)
