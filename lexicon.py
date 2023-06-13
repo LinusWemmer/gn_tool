@@ -60,7 +60,7 @@ class Lexicon:
                 elif i > index:
                     Lexicon.NEUTRAL_NOUNS.seek(0)
                     break
-            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc":
+            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" :
                 return noun
             elif feats[1] == ("Gen"):
                 return noun + "s"

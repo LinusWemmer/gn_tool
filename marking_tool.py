@@ -73,6 +73,13 @@ class Marking_Tool:
                     article_pos = min(self.nounphrases.get(pos+1))
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             else:
+                # Parzu sometimes doesn't correctly mark singular/plural, so we check these cases and mark them ourselves
+                if feats[2] == "_":
+                    if self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
+                        feats[1] = "Dat"
+                        feats[2] = "Pl"
+                    else:
+                        feats[2] = "Sg"
                 self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
         # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
