@@ -45,7 +45,7 @@ class Marking_Tool:
     def find_children(self, pos: int):
         children = []
         for word_parse in self.parse_list:
-            if word_parse[6] == pos and word_parse[3] != "N":
+            if word_parse[6] == pos and word_parse[3]:
                 children.append(int(word_parse[0]))
                 children.extend(self.find_children(word_parse[0]))
         return children

@@ -136,7 +136,10 @@ class Lexicon:
         elif feats[0] == "Indef":
             article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
             return article.capitalize() if word_parse[0] == "1" else article
-        # Case Jeder Paradigm
+        # Attributing relative pronouns
+        elif word_parse[4] == "PRELAT":
+            article = "dersen"
+            return article.capitalize() if word_parse[0] == "1" else article
         else:
             word = word_parse[1][0].lower() + word_parse[1][1:] 
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
@@ -166,7 +169,7 @@ class Lexicon:
                 adjective = word_parse[2] + "e"
                 return adjective.capitalize() if word_parse[0] == "1" else adjective
             else:
-                adjective = word_parse[2] + "er"
+                adjective = word_parse[2] + "en"
                 return adjective.capitalize() if word_parse[0] == "1" else adjective
             return word_parse[1]
         # Strong Flexion, on it's own
