@@ -201,7 +201,6 @@ class Lexicon:
         return word_parse[1]
 
     def neutralize_word(word_parse) -> str:
-        print(word_parse[1])
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
         if "Pl" in word_parse[5]:
             return word_parse[1]
@@ -230,6 +229,9 @@ class Lexicon:
                 return pronoun.capitalize() if word_parse[0] == "1" else pronoun
             elif word_parse[4] == "PRELS":
                 pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            elif word_parse[4] == "PDS":
+                pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
                 return pronoun.capitalize() if word_parse[0] == "1" else pronoun
         elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
             return Lexicon.neutralize_preposition(word_parse)
