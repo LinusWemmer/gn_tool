@@ -217,7 +217,16 @@ class Lexicon:
                     pronoun = Lexicon.PRONOUNS.get(feats[3])
                 return pronoun.capitalize() if word_parse[0] == "1" else pronoun
             elif word_parse[4] == "PIS":
-                pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                pronoun = word_parse[1]
+                if feats[1] == "_":
+                    feats[1] = "Nom"
+                if word_parse[2] == "man":
+                    pronoun = "mensch"
+                elif word_parse[2].endswith("mand"):
+                    if feats[1] == "Dat" or feats[1] == "Gen":
+                        pronoun = word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                else: 
+                    pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
                 return pronoun.capitalize() if word_parse[0] == "1" else pronoun
             elif word_parse[4] == "PRELS":
                 pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
