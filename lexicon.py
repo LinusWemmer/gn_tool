@@ -241,7 +241,9 @@ class Lexicon:
     # Returns line number in the list of role nouns if this is the case,
     # -1 if it is a substantivised adjective,
     # otherwise false
-    def check_role_noun(noun:str, gender:str):
+    def check_role_noun(word_parse):
+        noun = word_parse[2]
+        gender = word_parse[5][0]
         Lexicon.PART_NOUNS.seek(0)
         Lexicon.MALE_NOUNS.seek(0)
         Lexicon.FEMALE_NOUNS.seek(0)
@@ -264,6 +266,9 @@ class Lexicon:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     break   
         else:
+            # Plural cases can be disregarded, as these are already neutral.
+            if word_parse[5][-2:] == "Pl":
+                return False
             for i, line in enumerate(Lexicon.PART_NOUNS):
                 if noun.startswith(line[:-1]):
                     Lexicon.PART_NOUNS.seek(0)

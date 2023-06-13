@@ -57,7 +57,7 @@ class Marking_Tool:
         word_parse = self.parse_list[pos]
         if word_parse[3] == "ADJA":
             # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
-            # flection, the parent has to included when neutralizing the word.
+            # flexion, the parent has to included when neutralizing the word.
             self.parse_list[pos][1] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
@@ -105,7 +105,7 @@ class Marking_Tool:
                 <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
             elif word_parse[3] == "N":
-                line = Lexicon.check_role_noun(word_parse[2], word_parse[5][0])
+                line = Lexicon.check_role_noun(word_parse)
                 if line:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select">
