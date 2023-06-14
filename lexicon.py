@@ -274,6 +274,9 @@ class Lexicon:
     # otherwise false
     def check_role_noun(word_parse):
         noun = word_parse[2]
+        if "-" in word_parse[2]:
+            word_split = word_parse[2].split("-")
+            noun = word_split[-1]
         gender = word_parse[5][0]
         Lexicon.PART_NOUNS.seek(0)
         Lexicon.MALE_NOUNS.seek(0)

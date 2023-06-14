@@ -30,7 +30,6 @@ def mark_nouns(sentences: list):
 # To ensure correct parsing, 
 def split_prepositions(input_text: str) ->str:
     sentences = input_text.split(" ")
-    print(sentences)
     output = ""
     for word in sentences:
         if word =="beim":
@@ -71,9 +70,7 @@ def index():
 def parse_text():
     if request.method == "POST":
         input_text = request.form["inputText"]
-        print(input_text)
         input_text = split_prepositions(input_text)
-        print(input_text)
         parse = get_parse(input_text)
         print(parse)
         marked_nouns = mark_nouns(parse)

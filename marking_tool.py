@@ -67,11 +67,19 @@ class Marking_Tool:
         feats = self.parse_list[pos][5].split("|")
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
+            # Noun is a substantivized adjective
             if line == -1:
                 article_pos = pos+1
                 if self.nounphrases.get(pos+1):
                     article_pos = min(self.nounphrases.get(pos+1))
-                self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+                #Special handling if the role noun is a split word with "-"
+                if "-" in self.parse_list[pos][1]:
+                    word_split = self.parse_list[pos][1].split("-")
+                    self.parse_list[pos][1] = word_split[-1]
+                    self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+                else:
+                    self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+            # Noun is a classical role noun
             else:
                 # Parzu sometimes doesn't correctly mark singular/plural, so we check these cases and mark them ourselves
                 if feats[2] == "_":
@@ -80,7 +88,11 @@ class Marking_Tool:
                         feats[2] = "Pl"
                     else:
                         feats[2] = "Sg"
-                self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
+                if "-" in self.parse_list[pos][1]:
+                    word_split = self.parse_list[pos][1].split("-")
+                    self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)
+                else:
+                    self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
         # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
