@@ -215,10 +215,10 @@ class Lexicon:
         if word_parse[1]== "zum" or word_parse[1]=="zur" or word_parse[1]=="Zum" or word_parse[1]=="Zur":
             preposition = "zurm"
             return preposition.capitalize() if word_parse[0] == "1" else preposition
-        if word_parse[1]== word_parse[1]=="im" or word_parse[1]=="Im":
+        if word_parse[1]=="im" or word_parse[1]=="Im":
             preposition = "in derm"
             return preposition.capitalize() if word_parse[0] == "1" else preposition
-        if word_parse[1]== word_parse[1]=="vom" or word_parse[1]=="Vorm":
+        if word_parse[1] == "vom" or word_parse[1] == "Vom":
             preposition = "von derm"
             return preposition.capitalize() if word_parse[0] == "1" else preposition
         return word_parse[1]

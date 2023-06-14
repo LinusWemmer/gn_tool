@@ -22,11 +22,44 @@ def mark_nouns(sentences: list):
         words = sentence.split("\n")
         words = words[:-2]
         marking_tool = Marking_Tool(words)
-        # marking_tool.find_nounphrase()
         sentence_data.add_marking_tool(sentence_number, marking_tool)
         nouns += marking_tool.get_marking_form(sentence_number)
         sentence_number += 1
     return nouns
+
+# To ensure correct parsing, 
+def split_prepositions(input_text: str) ->str:
+    sentences = input_text.split(" ")
+    print(sentences)
+    output = ""
+    for word in sentences:
+        if word =="beim":
+            output += "bei dem "
+        elif word == "Beim":
+            output +="Bei dem "
+        elif word == "am":
+            output += "an dem "
+        elif word == "Am":
+            output += "An dem "
+        elif word == "zum":
+            output += "zu dem "
+        elif word == "Zum":
+            output += "Zu dem "
+        elif word == "zur":
+            output += "zu der "
+        elif word == "Zur":
+            output += "Zu der "
+        elif word == "im":
+            output += "in dem "
+        elif word == "Im":
+            output += "In dem "
+        elif word == "vom":
+            output += "von dem "
+        elif word == "Vom":
+            output += "Von dem "
+        else:
+            output += word + " "
+    return output
 
 app = Flask(__name__)
 
@@ -38,10 +71,12 @@ def index():
 def parse_text():
     if request.method == "POST":
         input_text = request.form["inputText"]
+        print(input_text)
+        input_text = split_prepositions(input_text)
+        print(input_text)
         parse = get_parse(input_text)
         print(parse)
-        marked_nouns = (mark_nouns(parse))
-
+        marked_nouns = mark_nouns(parse)
         return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
         <p>{marked_nouns}</p>
         <button type="submit" >Submit</button>
