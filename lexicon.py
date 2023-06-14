@@ -121,7 +121,20 @@ class Lexicon:
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
-        pronoun = "ense" if feats[0] == "Fem" else "ens"
+        pronoun = ""
+        if feats[1] == "Acc":
+            if feats[0] == "Fem":
+                pronoun = "ense"
+            elif feats[0] == "Masc":
+                pronoun = "ensen"
+            else:
+                pronoun = "ens"
+        if feats[1] == "Nom":
+            pronoun = "ense" if feats[0] == "Fem" else "ens"
+        if feats[1] == "Dat":
+            pronoun = "enser" if feats[0] == "Fem" else "ensem"
+        if feats[1] == "Gen":
+            pronoun = "enser" if feats[0] == "Fem" else "ensem"
         return pronoun.capitalize() if word_parse[0] == "1" else pronoun
     
     def neutralize_article(word_parse) -> str:
