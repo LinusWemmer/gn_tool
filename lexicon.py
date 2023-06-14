@@ -181,11 +181,17 @@ class Lexicon:
             elif re.match(r"(E|e)(uer|ure)", word):
                 article = Lexicon.ARTIKEL_EUER.get(feats[1])
                 return article.capitalize() if word_parse[0] == "1" else article
+            # Some articles don't have to be neutralized, just return them.
+            else:
+                return word_parse[1]
             raise Exception(f"The Article seems to be not convertable:{word_parse[1]}")
 
     def neutralize_adjectives(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
         article = article_parse[1]
+        # This is a weird hack to make sure "anders" works correctly
+        if word_parse[2].startswith("ander"):
+            word_parse[2] = "ander"
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
             if feats[2] == "Acc" or feats[2] == "Nom":
