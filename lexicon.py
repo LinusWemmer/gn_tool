@@ -228,6 +228,38 @@ class Lexicon:
             preposition = "von derm"
             return preposition.capitalize() if word_parse[0] == "1" else preposition
         return word_parse[1]
+    
+    def neutralize_pronoun(word_parse) -> str:
+        feats = word_parse[5].split("|")
+        if feats[0] == "Neut":
+            return word_parse[1]
+        if word_parse[4] == "PPER":
+            pronoun = word_parse[1]
+            if feats[0] == "3":
+                pronoun = Lexicon.PRONOUNS.get(feats[3])
+            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+        elif word_parse[4] == "PIS":
+            pronoun = word_parse[1]
+            if feats[1] == "_":
+                feats[1] = "Nom"
+            if word_parse[2] == "man":
+                pronoun = "mensch"
+            elif word_parse[2].endswith("mand"):
+                if feats[1] == "Dat" or feats[1] == "Gen":
+                    pronoun = word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+            else: 
+                pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+        elif word_parse[4] == "PRELS":
+            pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+        elif word_parse[4] == "PDS":
+            for start in Lexicon.JEDER_PARADIGM:
+                if word_parse[1].startswith(start):
+                    pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
+                    return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
 
     def neutralize_word(word_parse) -> str:
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
@@ -238,30 +270,7 @@ class Lexicon:
             return Lexicon.neutralize_article(word_parse)
         # neutralize Pronouns
         elif word_parse[3] == "PRO":
-            feats = word_parse[5].split("|")
-            if word_parse[4] == "PPER":
-                pronoun = word_parse[1]
-                if feats[0] == "3":
-                    pronoun = Lexicon.PRONOUNS.get(feats[3])
-                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
-            elif word_parse[4] == "PIS":
-                pronoun = word_parse[1]
-                if feats[1] == "_":
-                    feats[1] = "Nom"
-                if word_parse[2] == "man":
-                    pronoun = "mensch"
-                elif word_parse[2].endswith("mand"):
-                    if feats[1] == "Dat" or feats[1] == "Gen":
-                        pronoun = word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                else: 
-                    pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
-            elif word_parse[4] == "PRELS":
-                pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
-                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
-            elif word_parse[4] == "PDS":
-                pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
-                return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            return Lexicon.neutralize_pronoun(word_parse)
         elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
             return Lexicon.neutralize_preposition(word_parse)
         else:
