@@ -73,12 +73,7 @@ class Marking_Tool:
                 if self.nounphrases.get(pos+1):
                     article_pos = min(self.nounphrases.get(pos+1))
                 #Special handling if the role noun is a split word with "-"
-                if "-" in self.parse_list[pos][1]:
-                    word_split = self.parse_list[pos][1].split("-")
-                    self.parse_list[pos][1] = word_split[-1]
-                    self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
-                else:
-                    self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+                self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             # Noun is a classical role noun
             else:
                 # Parzu sometimes doesn't correctly mark singular/plural, so we check these cases and mark them ourselves
