@@ -308,18 +308,17 @@ class Lexicon:
                 elif i >= length:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     break   
-        else:
-            # Plural cases can be disregarded, as these are already neutral.
-            if word_parse[5][-2:] == "Pl":
-                return False
-            for i, line in enumerate(Lexicon.PART_NOUNS):
-                if noun.startswith(line[:-1]):
-                    Lexicon.PART_NOUNS.seek(0)
-                    return -1
-            if re.match(r".*sprachige", noun):
+        # Plural cases can be disregarded, as these are already neutral.
+        if word_parse[5][-2:] == "Pl":
+            return False
+        for i, line in enumerate(Lexicon.PART_NOUNS):
+            if noun.startswith(line[:-1]):
                 Lexicon.PART_NOUNS.seek(0)
-                return -1    
+                return -1
+        if re.match(r".*sprachige", noun):
             Lexicon.PART_NOUNS.seek(0)
+            return -1    
+        Lexicon.PART_NOUNS.seek(0)
         return False
     
     def __init__(self):
