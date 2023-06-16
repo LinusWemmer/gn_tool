@@ -194,13 +194,16 @@ class Lexicon:
             word_parse[2] = "ander"
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
-            if feats[2] == "Acc" or feats[2] == "Nom":
-                adjective = word_parse[2] + "e"
-                return adjective.capitalize() if word_parse[0] == "1" else adjective
+            if feats[3] == "Pl":
+                return word_parse[1]
             else:
-                adjective = word_parse[2] + "en"
-                return adjective.capitalize() if word_parse[0] == "1" else adjective
-            return word_parse[1]
+                if feats[2] == "Acc" or feats[2] == "Nom":
+                    adjective = word_parse[2] + "e"
+                    return adjective.capitalize() if word_parse[0] == "1" else adjective
+                else:
+                    adjective = word_parse[2] + "en"
+                    return adjective.capitalize() if word_parse[0] == "1" else adjective
+                return word_parse[1]
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":

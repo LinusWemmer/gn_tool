@@ -120,7 +120,7 @@ class Marking_Tool:
                     nouns += input_form
                 else: 
                     nouns += word_parse[1] + " "
-            elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and not word_parse[5].startswith("Neut"):
+            elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and not word_parse[5].startswith("Neut") and not word_parse[2] == "viel":
                 self.find_nounphrase(word_parse)
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="noun{sentence_number }|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
