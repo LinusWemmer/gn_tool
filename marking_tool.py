@@ -33,7 +33,7 @@ class Marking_Tool:
     # Returns True if the word is a role noun, otherwise false.
     def find_nounphrase(self, word_parse):
         self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0])
-        print(self.nounphrases)
+        #print(self.nounphrases)
     
     # Finds all nounphrases of the sentence that come role nouns
     def find_nounphrases(self):
