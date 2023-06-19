@@ -45,11 +45,22 @@ class Marking_Tool:
     def find_children(self, pos: int):
         children = []
         for word_parse in self.parse_list:
-            if word_parse[6] == pos and word_parse[3]:
+            if word_parse[6] == pos and word_parse[3] != "N":
                 children.append(int(word_parse[0]))
                 children.extend(self.find_children(word_parse[0]))
+            else:
+                children.extend(self.find_dessen(word_parse[0]))
         return children
     
+    def find_dessen(self, pos:int):
+        children = []
+        for word_parse in self.parse_list:
+            if word_parse[6] == pos:
+                if word_parse[4] == "PRELAT":
+                    children.append(int(word_parse[0]))
+                children.extend(self.find_dessen(word_parse[0]))
+        return children
+
     def get_nounphrase(self, pos:int):
         return self.nounphrases.get(pos)
     
