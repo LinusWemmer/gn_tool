@@ -262,6 +262,8 @@ class Lexicon:
                     pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
                     return pronoun.capitalize() if word_parse[0] == "1" else pronoun
             pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+            if word_parse[2].endswith("jenige"):
+                pronoun += "jenige"
             return pronoun.capitalize() if word_parse[0] == "1" else pronoun
 
     def neutralize_word(word_parse) -> str:
