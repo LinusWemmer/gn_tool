@@ -317,7 +317,8 @@ class Lexicon:
         if word_parse[5][-2:] == "Pl":
             return False
         for i, line in enumerate(Lexicon.PART_NOUNS):
-            if noun.startswith(line[:-1]):
+            subadj = line[:-1]
+            if noun == subadj or noun == subadj + "r" or noun == subadj + "n":
                 Lexicon.PART_NOUNS.seek(0)
                 return -1
         if re.match(r".*sprachige", noun):
