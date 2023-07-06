@@ -84,6 +84,7 @@ def parse_text():
 @app.route("/mark", methods=["POST"])
 def neutralize_marked():
     selected_nouns = request.form
+    print(selected_nouns)
     for selected_noun in selected_nouns:
         print(selected_noun)
         noun_data = selected_noun.split("|")
