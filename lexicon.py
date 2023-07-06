@@ -77,7 +77,7 @@ class Lexicon:
                 elif i > index:
                     Lexicon.NEUTRAL_NOUNS.seek(0)
                     break
-            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen"):
+            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
                 if noun.endswith("re"):
                     return noun[:-2] + "rne"
                 else:
