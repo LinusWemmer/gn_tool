@@ -29,7 +29,7 @@ class Sentence_Test(unittest.TestCase):
                 marking_tool.find_nounphrase(marking_tool.parse_list[nounphrase[0] - 1])
             for nounphrase in test_nounphrases[i]:
                 marking_tool.neutralize_nounphrase(nounphrase[0] - 1, nounphrase[1])
-            self.assertEqual(marking_tool.get_sentence(), test[1] + " ",f"Text {i} doesn't have correct output.") 
+            self.assertEqual(marking_tool.get_sentence(), test[1] + " ",f"Text {i+1} doesn't have correct output.") 
 
 
 if __name__ == "__main__":
