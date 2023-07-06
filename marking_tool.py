@@ -24,9 +24,12 @@ class Marking_Tool:
         sentence = ""
         for word_parse in self.parse_list:
             print(word_parse)
-            if word_parse[3].startswith("$"):
-                sentence = sentence[:-1]
-            sentence += word_parse[1] + " "
+            if word_parse[3]== ("$.") or word_parse[3]== ("$,"):
+                sentence = sentence[:-1] + word_parse[1] + " "
+            elif word_parse[3] == ("$("):
+                sentence += word_parse[1]
+            else:
+                sentence += word_parse[1] + " "
         return sentence
 
     # Finds all "nounphrases" of the sentence and stores them in a dict.
@@ -143,6 +146,8 @@ class Marking_Tool:
                 nouns += input_form
             elif word_parse[3] == "$." or word_parse[3] == "$,":
                 nouns = nouns[:-1] + word_parse[1] + " "
+            elif word_parse[3] == "$(":
+                nouns += word_parse[1]
             else:
                nouns += word_parse[1] + " "
         return nouns
