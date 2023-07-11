@@ -103,6 +103,7 @@ class Lexicon:
             return noun
             #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
 
+    # Neutralizes substantivized adjective
     def neutralize_sub_adj(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
         article = article_parse[1]

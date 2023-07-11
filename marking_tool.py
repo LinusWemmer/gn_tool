@@ -36,7 +36,7 @@ class Marking_Tool:
     # Returns True if the word is a role noun, otherwise false.
     def find_nounphrase(self, word_parse):
         self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0])
-        #print(self.nounphrases)
+        print(self.nounphrases)
     
     # Finds all nounphrases of the sentence that come role nouns
     def find_nounphrases(self):
@@ -51,18 +51,18 @@ class Marking_Tool:
             if word_parse[6] == pos and word_parse[3] != "N":
                 children.append(int(word_parse[0]))
                 children.extend(self.find_children(word_parse[0]))
-            else:
-                children.extend(self.find_dessen(word_parse[0]))
+            #else:
+            #    children.extend(self.find_dessen(word_parse[0]))
         return children
     
-    def find_dessen(self, pos:int):
-        children = []
-        for word_parse in self.parse_list:
-            if word_parse[6] == pos:
-                if word_parse[4] == "PRELAT":
-                    children.append(int(word_parse[0]))
-                children.extend(self.find_dessen(word_parse[0]))
-        return children
+    #def find_dessen(self, pos:int):
+    #    children = []
+    #    for word_parse in self.parse_list:
+    #        if word_parse[6] == pos:
+    #            if word_parse[4] == "PRELAT":
+    #                children.append(int(word_parse[0]))
+    #            children.extend(self.find_dessen(word_parse[0]))
+    #    return children
 
     def get_nounphrase(self, pos:int):
         return self.nounphrases.get(pos)
@@ -85,6 +85,7 @@ class Marking_Tool:
             if line == -1:
                 article_pos = pos+1
                 if self.nounphrases.get(pos+1):
+                    # TODO: Continue work here
                     article_pos = min(self.nounphrases.get(pos+1))
                 #Special handling if the role noun is a split word with "-"
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
@@ -108,7 +109,7 @@ class Marking_Tool:
         # Neutralized Pronouns
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
-        print(self.nounphrases)
+        #print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
             article_pos = min(self.nounphrases.get(pos+1))
             self.neutralize_word(child-1, article_pos)
@@ -144,10 +145,16 @@ class Marking_Tool:
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
+            elif word_parse[4] == "PRELAT":
+                self.find_nounphrase(word_parse)
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
+                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                nouns += input_form
             elif word_parse[3] == "$." or word_parse[3] == "$,":
                 nouns = nouns[:-1] + word_parse[1] + " "
             elif word_parse[3] == "$(":
                 nouns += word_parse[1]
             else:
                nouns += word_parse[1] + " "
+        print(self.nounphrases)
         return nouns
