@@ -84,9 +84,12 @@ class Marking_Tool:
             # Noun is a substantivized adjective
             if line == -1:
                 article_pos = pos+1
-                if self.nounphrases.get(pos+1):
-                    # TODO: Continue work here
-                    article_pos = min(self.nounphrases.get(pos+1))
+                nounphrase = self.nounphrases.get(pos+1)
+                if nounphrase:
+                    for child_pos in nounphrase: 
+                        if self.parse_list[child_pos-1][3] == "ART":
+                            article_pos = child_pos
+                    #article_pos = min(nounphrase)
                 #Special handling if the role noun is a split word with "-"
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             # Noun is a classical role noun
