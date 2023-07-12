@@ -90,7 +90,6 @@ class Marking_Tool:
                         if self.parse_list[child_pos-1][3] == "ART":
                             article_pos = child_pos
                     #article_pos = min(nounphrase)
-                #Special handling if the role noun is a split word with "-"
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             # Noun is a classical role noun
             else:
@@ -101,6 +100,7 @@ class Marking_Tool:
                         feats[2] = "Pl"
                     else:
                         feats[2] = "Sg"
+                #Special handling if the role noun is a split word with "-"
                 if "-" in self.parse_list[pos][1]:
                     word_split = self.parse_list[pos][1].split("-")
                     self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)

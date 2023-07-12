@@ -306,15 +306,31 @@ class Lexicon:
                 elif i >= length:
                     Lexicon.MALE_NOUNS.seek(0)
                     break
-        if gender == "F":
+        elif gender == "F":
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
                 if line[:-1] == noun:
                     Lexicon.FEMALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
                     Lexicon.FEMALE_NOUNS.seek(0)
-                    break   
-        # Plural cases can be disregarded, as these are already neutral.
+                    break
+        else:    
+            for i, line in enumerate(Lexicon.MALE_NOUNS):
+                if line[:-1] == noun:
+                    Lexicon.MALE_NOUNS.seek(0)
+                    return i
+                elif i >= length:
+                    Lexicon.MALE_NOUNS.seek(0)
+                    i = 0
+                    break
+            for i, line in enumerate(Lexicon.FEMALE_NOUNS):
+                if line[:-1] == noun:
+                    Lexicon.FEMALE_NOUNS.seek(0)
+                    return i
+                elif i >= length:
+                    Lexicon.FEMALE_NOUNS.seek(0)
+                    break
+        # Plural cases can be disregarded, as these are already neutral
         if word_parse[5][-2:] == "Pl":
             return False
         for i, line in enumerate(Lexicon.PART_NOUNS):
