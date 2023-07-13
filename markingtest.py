@@ -16,7 +16,8 @@ class Marking_Test(unittest.TestCase):
         test_sentence_4 = ("Kennst Du meine Verlobte?", """Kennst Du meine <input type="checkbox" id="0|4|-1" name="0|4|-1" value="select">
                     <label for="0|4|-1"><u>Verlobte</u></label>? """)
         test_sentence_5 = ("Gleich kommen sie.", "Gleich kommen sie. ")
-        test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4, test_sentence_5]
+        test_sentence_6 = ("Es kostet nicht viel.", "Es kostet nicht viel. ")
+        test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4, test_sentence_5, test_sentence_6]
         ParZu = parzu.Parser(parzu.process_arguments())
         for i, test in enumerate(test_sentences):
             parse = ParZu.main(test[0])

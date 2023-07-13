@@ -122,6 +122,7 @@ class Marking_Tool:
         #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
+            # Case: Possesive Pronoun
             if word_parse[4] == "PPOSAT" and not re.match(r"((M|m|D|d)ein)|((U|u)ns)|((E|e)u(re|er))", word_parse[1]):
                 # A possesive pronoun should only be selectable to be neutralized if it is in third person
                 # Parzu doesn't tag this, so we have to filter out the other cases manually.
@@ -129,6 +130,7 @@ class Marking_Tool:
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
+            # Case: Noun
             elif word_parse[3] == "N":
                 line = Lexicon.check_role_noun(word_parse)
                 if line:
@@ -138,7 +140,8 @@ class Marking_Tool:
                     nouns += input_form
                 else: 
                     nouns += word_parse[1] + " "
-            elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "alle":
+            # Case: Pronoun
+            elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "alle":
                 self.find_nounphrase(word_parse)
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
