@@ -37,29 +37,42 @@ class Lexicon:
     JEDER_PARADIGM = ["jedwed", "jed", "jen", "dies", "welch", "solch", "manch"]
 
     EIN_PARADIGM = ["ein", "kein", "mein", "dein", "sein", "ihr", "ens"]
-    
-    MALE_NOUNS = open("movierbare_Substantive.txt", "r")
 
-    FEMALE_NOUNS = open("movierbare_Substantive_feminin.txt", "r")
+    MALE_NOUNS = []
+    FEMALE_NOUNS = []
+    NEUTRAL_NOUNS = []
+    PART_NOUNS = []
 
-    NEUTRAL_NOUNS = open("movierbare_Substantive_inklusivum.txt", "r")
+    with open("movierbare_Substantive.txt") as f_male_nouns:
+        for line in f_male_nouns:
+            MALE_NOUNS.append(line.rstrip())
 
-    PART_NOUNS = open("substantivierte_adjektive.txt", "r")
+    with open("movierbare_Substantive_feminin.txt") as f_female_nouns:
+        for line in f_female_nouns:
+            FEMALE_NOUNS.append(line.rstrip())
+
+    with open("movierbare_Substantive_inklusivum.txt") as f_inclusive_nouns:
+        for line in f_inclusive_nouns:
+            NEUTRAL_NOUNS.append(line.rstrip())
+
+    with open("substantivierte_adjektive.txt") as f_sub_adj:
+        for line in f_sub_adj:
+            PART_NOUNS.append(line.rstrip())
 
     def neutralize_noun(feats:list, index:int) -> str:
         if index == -1:
             pass
         # Case: Noun is in Singular
         if feats[2] == "Sg":
-            noun = ""
-            for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
-                if i == index:
-                    noun = line[:-1]
-                    Lexicon.NEUTRAL_NOUNS.seek(0)
-                    break
-                elif i > index:
-                    Lexicon.NEUTRAL_NOUNS.seek(0)
-                    break
+            noun = Lexicon.NEUTRAL_NOUNS[index]
+            #for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
+            #    if i == index:
+            #        noun = line[:-1]
+            #        Lexicon.NEUTRAL_NOUNS.seek(0)
+            #        break
+            #    elif i > index:
+            #        Lexicon.NEUTRAL_NOUNS.seek(0)
+            #        break
             if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
                 return noun
             elif feats[1] == ("Gen"):
@@ -68,15 +81,15 @@ class Lexicon:
                 raise Exception(f"Somehow the word doesn't have a case: {feats}")
         # Case: Noun is Plural
         elif feats[2] == "Pl":
-            noun = ""
-            for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
-                if i == index:
-                    noun = line[:-1]
-                    Lexicon.NEUTRAL_NOUNS.seek(0)
-                    break
-                elif i > index:
-                    Lexicon.NEUTRAL_NOUNS.seek(0)
-                    break
+            noun = Lexicon.NEUTRAL_NOUNS[index]
+            #for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
+            #    if i == index:
+            #        noun = line[:-1]
+            #        Lexicon.NEUTRAL_NOUNS.seek(0)
+            #        break
+            #    elif i > index:
+            #        Lexicon.NEUTRAL_NOUNS.seek(0)
+            #        break
             if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
                 if noun.endswith("re"):
                     return noun[:-2] + "rne"
@@ -91,15 +104,15 @@ class Lexicon:
                 raise Exception(f"Somehow the word doesn't have a case: {feats}")
         else:
             #If somehow a word is neither Plural/Singular, we pretend it is singular.
-            noun = ""
-            for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
-                if i == index:
-                    noun = line[:-1]
-                    Lexicon.NEUTRAL_NOUNS.seek(0)
-                    break
-                elif i > index:
-                    Lexicon.NEUTRAL_NOUNS.seek(0)
-                    break
+            noun = Lexicon.NEUTRAL_NOUNS[index]
+            #for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
+            #    if i == index:
+            #        noun = line[:-1]
+            #        Lexicon.NEUTRAL_NOUNS.seek(0)
+            #        break
+            #    elif i > index:
+            #        Lexicon.NEUTRAL_NOUNS.seek(0)
+            #        break
             return noun
             #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
 
@@ -293,55 +306,55 @@ class Lexicon:
             word_split = word_parse[2].split("-")
             noun = word_split[-1]
         gender = word_parse[5][0]
-        Lexicon.PART_NOUNS.seek(0)
-        Lexicon.MALE_NOUNS.seek(0)
-        Lexicon.FEMALE_NOUNS.seek(0)
+        #Lexicon.PART_NOUNS.seek(0)
+        #Lexicon.MALE_NOUNS.seek(0)
+        #Lexicon.FEMALE_NOUNS.seek(0)
         length = 800
         i = 0
         if gender == "M":
             for i, line in enumerate(Lexicon.MALE_NOUNS):
-                if line[:-1] == noun:
-                    Lexicon.MALE_NOUNS.seek(0)
+                if line == noun:
+                    #Lexicon.MALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    Lexicon.MALE_NOUNS.seek(0)
+                    #Lexicon.MALE_NOUNS.seek(0)
                     break
         elif gender == "F":
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
-                if line[:-1] == noun:
-                    Lexicon.FEMALE_NOUNS.seek(0)
+                if line == noun:
+                    #Lexicon.FEMALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    Lexicon.FEMALE_NOUNS.seek(0)
+                    #Lexicon.FEMALE_NOUNS.seek(0)
                     break
         else:    
             for i, line in enumerate(Lexicon.MALE_NOUNS):
-                if line[:-1] == noun:
-                    Lexicon.MALE_NOUNS.seek(0)
+                if line == noun:
+                    #Lexicon.MALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    Lexicon.MALE_NOUNS.seek(0)
+                    #Lexicon.MALE_NOUNS.seek(0)
                     i = 0
                     break
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
-                if line[:-1] == noun:
-                    Lexicon.FEMALE_NOUNS.seek(0)
+                if line == noun:
+                    #Lexicon.FEMALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    Lexicon.FEMALE_NOUNS.seek(0)
+                    #Lexicon.FEMALE_NOUNS.seek(0)
                     break
         # Plural cases can be disregarded, as these are already neutral
         if word_parse[5][-2:] == "Pl":
             return False
         for i, line in enumerate(Lexicon.PART_NOUNS):
-            subadj = line[:-1]
+            subadj = line
             if noun == subadj or noun == subadj + "r" or noun == subadj + "n":
-                Lexicon.PART_NOUNS.seek(0)
+                #Lexicon.PART_NOUNS.seek(0)
                 return -1
         if re.match(r".*sprachige", noun):
-            Lexicon.PART_NOUNS.seek(0)
+            #Lexicon.PART_NOUNS.seek(0)
             return -1    
-        Lexicon.PART_NOUNS.seek(0)
+        #Lexicon.PART_NOUNS.seek(0)
         return False
     
     def __init__(self):
