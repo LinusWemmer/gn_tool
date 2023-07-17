@@ -182,6 +182,9 @@ class Lexicon:
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
             for start in Lexicon.JEDER_PARADIGM:
                 if word.startswith(start):
+                    #incase no grammatical case is found, treat as nominative, even if wrong.
+                    if feats[1] == "_":
+                        feats[1] = "Nom"
                     article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
                     return article.capitalize() if word_parse[0] == "1" else article
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
