@@ -82,14 +82,6 @@ class Lexicon:
         # Case: Noun is Plural
         elif feats[2] == "Pl":
             noun = Lexicon.NEUTRAL_NOUNS[index]
-            #for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
-            #    if i == index:
-            #        noun = line[:-1]
-            #        Lexicon.NEUTRAL_NOUNS.seek(0)
-            #        break
-            #    elif i > index:
-            #        Lexicon.NEUTRAL_NOUNS.seek(0)
-            #        break
             if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
                 if noun.endswith("re"):
                     return noun[:-2] + "rne"
@@ -105,14 +97,6 @@ class Lexicon:
         else:
             #If somehow a word is neither Plural/Singular, we pretend it is singular.
             noun = Lexicon.NEUTRAL_NOUNS[index]
-            #for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
-            #    if i == index:
-            #        noun = line[:-1]
-            #        Lexicon.NEUTRAL_NOUNS.seek(0)
-            #        break
-            #    elif i > index:
-            #        Lexicon.NEUTRAL_NOUNS.seek(0)
-            #        break
             return noun
             #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
 
@@ -228,6 +212,11 @@ class Lexicon:
         adjective =  word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
         return adjective.capitalize() if word_parse[0] == "1" else adjective
     
+    # Neutralize possesive jemand, this often doesn't get parsed correctly
+    def neutralize_pos_jemand(word_parse) -> str:
+        word = "jemanders"
+        return word.capitalize() if word_parse[0] == "1" else word
+    
     # Neutralize Prepostions if they are compound articles with prepositions, e.g. zur/im/beim
     def neutralize_preposition(word_parse) -> str:
         feats = word_parse[5]
@@ -309,42 +298,31 @@ class Lexicon:
             word_split = word_parse[2].split("-")
             noun = word_split[-1]
         gender = word_parse[5][0]
-        #Lexicon.PART_NOUNS.seek(0)
-        #Lexicon.MALE_NOUNS.seek(0)
-        #Lexicon.FEMALE_NOUNS.seek(0)
         length = 800
         i = 0
         if gender == "M":
             for i, line in enumerate(Lexicon.MALE_NOUNS):
                 if line == noun:
-                    #Lexicon.MALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    #Lexicon.MALE_NOUNS.seek(0)
                     break
         elif gender == "F":
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
                 if line == noun:
-                    #Lexicon.FEMALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    #Lexicon.FEMALE_NOUNS.seek(0)
                     break
         else:    
             for i, line in enumerate(Lexicon.MALE_NOUNS):
                 if line == noun:
-                    #Lexicon.MALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    #Lexicon.MALE_NOUNS.seek(0)
                     i = 0
                     break
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
                 if line == noun:
-                    #Lexicon.FEMALE_NOUNS.seek(0)
                     return i
                 elif i >= length:
-                    #Lexicon.FEMALE_NOUNS.seek(0)
                     break
         # Plural cases can be disregarded, as these are already neutral
         if word_parse[5][-2:] == "Pl":

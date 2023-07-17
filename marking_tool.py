@@ -54,15 +54,6 @@ class Marking_Tool:
             #else:
             #    children.extend(self.find_dessen(word_parse[0]))
         return children
-    
-    #def find_dessen(self, pos:int):
-    #    children = []
-    #    for word_parse in self.parse_list:
-    #        if word_parse[6] == pos:
-    #            if word_parse[4] == "PRELAT":
-    #                children.append(int(word_parse[0]))
-    #            children.extend(self.find_dessen(word_parse[0]))
-    #    return children
 
     def get_nounphrase(self, pos:int):
         return self.nounphrases.get(pos)
@@ -112,6 +103,9 @@ class Marking_Tool:
         # Neutralized attributing relative pronoun
         elif self.parse_list[pos][4] == "PRELAT":
             self.parse_list[pos][1] = Lexicon.neutralize_attributing_relative_pronoun(self.parse_list[pos])
+        elif re.match(r"(J|j)emand(e?)s" , self.parse_list[pos][1]):
+                print("here")
+                self.parse_list[pos][1] = Lexicon.neutralize_pos_jemand(self.parse_list[pos])
         #Neutralize everything else
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
@@ -145,6 +139,12 @@ class Marking_Tool:
                     nouns += word_parse[1] + " "
             # Case: Pronoun
             elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "alle":
+                self.find_nounphrase(word_parse)
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
+                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                nouns += input_form
+            # case: jemand (sometimes marked as adjective, should still be neutralizable in that case)
+            elif re.match(r"(J|j)emand(e?)s" , word_parse[1]):
                 self.find_nounphrase(word_parse)
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
