@@ -109,7 +109,10 @@ class Marking_Tool:
         # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
-        # Neutralized Pronouns
+        # Neutralized attributing relative pronoun
+        elif self.parse_list[pos][4] == "PRELAT":
+            self.parse_list[pos][1] = Lexicon.neutralize_attributing_relative_pronoun(self.parse_list[pos])
+        #Neutralize everything else
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         #print(self.nounphrases)
