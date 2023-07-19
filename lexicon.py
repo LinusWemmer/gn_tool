@@ -60,19 +60,9 @@ class Lexicon:
             PART_NOUNS.append(line.rstrip())
 
     def neutralize_noun(feats:list, index:int) -> str:
-        if index == -1:
-            pass
         # Case: Noun is in Singular
         if feats[2] == "Sg":
             noun = Lexicon.NEUTRAL_NOUNS[index]
-            #for i, line in enumerate(Lexicon.NEUTRAL_NOUNS):
-            #    if i == index:
-            #        noun = line[:-1]
-            #        Lexicon.NEUTRAL_NOUNS.seek(0)
-            #        break
-            #    elif i > index:
-            #        Lexicon.NEUTRAL_NOUNS.seek(0)
-            #        break
             if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
                 return noun
             elif feats[1] == ("Gen"):
@@ -116,6 +106,41 @@ class Lexicon:
         # If we for some reason don't get a case, pretend it is nominative.
         noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         return noun.capitalize()
+    
+    def neutralize_special_nouns(word_parse, line:int) -> str:
+        feats = word_parse[5].split("|")
+        if feats[2] == "Sg":
+            noun = ""
+            if line == -2:
+                return word_parse[2][:-4] + "person"
+            # Geschwister
+            elif line == -3:
+                noun = "Geschwister"
+            # Elter
+            elif line == -4:
+                noun = "Elter"
+            # Ota
+            elif line == -5:
+                noun = "Ota"
+            # Nefte 
+            elif line == -6:
+                noun = "Nefte"
+            return noun + "s" if feats[1] == "Gen" else noun
+        elif feats[2] == "Pl": 
+            if line == -2:
+                return word_parse[2][:-4] + "leute"
+            # Geschwister
+            elif line == -3:
+                return "Geschwistern" if feats[1] == "Dat" else "Geschwister"
+            # Elter
+            elif line == -4:
+                return "Eltern"
+            # Ota
+            elif line == -5:
+                return "Otas"
+            # Nefte
+            elif line == -6:
+                return "Neften"
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
@@ -298,7 +323,7 @@ class Lexicon:
             word_split = word_parse[2].split("-")
             noun = word_split[-1]
         gender = word_parse[5][0]
-        length = 800
+        length = 1000
         i = 0
         if gender == "M":
             for i, line in enumerate(Lexicon.MALE_NOUNS):
@@ -324,18 +349,27 @@ class Lexicon:
                     return i
                 elif i >= length:
                     break
-        # Plural cases can be disregarded, as these are already neutral
+        # Words ending on -mann or -frau:
+        if re.match(r".+m(a|ä)nn(er)?", noun) or re.match(r".+frau", noun):
+            return -2
+        # Neologisms these are all special and have to be handled differently (really only for plural):
+        if noun == "Bruder" or noun == "Schwester":
+            return -3
+        elif noun == "Mutter" or noun == "Vater":
+            return -4
+        elif noun == "Oma" or noun == "Opa":
+            return -5
+        elif noun == "Neffe" or noun == "Nichte":
+            return -6
+        # Plural cases can be disregarded, as these are already neutral for substantivized adjectives
         if word_parse[5][-2:] == "Pl":
             return False
         for i, line in enumerate(Lexicon.PART_NOUNS):
             subadj = line
             if noun == subadj or noun == subadj + "r" or noun == subadj + "n":
-                #Lexicon.PART_NOUNS.seek(0)
                 return -1
         if re.match(r".*sprachige", noun):
-            #Lexicon.PART_NOUNS.seek(0)
             return -1    
-        #Lexicon.PART_NOUNS.seek(0)
         return False
     
     def __init__(self):

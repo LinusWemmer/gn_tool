@@ -1,4 +1,5 @@
 from lexicon import Lexicon
+from lexicon_fem import Lexicon_Fem
 import re
 
 # The Marking_tool class is a class that stores the parsing data for a sentence.
@@ -66,7 +67,15 @@ class Marking_Tool:
             self.parse_list[pos][1] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
-        
+
+    def feminize_word(self, pos:int, article_pos:int):
+        word_parse = self.parse_list[pos]
+        if word_parse[3] == "ADJA":
+            # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
+            # flexion, the parent has to included when neutralizing the word.
+            self.parse_list[pos][1] = Lexicon_Fem.feminize_adjectives(word_parse, self.parse_list[article_pos-1])
+        else:
+            self.parse_list[pos][1] = Lexicon_Fem.feminize_word(word_parse)
     
     def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
@@ -82,6 +91,18 @@ class Marking_Tool:
                             article_pos = child_pos
                     #article_pos = min(nounphrase)
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+            # words ending on -mann or -frau:
+            elif line == -2:
+                self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
+                feats = self.parse_list[pos][5].split("|")
+                if feats[0] == "Masc" and feats[2] == "Sg":
+                    for child in self.nounphrases.get(pos+1):
+                        article_pos = min(self.nounphrases.get(pos+1))
+                        self.feminize_word(child-1, article_pos)
+                return
+            # Special neologisms    
+            elif line <= -3:
+                self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
             # Noun is a classical role noun
             else:
                 # Parzu sometimes doesn't correctly mark singular/plural, so we check these cases and mark them ourselves
@@ -109,7 +130,6 @@ class Marking_Tool:
         #Neutralize everything else
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
-        #print(self.nounphrases)
         for child in self.nounphrases.get(pos+1):
             article_pos = min(self.nounphrases.get(pos+1))
             self.neutralize_word(child-1, article_pos)
