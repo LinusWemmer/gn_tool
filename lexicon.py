@@ -109,7 +109,7 @@ class Lexicon:
     
     def neutralize_special_nouns(word_parse, line:int) -> str:
         feats = word_parse[5].split("|")
-        if feats[2] == "Sg":
+        if feats[2] == "Sg" or feats[2] == "_":
             noun = ""
             if line == -2:
                 return word_parse[2][:-4] + "person"
