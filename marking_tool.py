@@ -179,6 +179,11 @@ class Marking_Tool:
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
                 nouns += input_form
+            elif word_parse[3] == "ART" and word_parse[6] == "0":
+                self.find_nounphrase(word_parse)
+                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
+                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                nouns += input_form
             elif word_parse[3] == "$." or word_parse[3] == "$,":
                 nouns = nouns[:-1] + word_parse[1] + " "
             elif word_parse[3] == "$(":
