@@ -323,7 +323,7 @@ class Lexicon:
             word_split = word_parse[2].split("-")
             noun = word_split[-1]
         gender = word_parse[5][0]
-        length = 1000
+        length = 4116
         i = 0
         if gender == "M":
             for i, line in enumerate(Lexicon.MALE_NOUNS):
