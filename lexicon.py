@@ -199,6 +199,8 @@ class Lexicon:
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
             for start in Lexicon.EIN_PARADIGM:
                 if word.startswith(start):
+                    if feats[1] == "_":
+                        feats[1] = "Nom"
                     article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
                     return article.capitalize() if word_parse[0] == "1" else article
             if re.match(r"(U|u)(nser|nsre|nsere)", word):
