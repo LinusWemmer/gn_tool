@@ -36,10 +36,10 @@ def split_prepositions(input_text: str) ->str:
             output += "bei dem "
         elif word == "Beim":
             output +="Bei dem "
-        elif word == "am":
-            output += "an dem "
-        elif word == "Am":
-            output += "An dem "
+        #elif word == "am":
+        #    output += "an dem "
+        #elif word == "Am":
+        #    output += "An dem "
         elif word == "zum":
             output += "zu dem "
         elif word == "Zum":

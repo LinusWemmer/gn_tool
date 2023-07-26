@@ -218,23 +218,34 @@ class Lexicon:
         # This is a weird hack to make sure "anders" works correctly
         if word_parse[2].startswith("ander"):
             word_parse[2] = "ander"
+        # Differentiate Superlative/Comparative/Normal adjectives
+        adjective = ""
+        if "Sup" in word_parse[5]:
+            match = re.search(r".+st", word_parse[1])
+            adjective = match.group(0)
+        elif "Comp" in word_parse[5]:
+            match1 = re.search(r".+er", word_parse[1])
+            adjective = match1.group(0)
+        else:
+            adjective = word_parse[2]
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
             if feats[3] == "Pl":
                 return word_parse[1]
             else:
+                # Differentiate case
                 if feats[2] == "Acc" or feats[2] == "Nom":
-                    adjective = word_parse[2] + "e"
+                    adjective = adjective + "e"
                     return adjective.capitalize() if word_parse[0] == "1" else adjective
                 else:
-                    adjective = word_parse[2] + "en"
+                    adjective = adjective + "en"
                     return adjective.capitalize() if word_parse[0] == "1" else adjective
                 return word_parse[1]
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
             feats[2] = "Nom"
-        adjective =  word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[2])
+        adjective =  adjective + Lexicon.ARTIKEL_JEDER.get(feats[2])
         return adjective.capitalize() if word_parse[0] == "1" else adjective
     
     # Neutralize possesive jemand, this often doesn't get parsed correctly
@@ -246,7 +257,7 @@ class Lexicon:
     def neutralize_preposition(word_parse) -> str:
         feats = word_parse[5]
         # The different shortforms have to be hardcoded, boring
-        if word_parse[1]=="beim" or word_parse[1]== "Beim":
+        if word_parse[1]== "beim" or word_parse[1]== "Beim":
             preposition = "bei derm"
             return preposition.capitalize() if word_parse[0] == "1" else preposition
         if word_parse[1]== "am" or word_parse[1]=="Am":
