@@ -176,16 +176,17 @@ class Lexicon:
     
     def neutralize_article(word_parse) -> str:
         feats = word_parse[5].split("|")
+        is_capitalized = word_parse[1][0].isupper()
         # Case Definitive Articles
         if feats[0] == "Def":
             if feats[2] == "_":
                 feats[2] = "Nom"
             article =  Lexicon.ARTIKEL_DER.get(feats[2])
-            return article.capitalize() if word_parse[0] == "1" else article
+            return article.capitalize() if is_capitalized else article
         # Case Indifinitive Artikels, only ein
         elif feats[0] == "Indef":
             article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
-            return article.capitalize() if word_parse[0] == "1" else article
+            return article.capitalize() if is_capitalized else article
         else:
             word = word_parse[1][0].lower() + word_parse[1][1:] 
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
@@ -195,20 +196,20 @@ class Lexicon:
                     if feats[1] == "_":
                         feats[1] = "Nom"
                     article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
-                    return article.capitalize() if word_parse[0] == "1" else article
+                    return article.capitalize() if is_capitalized else article
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
             for start in Lexicon.EIN_PARADIGM:
                 if word.startswith(start):
                     if feats[1] == "_":
                         feats[1] = "Nom"
                     article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
-                    return article.capitalize() if word_parse[0] == "1" else article
+                    return article.capitalize() if is_capitalized else article
             if re.match(r"(U|u)(nser|nsre|nsere)", word):
                 article = Lexicon.ARTIKEL_UNSER.get(feats[1])
-                return article.capitalize() if word_parse[0] == "1" else article
+                return article.capitalize() if is_capitalized else article
             elif re.match(r"(E|e)(uer|ure)", word):
                 article = Lexicon.ARTIKEL_EUER.get(feats[1])
-                return article.capitalize() if word_parse[0] == "1" else article
+                return article.capitalize() if is_capitalized else article
             # Some articles don't have to be neutralized, just return them.
             else:
                 return word_parse[1]
@@ -278,13 +279,14 @@ class Lexicon:
     
     def neutralize_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
+        is_capitalized = word_parse[1][0].isuppper()
         if feats[0] == "Neut":
             return word_parse[1]
         if word_parse[4] == "PPER":
             pronoun = word_parse[1]
             if feats[0] == "3":
                 pronoun = Lexicon.PRONOUNS.get(feats[3])
-            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PIS":
             pronoun = word_parse[1]
             if feats[1] == "_":
@@ -298,19 +300,19 @@ class Lexicon:
                 if word_parse[2].endswith("er"):
                     word_parse[2] = word_parse[2][:-1]
                 pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
-            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS":
             pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
-            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PDS":
             for start in Lexicon.JEDER_PARADIGM:
                 if word_parse[1].startswith(start):
                     pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
-                    return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+                    return pronoun.capitalize() if is_capitalized else pronoun
             pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
             if word_parse[2].endswith("jenige"):
                 pronoun += "jenige"
-            return pronoun.capitalize() if word_parse[0] == "1" else pronoun
+            return pronoun.capitalize() if is_capitalized else pronoun
 
     def neutralize_word(word_parse) -> str:
         # For Plural Cases, I think this doesn't have to be changed. Check with testing.
