@@ -295,6 +295,8 @@ class Lexicon:
                 if feats[1] == "Dat" or feats[1] == "Gen":
                     pronoun = word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
             else: 
+                if word_parse[2].endswith("er"):
+                    word_parse[2] = word_parse[2][:-1]
                 pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
             return pronoun.capitalize() if word_parse[0] == "1" else pronoun
         elif word_parse[4] == "PRELS":
