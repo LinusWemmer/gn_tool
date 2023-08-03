@@ -3,6 +3,7 @@ from marking_tool import Marking_Tool
 class Sentence_Data:
     def __init__(self) -> None:
         self.marking_tools = {}
+        self.split_words = {}
 
     def add_marking_tool(self, sentence_number: int, marking_tool: Marking_Tool):
         self.marking_tools[sentence_number] = marking_tool
@@ -21,3 +22,13 @@ class Sentence_Data:
 
     def clear_marking_tools(self):
         self.marking_tools = {}
+        self.split_words = {}
+
+    def add_split(self, sentence:int, word:int):
+        if sentence in self.split_words.keys():
+            self.split_words[sentence] = self.split_words[sentence].add(word)
+        else:
+            self.split_words[sentence] = [word]
+    
+    def get_split_words(self):
+        return self.split_words

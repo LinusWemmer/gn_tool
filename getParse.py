@@ -3,6 +3,7 @@ from marking_tool import Marking_Tool
 from sentence_data import Sentence_Data
 
 import parzu_class as parzu
+import re
 import sys
 
 sentence_data = Sentence_Data()
@@ -11,7 +12,7 @@ ParZu = parzu.Parser(options)
 
 def get_parse(text: str):
     sentences = ParZu.main(text)
-    sentence_data.clear_marking_tools()
+    #sentence_data.clear_marking_tools()
     return sentences
 
 
@@ -29,35 +30,54 @@ def mark_nouns(sentences: list):
 
 # To ensure correct parsing, 
 def split_prepositions(input_text: str) ->str:
-    sentences = input_text.split(" ")
+    sentences = re.split(r"(\.|\!|\?)", input_text)
     output = ""
-    for word in sentences:
-        if word =="beim":
-            output += "bei dem "
-        elif word == "Beim":
-            output +="Bei dem "
-        #elif word == "am":
-        #    output += "an dem "
-        #elif word == "Am":
-        #    output += "An dem "
-        elif word == "zum":
-            output += "zu dem "
-        elif word == "Zum":
-            output += "Zu dem "
-        elif word == "zur":
-            output += "zu der "
-        elif word == "Zur":
-            output += "Zu der "
-        elif word == "im":
-            output += "in dem "
-        elif word == "Im":
-            output += "In dem "
-        elif word == "vom":
-            output += "von dem "
-        elif word == "Vom":
-            output += "Von dem "
-        else:
-            output += word + " "
+    for i,sentence in enumerate(sentences):
+        words = sentence.split(" ")
+        for j,word in enumerate(words):
+            k = 0
+            if word =="beim":
+                output += "bei dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "Beim":
+                output +="Bei dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "zum":
+                output += "zu dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "Zum":
+                output += "Zu dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "zur":
+                output += "zu der "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "Zur":
+                output += "Zu der "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "im":
+                output += "in dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "Im":
+                output += "In dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "vom":
+                output += "von dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "Vom":
+                output += "Von dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            else:
+                output += word + " "
     return output
 
 app = Flask(__name__)
@@ -70,6 +90,7 @@ def index():
 def parse_text():
     if request.method == "POST":
         input_text = request.form["inputText"]
+        sentence_data.clear_marking_tools()
         input_text = split_prepositions(input_text)
         parse = get_parse(input_text)
         print(parse)
