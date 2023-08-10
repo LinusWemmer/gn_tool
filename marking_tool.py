@@ -21,7 +21,7 @@ class Marking_Tool:
         self.nounphrases = {}
 
     # Returns the sentence underlying the parse.
-    def get_sentence(self) -> str:
+    def get_sentence(self, split_list = []) -> str:
         sentence = ""
         for word_parse in self.parse_list:
             print(word_parse)
@@ -30,8 +30,42 @@ class Marking_Tool:
             elif word_parse[3] == ("$("):
                 sentence += word_parse[1]
             else:
-                sentence += word_parse[1] + " "
+                if int(word_parse[0]) in split_list:
+                    preposition = word_parse[1] + " " + self.parse_list[int(word_parse[0])][1]
+                    sentence += self.get_prepositions(preposition) + " "
+                elif int(word_parse[0]) - 1 in split_list:
+                    pass
+                else:
+                    sentence += word_parse[1] + " "
         return sentence
+
+    def get_prepositions(self, word) -> str:
+        if word =="bei dem":
+            return "beim"
+        elif word == "Bei dem":
+            return "beim"
+        elif word == "zu dem":
+            return "zum"
+        elif word == "Zu dem":
+            return "Zum"
+        elif word == "zu der":
+            return "zur"
+        elif word == "Zu der":
+            return "Zur"
+        elif word == "zu derm":
+            return "zurm"
+        elif word == "Zu derm":
+            return "Zurm"
+        elif word == "in dem":
+            return "im"
+        elif word == "In dem":
+            return "Im"
+        elif word == "von dem":
+            return "vom"
+        elif word == "Von dem":
+            return "Vom"
+        else:
+            return word
 
     # Finds all "nounphrases" of the sentence and stores them in a dict.
     # Returns True if the word is a role noun, otherwise false.

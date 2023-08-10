@@ -13,8 +13,12 @@ class Sentence_Data:
     
     def get_text(self) -> str:
         text = ""
+        print(self.split_words)
         for sentence_number, marking_tool in self.marking_tools.items():
-            text += marking_tool.get_sentence()
+            if sentence_number in self.split_words.keys():
+                text += marking_tool.get_sentence(self.split_words[sentence_number])
+            else:
+                text += marking_tool.get_sentence()
         return text
     
     def get_marking_tools(self):
