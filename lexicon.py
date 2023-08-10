@@ -279,7 +279,7 @@ class Lexicon:
     
     def neutralize_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
-        is_capitalized = word_parse[1][0].isuppper()
+        is_capitalized = word_parse[1][0].isupper()
         if feats[0] == "Neut":
             return word_parse[1]
         if word_parse[4] == "PPER":
