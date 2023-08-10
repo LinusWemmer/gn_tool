@@ -21,6 +21,7 @@ class Sentence_Test(unittest.TestCase):
         test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10, test_sentence_11]
         test_nounphrases = [((2,34), (5,6)), ((1,0), (3,0)), ((4,43),), ((1,0),), ((2,0),), ((4, -1),), ((5,0),), ((5,0), (6,27)), ((9,0),), ((7,27),), ((4,0),)]
         for i,test in enumerate(test_sentences):
+            print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])
             words = parse[0].split("\n")
             words = words[:-2]
