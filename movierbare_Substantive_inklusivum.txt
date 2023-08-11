@@ -16,7 +16,7 @@ Autore
 Chefe
 Politikere
 Zuschauere
-Kundre
+Kundere
 Schweizere
 Künstlere
 Teilnehmere
@@ -1478,7 +1478,7 @@ Zustellere
 Teamspielere
 Amtsträgere
 Friedensnobelpreisträgere
-Vorbotre
+Vorbotere
 Wallere
 Cheerleadere
 Atomkraftgegnere
@@ -1844,7 +1844,7 @@ Passre
 Zollbeamtre
 Kreditnehmere
 Jenaere
-Postbotre
+Postbotere
 Melkere
 Osteuropäere
 Asiatre
@@ -3034,7 +3034,7 @@ Solingere
 Wirtschaftsingenieure
 Landstreichere
 Primarlehrere
-Dienstbotre
+Dienstbotere
 Computerexpertre
 Mehrheitseignere
 Verhaltensforschere
@@ -3579,7 +3579,7 @@ Geldanlegere
 Doppelpartnere
 Gelegenheitsarbeitere
 Studienabbrechere
-Geldbotre
+Geldbotere
 Loyaliste
 Korbflechtere
 Sowjetbürgere
