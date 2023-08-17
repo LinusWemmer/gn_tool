@@ -93,6 +93,9 @@ class Lexicon:
     # Neutralizes substantivized adjective
     def neutralize_sub_adj(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
+        # Test for now: If we don't mark singular or plural, be conservative and leave as is, as plural often isn't marked correctly
+        if feats[2] != "Sg":
+            return word_parse[1]
         article = article_parse[1]
         if feats[1] == "_":
             feats[1] = "Nom"
@@ -104,7 +107,10 @@ class Lexicon:
                 return word_parse[2] + "n"
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
-        noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        if word_parse[2].endswith("er"):
+            noun =  word_parse[2][:-2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        else:
+            noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         return noun.capitalize()
     
     def neutralize_special_nouns(word_parse, line:int) -> str:

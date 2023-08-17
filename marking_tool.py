@@ -115,8 +115,8 @@ class Marking_Tool:
         feats = self.parse_list[pos][5].split("|")
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
-            # Noun is a substantivized adjective
-            if line == -1:
+            # Noun is a substantivized adjective or the word "Beamte"
+            if line == -1 or line == 88:
                 article_pos = pos+1
                 nounphrase = self.nounphrases.get(pos+1)
                 if nounphrase:
