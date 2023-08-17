@@ -462,7 +462,7 @@ Designere
 Anliegere
 Siedlere
 Kabarettiste
-Einwanderere
+Einwandere
 Klägere
 Schreibere
 Parteifreunde
@@ -583,7 +583,7 @@ Chorleitere
 Schlagzeugere
 Verbrechere
 % Bart
-Herausforderere
+Herausfordere
 Krämere
 %Liebling (?)
 Mitbegründere
@@ -852,7 +852,7 @@ Nobelpreisträgere
 Sportsfreunde
 %Drucker(?)
 Ukrainere
-Zuwanderere
+Zuwandere
 Weggefährtre
 Dissidente
 Kontrolleure
@@ -2610,7 +2610,7 @@ Erdenbürgere
 Marktleitere
 Rekordnationalspielere
 Stammwählere
-Iberere
+Ibere
 Bundeslandwirtschaftsministere
 Jordaniere
 Armeesprechere

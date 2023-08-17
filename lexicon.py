@@ -125,6 +125,12 @@ class Lexicon:
             # Nefte 
             elif line == -6:
                 noun = "Nefte"
+            elif line == -7:
+                noun = "Tonke"
+            elif line == -8:
+                noun = "Couse"
+            elif line == -9:
+                noun = "Spross"
             return noun + "s" if feats[1] == "Gen" else noun
         elif feats[2] == "Pl": 
             if line == -2:
@@ -141,6 +147,12 @@ class Lexicon:
             # Nefte
             elif line == -6:
                 return "Neften"
+            elif line == -7:
+                noun = "Tonken"
+            elif line == -8:
+                noun = "Couserne"
+            elif line == -9:
+                noun = "Sprosse"
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
@@ -378,6 +390,12 @@ class Lexicon:
             return -5
         elif noun == "Neffe" or noun == "Nichte":
             return -6
+        elif noun == "Onkel" or noun == "Tante":
+            return -7
+        elif noun == "Cousin" or noun == "Cousine":
+            return -8
+        elif noun == "Tochter" or noun == "Sohn":
+            return -9
         # Plural cases can be disregarded, as these are already neutral for substantivized adjectives
         if word_parse[5][-2:] == "Pl":
             return False
