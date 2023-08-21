@@ -9,7 +9,7 @@
 {% block body %}
     <form action="/parse" method="POST">
         <textarea id="textInput" name="inputText" placeholder="Type..." rows="8" cols="100"></textarea>
-        <button type="submit" >Submit</button>
+        <button type="submit" >Text Parsen.</button>
     </form>
     {{ dataToRender|safe }}
     <p>{{outputText}}</p>

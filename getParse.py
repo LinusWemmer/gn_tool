@@ -97,7 +97,7 @@ def parse_text():
         marked_nouns = mark_nouns(parse)
         return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
         <p>{marked_nouns}</p>
-        <button type="submit" >Submit</button>
+        <button type="submit" >Ausgewählte Wörter neutralisieren.</button>
         </form>""")
     else:
         return render_template("index.html")
