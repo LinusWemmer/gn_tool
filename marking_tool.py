@@ -115,8 +115,8 @@ class Marking_Tool:
         feats = self.parse_list[pos][5].split("|")
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
-            # Noun is a substantivized adjective or the word "Beamte"
-            if line == -1 or line == 88:
+            # Noun is a substantivized adjective 
+            if line == -1:
                 article_pos = pos+1
                 nounphrase = self.nounphrases.get(pos+1)
                 if nounphrase:
@@ -137,6 +137,15 @@ class Marking_Tool:
             # Special neologisms    
             elif line <= -3:
                 self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
+            # Noun is the Special case "Beamter" (line 88)
+            elif line == 88:
+                article_pos = pos+1
+                nounphrase = self.nounphrases.get(pos+1)
+                if nounphrase:
+                    for child_pos in nounphrase: 
+                        if self.parse_list[child_pos-1][3] == "ART":
+                            article_pos = child_pos
+                self.parse_list[pos][1] = Lexicon.neutralize_beamter(self.parse_list[pos], self.parse_list[article_pos-1])
             # Noun is a classical role noun
             else:
                 # Parzu sometimes doesn't correctly mark singular/plural, so we check these cases and mark them ourselves

@@ -113,6 +113,28 @@ class Lexicon:
             noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         return noun.capitalize()
     
+    def neutralize_beamter(word_parse, article_parse) -> str:
+        feats = word_parse[5].split("|")
+        # Test for now: If we don't mark singular or plural, be conservative and leave as is, as plural often isn't marked correctly
+        if feats[2] == "Pl":
+            return "Beamternen" if feats[1] == "Dat" else "Beamterne"
+        article = article_parse[1]
+        if feats[1] == "_":
+            feats[1] = "Nom"
+        # Weak Flexion, after article
+        if article_parse[3] == "ART" or article_parse[4] == "APPRART":
+            if feats[1] == "Nom" or feats[1] == "Acc": 
+                return "Beamte"
+            else:
+                return "Beamten"
+        # Strong Flexion, on it's own
+        # If we for some reason don't get a case, pretend it is nominative.
+        if word_parse[2].endswith("er"):
+            noun =  "Beamt" + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        else:
+            noun =  "Beamt" + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        return noun.capitalize()
+    
     def neutralize_special_nouns(word_parse, line:int) -> str:
         feats = word_parse[5].split("|")
         if feats[2] == "Sg" or feats[2] == "_":
