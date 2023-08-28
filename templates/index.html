@@ -7,6 +7,9 @@
 
 
 {% block body %}
+    <div class="paragraph">
+        <p style="font-family: Arial">Dies ist ein Werkzeug das dabei helfen soll, Texte nach dem <a href="https://geschlechtsneutral.net/gesamtsystem/">De-e-System</a> inklusiv zu formulieren. Der Text wird mithilfe vom <a href="https://pub.cl.uzh.ch/demo/parzu/">ParZu Parser</a> verarbeitet.</p>
+    </div>
     <form action="/parse" method="POST">
         <textarea id="textInput" name="inputText" placeholder="Type..." rows="8" cols="100"></textarea>
         <button type="submit" >Text Parsen.</button>

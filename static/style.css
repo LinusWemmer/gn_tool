@@ -1,8 +1,4 @@
-paragraph {
+.paragraph {
     width:42%;
-    float: left;
-}
-
-p {
-    color: red;
+    float: right;
 }
