@@ -1,6 +1,13 @@
-FROM ubuntu:20.04
+FROM python:3.8-slim
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container
+COPY . /app
+
+# Install Python dependencies
+RUN apt-get update &&  apt-get -y install \
     git \
     swi-prolog \
     sfst \
@@ -8,13 +15,18 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install \
     wget \
     python3 \
     python3-pexpect \
-    python3-flask \
     python-is-python3
 
-ADD https://api.github.com/repos/rsennrich/ParZu/git/refs/heads/master version.json
-RUN git clone https://github.com/rsennrich/ParZu
+RUN pip install --no-cache-dir flask pexpect
 
-RUN (cd ParZu; bash install.sh)
+RUN (bash install.sh)
 
-WORKDIR /ParZu
-CMD python3 parzu_server.py --host 0.0.0.0
+# Make port 80 available to the world outside this container
+EXPOSE 80
+EXPOSE 4000
+
+# Define environment variable (if needed)
+# ENV NAME World
+
+# Run your Flask app when the container launches
+CMD ["python", "__init__.py"]

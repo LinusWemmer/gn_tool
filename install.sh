@@ -14,10 +14,10 @@ cd ../..
 
 # get models
 cd external
-wget -c https://pub.cl.uzh.ch/users/sennrich/zmorge/transducers/zmorge-20140521-smor_newlemma.ca.zip
+#wget -c https://pub.cl.uzh.ch/users/sennrich/zmorge/transducers/zmorge-20140521-smor_newlemma.ca.zip
 wget -c https://pub.cl.uzh.ch/users/sennrich/zmorge/transducers/zmorge-20150315-smor_newlemma.ca.zip
 wget -c https://pub.cl.uzh.ch/users/sennrich/zmorge/models/hdt_ab.zmorge-20140521-smor_newlemma.model.zip
-unzip -u zmorge-20140521-smor_newlemma.ca.zip
+#unzip -u zmorge-20140521-smor_newlemma.ca.zip
 unzip -u zmorge-20150315-smor_newlemma.ca.zip
 unzip -u hdt_ab.zmorge-20140521-smor_newlemma.model.zip
 cd ..
@@ -25,7 +25,7 @@ cd ..
 SCRIPTPATH=`cd $(dirname "$SCRIPT") && pwd`
 
 # configure clevertagger
-sed -i "s,^SMOR_MODEL =.*$,SMOR_MODEL = '$SCRIPTPATH/external/zmorge-20140521-smor_newlemma.ca'," external/clevertagger/config.py
+sed -i "s,^SMOR_MODEL =.*$,SMOR_MODEL = '$SCRIPTPATH/external/zmorge-20150315-smor_newlemma.ca'," external/clevertagger/config.py
 sed -i "s,^CRF_MODEL =.*$,CRF_MODEL = '$SCRIPTPATH/external/hdt_ab.zmorge-20140521-smor_newlemma.model'," external/clevertagger/config.py
 sed -i "s,^CRF_BACKEND_EXEC =.*$,CRF_BACKEND_EXEC = '$SCRIPTPATH/external/Wapiti/wapiti'," external/clevertagger/config.py
 
