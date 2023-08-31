@@ -31,7 +31,21 @@ Local installation:
 Usage:
 ------
 
-You can run the program locally by running getParse.py. You should then find the program running on localhost:5000.
+You can run the program locally by running __init__.py. You should then find the program running on localhost:4000.
+
+Docker:
+------
+
+You can build the docker image by calling:
+```console
+~$: sudo docker build -t your_image_name .
+```
+
+To then run the image in a container, you can call:
+```console
+~$: sudo docker run -p 4000 your_image_name
+```
+You will then find the app running on the second IP adress shown in the command line.
 
 Possible Errors:
 ---------------
