@@ -76,6 +76,14 @@ def split_prepositions(input_text: str) ->str:
                 output += "Von dem "
                 sentence_data.add_split(i,j+k+1)
                 k += 1
+            elif word == "am":
+                output += "an dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
+            elif word == "Am":
+                output += "An dem "
+                sentence_data.add_split(i,j+k+1)
+                k += 1
             else:
                 output += word + " "
     return output

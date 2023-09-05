@@ -64,6 +64,10 @@ class Marking_Tool:
             return "vom"
         elif word == "Von dem":
             return "Vom"
+        elif word == "an dem":
+            return "am"
+        elif word == "An dem":
+            return "Am"
         else:
             return word
 
