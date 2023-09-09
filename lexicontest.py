@@ -19,8 +19,9 @@ class Sentence_Test(unittest.TestCase):
         test_sentence_10 = ("Ich kenne aber schon viele andere Kollegen von Kim.", "Ich kenne aber schon viele andere Kollegerne von Kim.")
         test_sentence_11 = ("Bei uns ist jeder willkommen!", "Bei uns ist jedey willkommen!")
         test_sentence_12 = ("Als Vorsitzender hat Kim viel zu tun.", "Als Vorsitzendey hat Kim viel zu tun.")
-        test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10, test_sentence_11, test_sentence_12]
-        test_nounphrases = [((2,34), (5,6)), ((1,0), (3,0)), ((4,43),), ((1,0),), ((2,0),), ((4, -1),), ((5,0),), ((5,0), (6,27)), ((9,0),), ((7,27),), ((4,0),),((2,-1),)]
+        test_sentence_13 = ("Sein öffentliches Coming-Out als X-gender und asexuell hatte Kamatani in einem Tweet im Jahr 2012.", "Ens öffentliches Coming-Out als X-gender und asexuell hatte Kamatani in einem Tweet im Jahr 2012.")
+        test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10, test_sentence_11, test_sentence_12, test_sentence_13]
+        test_nounphrases = [((2,34), (5,6)), ((1,0), (3,0)), ((4,43),), ((1,0),), ((2,0),), ((4, -1),), ((5,0),), ((5,0), (6,27)), ((9,0),), ((7,27),), ((4,0),), ((2,-1),), ((1,0),)]
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])
