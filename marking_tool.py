@@ -141,6 +141,9 @@ class Marking_Tool:
             # Noun is a romanism
             elif line == -10:
                 self.parse_list[pos][1] = Lexicon.neutralize_romanism(self.parse_list[pos])
+            # Noun is irregular
+            elif line == -11:
+                self.parse_list[pos][1] = Lexicon.neutralize_irregular_noun(self.parse_list[pos])
             # Special neologisms    
             elif line <= -3:
                 self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)

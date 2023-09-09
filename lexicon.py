@@ -44,6 +44,8 @@ class Lexicon:
     PART_NOUNS = []
     ROMAN_NOUNS = [r"Alumn(a|us|i)", r"Ballerin(o|a)s?", r"Emerit(a|us|i)", r"Filipin(o|a)s?", r"Gueriller(o|a)s?", r"Latin(o|a)s?", r"Liber(o|a)s?", r"Mafios(o|a)s?", r"Torer(o|a)s?"]
     ROMAN_NOUN_STARTS = ["Alumn", "Ballerin", "Emerit", "Filipin", "Gueriller", "Latin", "Liber", "Mafios", "Torer"]
+    IRREGULAR_NOUNS = [r"Prinz(essin)?", r"Hexer?", r"Witwer?", r"Br(a|ä)ut(igam)?", r"Hebamme", r"Amme"]
+    IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere"]
 
     with open("movierbare_Substantive.txt") as f_male_nouns:
         for line in f_male_nouns:
@@ -257,7 +259,6 @@ class Lexicon:
             # Some articles don't have to be neutralized, just return them.
             else:
                 return word_parse[1]
-            raise Exception(f"The Article seems to be not convertable:{word_parse[1]}")
 
     def neutralize_adjectives(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
@@ -379,7 +380,6 @@ class Lexicon:
     def neutralize_romanism(word_parse) -> str:
         line = 0
         noun = word_parse[1]
-        print(noun)
         feats = word_parse[5].split("|")
         for index, start in enumerate(Lexicon.ROMAN_NOUN_STARTS):
             print(start)
@@ -399,6 +399,27 @@ class Lexicon:
             else:
                 raise Exception(f"Somehow the word doesn't have a case: {feats}")
         return ""
+    
+    def neutralize_irregular_noun(word_parse) -> str:
+        line = 0
+        noun = word_parse[1]
+        feats = word_parse[5].split("|")
+        for index, irregular_noun in enumerate(Lexicon.IRREGULAR_NOUNS):
+            if re.match(irregular_noun, noun):
+                line = index
+        noun = Lexicon.IRREGULAR_NOUNS_NEUTRAL[line]
+        if feats[2] == "Pl":
+            if noun.endswith("ere"):
+                noun = noun[:-2]
+            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
+                return noun + "rne"
+            if feats[1] ==  "Dat":
+                return noun + "rnen"
+        else:
+            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
+                return noun
+            elif feats[1] == ("Gen"):
+                return noun + "s"
 
     # This function checks if a certain noun is a role noun (refers to a person) that can be gendered
     # Returns line number in the list of role nouns if this is the case,
@@ -443,6 +464,9 @@ class Lexicon:
         for romanism in Lexicon.ROMAN_NOUNS:
             if re.match(romanism, noun):
                 return "-10"
+        for irregular_noun in Lexicon.IRREGULAR_NOUNS:
+            if re.match(irregular_noun, noun):
+                return "-11"
         # Neologisms these are all special and have to be handled differently (really only for plural):
         if noun == "Bruder" or noun == "Schwester":
             return -3

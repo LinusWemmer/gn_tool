@@ -122,7 +122,7 @@ def neutralize_marked():
     return render_template("index.html", outputText = neutralized_text)
 
 if __name__ == "__main__":
-    # DOcker should'nt be in debug mode
+    # Docker should'nt be in debug mode
     debugging = True
     if len(sys.argv) >= 2:
         if sys.argv[1] == "run":
