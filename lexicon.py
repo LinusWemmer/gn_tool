@@ -346,6 +346,8 @@ class Lexicon:
                 pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS":
+            if feats[1] == "_":
+                feats[1] = "Nom"
             pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PDS":
