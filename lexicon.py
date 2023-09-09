@@ -206,7 +206,7 @@ class Lexicon:
                     pronoun = "ensen"
                 else:
                     pronoun = "ens"
-            if feats[1] == "Nom":
+            if feats[1] == "Nom" or feats[1] == "_":
                 pronoun = "ense" if feats[0] == "Fem" else "ens"
             if feats[1] == "Dat":
                 pronoun = "enser" if feats[0] == "Fem" else "ensem"
