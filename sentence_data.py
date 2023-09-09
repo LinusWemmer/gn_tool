@@ -28,11 +28,16 @@ class Sentence_Data:
         self.marking_tools = {}
         self.split_words = {}
 
-    def add_split(self, sentence:int, word:int):
-        if sentence in self.split_words.keys():
-            self.split_words[sentence] = self.split_words[sentence].add(word)
+    def add_split(self, sentence_nr:int, word:int):
+        print(self.split_words)
+        if sentence_nr in self.split_words.keys():
+            splits = self.split_words[sentence_nr]
+            splits.append(word)
+            print(splits)
+            self.split_words[sentence_nr] = splits
+            print(self.split_words)
         else:
-            self.split_words[sentence] = [word]
+            self.split_words[sentence_nr] = [word]
     
     def get_split_words(self):
         return self.split_words

@@ -34,8 +34,8 @@ def split_prepositions(input_text: str) ->str:
     output = ""
     for i,sentence in enumerate(sentences):
         words = sentence.split(" ")
+        k = 0
         for j,word in enumerate(words):
-            k = 0
             if word =="beim":
                 output += "bei dem "
                 sentence_data.add_split(i,j+k+1)
