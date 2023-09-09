@@ -17,6 +17,13 @@ class Marking_Test(unittest.TestCase):
                     <label for="0|4|-1"><u>Verlobte</u></label>? """)
         test_sentence_5 = ("Gleich kommen sie.", "Gleich kommen sie. ")
         test_sentence_6 = ("Es kostet nicht viel.", "Es kostet nicht viel. ")
+        test_sentence_7 = ("Yuhki Kamatani (鎌谷 悠希 Kamatani Yūki, * 22 Juni 1983) ist eine nichtbinäre japanische Manga-Künstlerin und Illustratorin, die vor allem für ihre Manga-Reihe Nabari no Ō (Der König von Nabari) bekannt ist.",
+                           """Yuhki Kamatani (鎌谷 悠希 Kamatani Yūki, * 22 Juni 1983 )ist eine nichtbinäre japanische <input type="checkbox" id="0|18|20" name="0|18|20" value="select">
+                    <label for="0|18|20"><u>Manga-Künstlerin</u></label> und <input type="checkbox" id="0|20|1440" name="0|20|1440" value="select">
+                    <label for="0|20|1440"><u>Illustratorin</u></label>, <input type="checkbox" id="0|22|0" name="0|22|0" value="select">
+                <label for="0|22|0"><u>die</u></label> vor allem für <input type="checkbox" id="0|26|0" name="0|26|0" value="select">
+                <label for="0|26|0"><u>ihre</u></label> Manga-Reihe Nabari no Ō (Der <input type="checkbox" id="0|33|40" name="0|33|40" value="select">
+                    <label for="0|33|40"><u>König</u></label> von Nabari )bekannt ist. """ )
         test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4, test_sentence_5, test_sentence_6]
         ParZu = parzu.Parser(parzu.process_arguments())
         for i, test in enumerate(test_sentences):
