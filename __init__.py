@@ -123,9 +123,9 @@ def neutralize_marked():
 
 if __name__ == "__main__":
     # DOcker should'nt be in debug mode
-    debugging = False
+    debugging = True
     if len(sys.argv) >= 2:
-        if sys.argv[1] == "Debug":
-            debugging = True
+        if sys.argv[1] == "run":
+            debugging = False
     app.run(debug=debugging, host='0.0.0.0', port=4000)
     

@@ -138,6 +138,9 @@ class Marking_Tool:
                         article_pos = min(self.nounphrases.get(pos+1))
                         self.feminize_word(child-1, article_pos)
                 return
+            # Noun is a romanism
+            elif line == -10:
+                self.parse_list[pos][1] = Lexicon.neutralize_romanism(self.parse_list[pos])
             # Special neologisms    
             elif line <= -3:
                 self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
