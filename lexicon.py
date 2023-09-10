@@ -46,6 +46,8 @@ class Lexicon:
     ROMAN_NOUN_STARTS = ["Alumn", "Ballerin", "Emerit", "Filipin", "Gueriller", "Latin", "Liber", "Mafios", "Torer"]
     IRREGULAR_NOUNS = [r"Prinz(essin)?", r"Hexer?", r"Witwer?", r"Br(a|ä)ut(igam)?", r"Hebamme", r"Amme"]
     IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere"]
+    GRAMM_MAlE_NEUTRAL_NOUNS = ["Gast", "Vormund", "Flüchtling", "Charakter", "Waise", "Geisel", "Profi", "Studi", "Admin"]
+    ENGLISH_NOUNS = ["Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie"]
 
     with open("movierbare_Substantive.txt") as f_male_nouns:
         for line in f_male_nouns:
@@ -464,9 +466,13 @@ class Lexicon:
         for romanism in Lexicon.ROMAN_NOUNS:
             if re.match(romanism, noun):
                 return "-10"
+        # Noun is irregular
         for irregular_noun in Lexicon.IRREGULAR_NOUNS:
             if re.match(irregular_noun, noun):
                 return "-11"
+        # Noun is already neutral, but article should be declinated
+        if noun in Lexicon.ENGLISH_NOUNS or noun in Lexicon.GRAMM_MAlE_NEUTRAL_NOUNS:
+            return -12
         # Neologisms these are all special and have to be handled differently (really only for plural):
         if noun == "Bruder" or noun == "Schwester":
             return -3

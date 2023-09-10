@@ -144,6 +144,9 @@ class Marking_Tool:
             # Noun is irregular
             elif line == -11:
                 self.parse_list[pos][1] = Lexicon.neutralize_irregular_noun(self.parse_list[pos])
+            # Noun is already neutral:
+            elif line == -12:
+                pass
             # Special neologisms    
             elif line <= -3:
                 self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
@@ -183,6 +186,8 @@ class Marking_Tool:
         #Neutralize everything else
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
+
+        # Neutralize the other words in the nounphrase
         for child in self.nounphrases.get(pos+1):
             article_pos = min(self.nounphrases.get(pos+1))
             self.neutralize_word(child-1, article_pos)
