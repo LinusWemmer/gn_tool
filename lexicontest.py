@@ -24,7 +24,10 @@ class Sentence_Test(unittest.TestCase):
         test_sentence_15 = ("Wo ist das Hauptgebäude seiner Schule?", "Wo ist das Hauptgebäude enser Schule?", ((5,0),))
         test_sentence_16 = ("Kennst Du seinen Namen?", "Kennst Du ensen Namen?", ((3,0),))
         test_sentence_17 = ("Als Vorsitzender hat Kim viel zu tun.", "Als Vorsitzendey hat Kim viel zu tun.", ((2,-1),))
-        test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10, test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17]
+        test_sentence_18 = ("Sicher kaum einer!", "Sicher kaum einey!", ((3,0),))
+        test_sentence_19 = ("Der Schüler, der dort steht, ist nett.", "De Schülere, de dort steht, ist nett.", ((2,6), (3,0)))
+        test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10,
+                           test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17, test_sentence_18]
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])
