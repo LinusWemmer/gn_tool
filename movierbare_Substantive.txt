@@ -627,6 +627,7 @@ Pensionist
 Interpret
 Belgier
 Zauberer
+Wanderer
 Amtsinhaber
 %Schauer
 Walker

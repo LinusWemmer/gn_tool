@@ -627,6 +627,7 @@ Pensioniste
 Interprete
 Belgiere
 Zaubere
+Wandere
 Amtsinhabere
 % Schauer (?)
 Walkere
