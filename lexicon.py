@@ -192,30 +192,9 @@ class Lexicon:
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
-        pronoun = ""
-        if feats[2] == "Pl":
-            if feats[1] == "Acc":
-                pronoun = "ense"
-            if feats[1] == "Nom":
-                pronoun = "ense" 
-            if feats[1] == "Dat":
-                pronoun = "ensen"
-            if feats[1] == "Gen":
-                pronoun = "enser"
-        else:
-            if feats[1] == "Acc":
-                if feats[0] == "Fem":
-                    pronoun = "ense"
-                elif feats[0] == "Masc":
-                    pronoun = "ensen"
-                else:
-                    pronoun = "ens"
-            if feats[1] == "Nom" or feats[1] == "_":
-                pronoun = "ense" if feats[0] == "Fem" else "ens"
-            if feats[1] == "Dat":
-                pronoun = "enser" if feats[0] == "Fem" else "ensem"
-            if feats[1] == "Gen":
-                pronoun = "enser" if feats[0] == "Fem" else "ensem"
+        pronoun = word_parse[1][0].lower() + word_parse[1][1:] 
+        pronoun = pronoun.replace("ihr", "ens")
+        pronoun = pronoun.replace("sein", "ens")
         return pronoun.capitalize() if word_parse[0] == "1" else pronoun
     
     def neutralize_attributing_relative_pronoun(word_parse) -> str:
@@ -235,6 +214,7 @@ class Lexicon:
         elif feats[0] == "Indef":
             article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
             return article.capitalize() if is_capitalized else article
+        # All other types of article
         else:
             word = word_parse[1][0].lower() + word_parse[1][1:] 
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
