@@ -194,7 +194,6 @@ class Marking_Tool:
 
     # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
-        #self.find_nounphrases()
         nouns = ""
         for word_parse in self.parse_list:
             # Case: Possesive Pronoun

@@ -103,10 +103,16 @@ def parse_text():
         parse = get_parse(input_text)
         print(parse)
         marked_nouns = mark_nouns(parse)
-        return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
-        <p>{marked_nouns}</p>
-        <button type="submit" >Ausgewählte Wörter neutralisieren.</button>
-        </form>""")
+        if "checkbox" in marked_nouns:
+            return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
+            <p>{marked_nouns}</p>
+            <button type="submit" >Ausgewählte Wörter neutralisieren.</button>
+            </form>""")
+        else:
+            return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
+            <p>{marked_nouns}</p>
+            <button type="submit" >Keine neutralisierbare Personenbezeichnung gefunden.</button>
+            </form>""")
     else:
         return render_template("index.html")
     
