@@ -317,11 +317,12 @@ Pressesprechere
 Theologere
 Fußgängere
 Schulleitere
-Muslimre
+Muslime
+Muslime
 Einbrechere
 Kämpfere
 Springere
-Gestre
+%Gestre
 Mastere
 Kommuniste
 Chinesere

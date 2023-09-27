@@ -318,10 +318,11 @@ Theologin
 Fußgängerin
 Schulleiterin
 Muslimin
+Muslima
 Einbrecherin
 Kämpferin
 Springerin
-Gestin
+%Gestin
 Masterin
 Kommunistin
 Chinesin

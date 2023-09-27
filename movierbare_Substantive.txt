@@ -317,11 +317,12 @@ Pressesprecher
 Theologe
 Fußgänger
 Schulleiter
-Muslime
+Muslim
+Muslim
 Einbrecher
 Kämpfer
 Springer
-Geste
+%Geste
 Master
 Kommunist
 Chinese
