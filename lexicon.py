@@ -364,23 +364,23 @@ class Lexicon:
         noun = word_parse[1]
         feats = word_parse[5].split("|")
         for index, start in enumerate(Lexicon.ROMAN_NOUN_STARTS):
-            print(start)
             if noun.startswith(start):
                 line = index
         noun = Lexicon.ROMAN_NOUN_STARTS[line] + "e"
-        if feats[2] == "Pl":
-            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
-                return noun + "rne"
-            if feats[1] ==  "Dat":
-                return noun + "rnen"
-        else:
-            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
-                return noun
-            elif feats[1] == ("Gen"):
-                return noun + "s"
+        if not len(feats)<=1:
+            if feats[2] == "Pl":
+                if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
+                    return noun + "rne"
+                if feats[1] ==  "Dat":
+                    return noun + "rnen"
             else:
-                raise Exception(f"Somehow the word doesn't have a case: {feats}")
-        return ""
+                if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
+                    return noun
+                elif feats[1] == ("Gen"):
+                    return noun + "s"
+                else:
+                    raise Exception(f"Somehow the word doesn't have a case: {feats}")
+        return noun
     
     def neutralize_irregular_noun(word_parse) -> str:
         line = 0
