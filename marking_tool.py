@@ -249,7 +249,12 @@ class Marking_Tool:
             elif word_parse[3] == "$." or word_parse[3] == "$,":
                 nouns = nouns[:-1] + word_parse[1] + " "
             elif word_parse[3] == "$(":
-                nouns += word_parse[1]
+                if word_parse[1] == "(":
+                    nouns += word_parse[1]
+                elif word_parse[1] == ")":
+                    nouns = nouns[:-1] + word_parse[1] + " "
+                else:
+                    nouns += word_parse[1]
             else:
                nouns += word_parse[1] + " "
         print(self.nounphrases)
