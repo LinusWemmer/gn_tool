@@ -44,10 +44,16 @@ class Lexicon:
     PART_NOUNS = []
     ROMAN_NOUNS = [r"Alumn(a|us|i)", r"Ballerin(o|a)s?", r"Emerit(a|us|i)", r"Filipin(o|a)s?", r"Gueriller(o|a)s?", r"Latin(o|a)s?", r"Liber(o|a)s?", r"Mafios(o|a)s?", r"Torer(o|a)s?"]
     ROMAN_NOUN_STARTS = ["Alumn", "Ballerin", "Emerit", "Filipin", "Gueriller", "Latin", "Liber", "Mafios", "Torer"]
+
     IRREGULAR_NOUNS = [r"Prinz(essin)?", r"Hexer?", r"Witwer?", r"Br(a|ä)ut(igam)?", r"Hebamme", r"Amme"]
     IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere"]
+
     GRAMM_MAlE_NEUTRAL_NOUNS = ["Gast", "Vormund", "Flüchtling", "Charakter", "Waise", "Geisel", "Profi", "Studi", "Admin"]
+
     ENGLISH_NOUNS = ["Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie"]
+
+    NEOLOGISMS = [r"(Bruder)|(Schwester)", r"(Vater)|(Mutter)", r"O(p|m)a", r"(Onkel)|(Tante)", r"Cousine?", r"Tochter|Sohn", r"Jungfrau"]
+    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Tonke", "Couse", "Spross", "Jungfere"]
 
     with open("movierbare_Substantive.txt") as f_male_nouns:
         for line in f_male_nouns:
@@ -98,7 +104,6 @@ class Lexicon:
 
     # Neutralizes substantivized adjective
     def neutralize_sub_adj(word_parse, article_parse) -> str:
-        
         feats = word_parse[5].split("|")
         # Test for now: If we don't mark singular or plural, be conservative and leave as is, as plural often isn't marked correctly
         if feats[2] != "Sg":
@@ -143,14 +148,19 @@ class Lexicon:
             noun =  "Beamt" + Lexicon.ARTIKEL_JEDER.get(feats[1])
         return noun.capitalize()
     
+    def neutralize_gendered_suffix(word_parse) -> str:
+        feats = word_parse[5].split("|")
+        if feats[2] == "Sg" or feats[2] == "_":
+            return word_parse[2][:-4] + "person"
+        elif feats[2] == "Pl": 
+            return word_parse[2][:-4] + "leute"
+    
     def neutralize_special_nouns(word_parse, line:int) -> str:
         feats = word_parse[5].split("|")
         if feats[2] == "Sg" or feats[2] == "_":
             noun = ""
-            if line == -2:
-                return word_parse[2][:-4] + "person"
             # Geschwister
-            elif line == -3:
+            if line == -3:
                 noun = "Geschwister"
             # Elter
             elif line == -4:
@@ -169,18 +179,12 @@ class Lexicon:
                 noun = "Spross"
             return noun + "s" if feats[1] == "Gen" else noun
         elif feats[2] == "Pl": 
-            if line == -2:
-                return word_parse[2][:-4] + "leute"
-            # Geschwister
-            elif line == -3:
+            if line == -3:
                 return "Geschwistern" if feats[1] == "Dat" else "Geschwister"
-            # Elter
             elif line == -4:
                 return "Eltern"
-            # Ota
             elif line == -5:
                 return "Otas"
-            # Nefte
             elif line == -6:
                 return "Neften"
             elif line == -7:
@@ -189,6 +193,28 @@ class Lexicon:
                 noun = "Couserne"
             elif line == -9:
                 noun = "Sprosse"
+
+    def neutralize_neologism(word_parse) -> str:
+        line = 0
+        noun = word_parse[2]
+        feats = word_parse[5].split("|")
+        for index, neologism in enumerate(Lexicon.NEOLOGISMS):
+            if re.match(neologism, noun):
+                line = index
+                break
+        noun = Lexicon.NEOLOGISMS_NEUTRAL[line]
+        if feats[2] == "Pl":
+            if noun.endswith("ere"):
+                noun = noun[:-2]
+            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
+                return noun + "rne"
+            if feats[1] ==  "Dat":
+                return noun + "rnen"
+        else:
+            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
+                return noun
+            elif feats[1] == ("Gen"):
+                return noun + "s"
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
@@ -415,6 +441,7 @@ class Lexicon:
         gender = word_parse[5][0]
         length = 4116
         i = 0
+        # Checks the List of role Nouns to check if word is a role noun
         if gender == "M":
             for i, line in enumerate(Lexicon.MALE_NOUNS):
                 if line == noun:
@@ -439,36 +466,25 @@ class Lexicon:
                     return i
                 elif i >= length:
                     break
+        # Neologisms:
+        for neologism in Lexicon.NEOLOGISMS:
+            if re.match(neologism, noun):
+                return "-3"
         # Words ending on -mann or -frau:
         if re.match(r".+m(a|ä)nn(er)?", noun) or re.match(r".+frau", noun):
             return -2
-        #Romanisms
+        #Romanisms:
         for romanism in Lexicon.ROMAN_NOUNS:
             if re.match(romanism, noun):
                 return "-10"
-        # Noun is irregular
+        # Irregular role Nouns:
         for irregular_noun in Lexicon.IRREGULAR_NOUNS:
             if re.match(irregular_noun, noun):
                 return "-11"
         # Noun is already neutral, but article should be declinated
         if noun in Lexicon.ENGLISH_NOUNS or noun in Lexicon.GRAMM_MAlE_NEUTRAL_NOUNS:
             return -12
-        # Neologisms these are all special and have to be handled differently (really only for plural):
-        if noun == "Bruder" or noun == "Schwester":
-            return -3
-        elif noun == "Mutter" or noun == "Vater":
-            return -4
-        elif noun == "Oma" or noun == "Opa":
-            return -5
-        elif noun == "Neffe" or noun == "Nichte":
-            return -6
-        elif noun == "Onkel" or noun == "Tante":
-            return -7
-        elif noun == "Cousin" or noun == "Cousine":
-            return -8
-        elif noun == "Tochter" or noun == "Sohn":
-            return -9
-        # Plural cases can be disregarded, as these are already neutral for substantivized adjectives
+        # Check substantivized adjectives
         if word_parse[5][-2:] == "Pl":
             return False
         for i, line in enumerate(Lexicon.PART_NOUNS):

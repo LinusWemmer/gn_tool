@@ -131,7 +131,7 @@ class Marking_Tool:
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             # words ending on -mann or -frau:
             elif line == -2:
-                self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
+                self.parse_list[pos][1] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos], line)
                 feats = self.parse_list[pos][5].split("|")
                 if feats[0] == "Masc" and feats[2] == "Sg":
                     for child in self.nounphrases.get(pos+1):
@@ -149,7 +149,7 @@ class Marking_Tool:
                 pass
             # Special neologisms    
             elif line <= -3:
-                self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
+                self.parse_list[pos][1] = Lexicon.neutralize_neologism(self.parse_list[pos])
             # Noun is the Special case "Beamter" (line 88)
             elif line == 88:
                 article_pos = pos+1
