@@ -111,7 +111,7 @@ def parse_text():
         else:
             return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
             <p>{marked_nouns}</p>
-            <button type="submit" >Keine neutralisierbare Personenbezeichnung gefunden.</button>
+            <button type="reset" style="color:Red">Keine neutralisierbare Personenbezeichnung gefunden.</button>
             </form>""")
     else:
         return render_template("index.html")
