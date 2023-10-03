@@ -107,21 +107,24 @@ class Lexicon:
         feats = word_parse[5].split("|")
         # Test for now: If we don't mark singular or plural, be conservative and leave as is, as plural often isn't marked correctly
         if feats[2] != "Sg":
-            if not word_parse[2].endswith("er"):
+            print("here1")
+            if not word_parse[1].endswith("er"):
                 return word_parse[1]
         article = article_parse[1]
+        # If we for some reason don't get a case, pretend it is nominative.
         if feats[1] == "_":
+            print("here2")
             feats[1] = "Nom"
         # Weak Flexion, after article
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
+            print("here3")
             if feats[1] == "Nom" or feats[1] == "Acc": 
                 return word_parse[2]
             else:
                 return word_parse[2] + "n"
         # Strong Flexion, on it's own
-        # If we for some reason don't get a case, pretend it is nominative.
-        if word_parse[2].endswith("er"):
-            noun =  word_parse[2][:-2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        if word_parse[1].endswith("er"):
+            noun =  word_parse[1][:-2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         else:
             noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         return noun.capitalize()
