@@ -60,19 +60,19 @@ class Lexicon:
     FEMALE_NOUNS = []
     NEUTRAL_NOUNS = []
     PART_NOUNS = []
-    with open("movierbare_Substantive.txt") as f_male_nouns:
+    with open("static/movierbare_Substantive.txt") as f_male_nouns:
         for line in f_male_nouns:
             MALE_NOUNS.append(line.rstrip())
 
-    with open("movierbare_Substantive_feminin.txt") as f_female_nouns:
+    with open("static/movierbare_Substantive_feminin.txt") as f_female_nouns:
         for line in f_female_nouns:
             FEMALE_NOUNS.append(line.rstrip())
 
-    with open("movierbare_Substantive_inklusivum.txt") as f_inclusive_nouns:
+    with open("static/movierbare_Substantive_inklusivum.txt") as f_inclusive_nouns:
         for line in f_inclusive_nouns:
             NEUTRAL_NOUNS.append(line.rstrip())
 
-    with open("substantivierte_adjektive.txt") as f_sub_adj:
+    with open("static/substantivierte_adjektive.txt") as f_sub_adj:
         for line in f_sub_adj:
             PART_NOUNS.append(line.rstrip())
 
