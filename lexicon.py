@@ -1,7 +1,10 @@
 import re
 
+
+ # This class holds all the necessary information to construct the inclusivum form.
+ # It is designed as a "static" class, so no lexicon object should be created, instead functions
+ # are called by calling Lexicon.function()
 class Lexicon:
-    # This class holds all the necessary information to construct the inclusivum
     PRONOUNS = {"Nom": "en",
                 "Gen": "ens",
                 "Dat": "em",
@@ -38,10 +41,6 @@ class Lexicon:
 
     EIN_PARADIGM = ["ein", "kein", "mein", "dein", "sein", "ihr", "ens"]
 
-    MALE_NOUNS = []
-    FEMALE_NOUNS = []
-    NEUTRAL_NOUNS = []
-    PART_NOUNS = []
     ROMAN_NOUNS = [r"Alumn(a|us|i)", r"Ballerin(o|a)s?", r"Emerit(a|us|i)", r"Filipin(o|a)s?", r"Gueriller(o|a)s?", r"Latin(o|a)s?", r"Liber(o|a)s?", r"Mafios(o|a)s?", r"Torer(o|a)s?"]
     ROMAN_NOUN_STARTS = ["Alumn", "Ballerin", "Emerit", "Filipin", "Gueriller", "Latin", "Liber", "Mafios", "Torer"]
 
@@ -52,9 +51,15 @@ class Lexicon:
 
     ENGLISH_NOUNS = ["Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie"]
 
-    NEOLOGISMS = [r"(Bruder)|(Schwester)", r"(Vater)|(Mutter)", r"O(p|m)a", r"(Onkel)|(Tante)", r"Cousine?", r"Tochter|Sohn", r"Jungfrau"]
-    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Tonke", "Couse", "Spross", "Jungfere"]
+    NEOLOGISMS = [r"(Bruder)|(Schwester)", r"(Vater)|(Mutter)", r"O(p|m)a", r"(Onkel)|(Tante)", r"Cousine?", r"Tochter|Sohn", r"Jungfrau", r"Mädchen|Junge"]
+    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Tonke", "Couse", "Spross", "Jungfere", "Kid"]
 
+    # The next section generates List of Male/Female role nouns an their corresponding neutral forms
+    # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
+    MALE_NOUNS = []
+    FEMALE_NOUNS = []
+    NEUTRAL_NOUNS = []
+    PART_NOUNS = []
     with open("movierbare_Substantive.txt") as f_male_nouns:
         for line in f_male_nouns:
             MALE_NOUNS.append(line.rstrip())
@@ -157,46 +162,15 @@ class Lexicon:
             return word_parse[2][:-4] + "person"
         elif feats[2] == "Pl": 
             return word_parse[2][:-4] + "leute"
-    
-    def neutralize_special_nouns(word_parse, line:int) -> str:
+        
+    def neutralize_mann_frau(word_parse) -> str:
         feats = word_parse[5].split("|")
         if feats[2] == "Sg" or feats[2] == "_":
-            noun = ""
-            # Geschwister
-            if line == -3:
-                noun = "Geschwister"
-            # Elter
-            elif line == -4:
-                noun = "Elter"
-            # Ota
-            elif line == -5:
-                noun = "Ota"
-            # Nefte 
-            elif line == -6:
-                noun = "Nefte"
-            elif line == -7:
-                noun = "Tonke"
-            elif line == -8:
-                noun = "Couse"
-            elif line == -9:
-                noun = "Spross"
-            return noun + "s" if feats[1] == "Gen" else noun
+            return "Person"
         elif feats[2] == "Pl": 
-            if line == -3:
-                return "Geschwistern" if feats[1] == "Dat" else "Geschwister"
-            elif line == -4:
-                return "Eltern"
-            elif line == -5:
-                return "Otas"
-            elif line == -6:
-                return "Neften"
-            elif line == -7:
-                noun = "Tonken"
-            elif line == -8:
-                noun = "Couserne"
-            elif line == -9:
-                noun = "Sprosse"
+            return "Leute"
 
+    # Neutralizes words where a neologism is the neutral form 
     def neutralize_neologism(word_parse) -> str:
         line = 0
         noun = word_parse[2]
@@ -476,6 +450,9 @@ class Lexicon:
         # Words ending on -mann or -frau:
         if re.match(r".+m(a|ä)nn(er)?", noun) or re.match(r".+frau", noun):
             return -2
+        # The Word "Mann", "Frau", "Herr", "Dame":
+        if noun == "Mann" or noun =="Frau" or noun == "Herr" or noun == "Dame":
+            return -4
         #Romanisms:
         for romanism in Lexicon.ROMAN_NOUNS:
             if re.match(romanism, noun):
