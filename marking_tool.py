@@ -28,7 +28,10 @@ class Marking_Tool:
             if word_parse[3]== ("$.") or word_parse[3]== ("$,"):
                 sentence = sentence[:-1] + word_parse[1] + " "
             elif word_parse[3] == ("$("):
-                sentence += word_parse[1]
+                if word_parse[1] == "(":
+                    sentence += word_parse[1]
+                else:
+                    sentence = sentence[:-1] + word_parse[1] + " "
             else:
                 if int(word_parse[0]) in split_list:
                     preposition = word_parse[1] + " " + self.parse_list[int(word_parse[0])][1]
