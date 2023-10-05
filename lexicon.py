@@ -125,10 +125,10 @@ class Lexicon:
             else:
                 return word_parse[2] + "n"
         # Strong Flexion, on it's own
-        if word_parse[1].endswith("er"):
-            noun =  word_parse[1][:-2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
-        else:
+        if word_parse[1].endswith("e"):
             noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+        else:
+            noun =  word_parse[1][:-2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         return noun.capitalize()
     
     def neutralize_beamter(word_parse, article_parse) -> str:
