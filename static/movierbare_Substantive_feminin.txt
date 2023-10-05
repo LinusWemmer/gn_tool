@@ -22,25 +22,25 @@ Künstlerin
 Teilnehmerin
 Berlinerin
 Gegnerin
-Arztin
+Ärztin
 Vertreterin
 Leiterin
 Kollegin
 Sprecherin
-Gottin
+Göttin
 Soldatin
 % Fan ?
 Ministerpräsidentin
 Täterin
 Lehrerin
 Meisterin
-Gemeinderatin
+Gemeinderätin
 Expertin
-Ratin
+Rätin
 Geschäftsführerin
 Königin
 Einwohnerin
-Frankin
+Fränkin
 Professorin
 Kandidatin
 Patientin
@@ -54,7 +54,7 @@ Stadtratin
 Nachfolgerin
 Pfarrerin
 % Hund
-Bauerin
+Bäuerin
 Schauspielerin
 Managerin
 Journalistin
@@ -69,20 +69,20 @@ Nürnbergerin
 Leserin
 Bayerin
 Bewohnerin
-Bischofin
+Bischöfin
 Direktorin
 Seniorin
 Schriftstellerin
 Veranstalterin
 Amerikanerin
-Bundesratin
+Bundesrätin
 Frankfurterin
 Helferin
 Judin
 Münchnerin
 Nachbarin
 Autofahrerin
-Anwaltin
+Anwältin
 Mannheimerin
 Mainzerin
 Architektin
@@ -94,9 +94,9 @@ Außenministerin
 Anhängerin
 Kaiserin
 Herstellerin
-Papstin
+Päpstin
 Wissenschaftlerin
-Grafin
+Gräfin
 Generalin
 % Wolf (?)
 Investorin
@@ -112,7 +112,7 @@ Hamburgerin
 Besitzerin
 Forscherin
 %Sender (?)
-Franzosin
+Französin
 Oberbürgermeisterin
 %Typ ?in
 Kritikerin
@@ -131,7 +131,7 @@ Malerin
 Österreicherin
 Konkurrentin
 Kanzlerin
-Kochin
+Köchin
 Juniorin
 Zuhörerin
 Koblenzerin
@@ -161,7 +161,7 @@ Zählerin
 Schiedsrichterin
 Landwirtin
 Aufsteigerin
-Aufsichtsratin
+Aufsichtsrätin
 Führerin
 Interessentin
 % Löwe
@@ -238,7 +238,7 @@ Premierministerin
 Reiterin
 % Klassiker
 Rentnerin
-Niedersachsin
+Niedersächsin
 Verteidigungsministerin
 Gründerin
 Moderatorin
@@ -257,7 +257,7 @@ Senatorin
 %% Kaufmann (?)
 %All (?)
 Heidin
-Betriebsratin
+Betriebsrätin
 Betreuerin
 Schweizerin
 Nationalratin
@@ -283,7 +283,7 @@ Grazerin
 Herausgeberin
 Mörderin
 Radfahrerin
-Westfalin
+Westfälin
 Solistin
 Intendantin
 Darstellerin
@@ -335,12 +335,12 @@ Reporterin
 Konsumentin
 Preisträgerin
 %Fernseher
-Narrin
+Närrin
 Spitzenkandidatin
 Korrespondentin
 Laiin
 Katholikin
-Ortsbeiratin
+Ortsbeirätin
 Kommissarin
 Initiatorin
 % Tee (?)
@@ -374,8 +374,8 @@ Turnerin
 Verlegerin
 Kurdin
 Londonerin
-Regierungsratin
-Sachsin
+Regierungsrätin
+Sächsin
 %Hase (?)
 Kameradin
 Majorin
@@ -412,7 +412,7 @@ Erfinderin
 Rivalin
 Protagonistin
 Diktatorin
-Schwabin
+Schwäbin
 Technikerin
 % Koalitionspartner (?)
 Gesetzgeberin
@@ -442,7 +442,7 @@ Teamkollegin
 Schwedin
 Tschechin
 Verkäuferin
-Beiratin
+Beirätin
 Verfasserin
 Torjägerin
 Verfolgerin
@@ -491,7 +491,7 @@ Bäckerin
 Mitspielerin
 Thüringerin
 Verkehrsministerin
-Notarztin
+Notärztin
 Schriftführerin
 Kennerin
 Baronin
@@ -571,7 +571,7 @@ Bundesbürgerin
 Naturfreundin
 Komplizin
 Organistin
-Chefarztin
+Chefärztin
 Hausarztin
 Philharmonikerin
 Spielmacherin
@@ -633,10 +633,10 @@ Amtsinhaberin
 % Schauer (?)
 Walkerin
 Pokalsiegerin
-Ständeratin
+Ständerätin
 Projektleiterin
 Moskauerin
-Tierarztin
+Tierärztin
 Norwegerin
 Zeichnerin
 Ratgeberin
@@ -696,7 +696,7 @@ Vizekanzlerin
 Halterin
 % Eifer (?)
 Zöllnerin
-Schwagerin
+Schwägerin
 Wanderfreundin
 Töpferin
 Zwangsarbeiterin
@@ -706,7 +706,7 @@ Irakerin
 Geigerin
 Grundschülerin
 Begründerin
-Schulratin
+Schulrätin
 Klagenfurterin
 Landeschefin
 Astronomin
@@ -1053,7 +1053,7 @@ Erzeugerin
 Generalstaatsanwaltin
 Rheinländerin
 Schmiedin
-Kinderarztin
+Kinderärztin
 Zürcherin
 Rekrutin
 Absenderin
@@ -1075,7 +1075,7 @@ Linzerin
 Adressatin
 Imkerin
 Thronfolgerin
-Hofratin
+Hofrätin
 Afghanin
 Sparerin
 Nachfahrin
@@ -1140,7 +1140,7 @@ Landgrafin
 Oldenburgerin
 Praktikantin
 Bundesgeschäftsführerin
-Elternbeiratin
+Elternbeirätin
 Stadtplanerin
 Stadtchefin
 Verhandlungsführerin
@@ -1200,7 +1200,7 @@ Hüterin
 Obermeisterin
 Kutscherin
 Kulturministerin
-Bezirksbeiratin
+Bezirksbeirätin
 Konfirmandin
 Musiklehrerin
 Washingtonerin
@@ -1210,7 +1210,7 @@ Solin
 Saarländerin
 Biathletin
 Topfavoritin
-Propstin
+Pröpstin
 Triathletin
 Facharbeiterin
 Ehrenpräsidentin
@@ -1300,7 +1300,7 @@ Berichterstatterin
 Patronin
 Romantikerin
 Arschin
-Augenarztin
+Augenärztin
 Banditin
 Philologin
 Machin
@@ -1387,7 +1387,7 @@ Radsportlerin
 Literaturwissenschaftlerin
 Privatdozentin
 Verhandlungspartnerin
-Landesbischofin
+Landesbischöfin
 Perserin
 Gesamtsiegerin
 Angstgegnerin
@@ -1430,12 +1430,12 @@ Schöffin
 Briefträgerin
 Präfektin
 Genießerin
-Milchbauerin
+Milchbäuerin
 Baustadtratin
 Nationalratspräsidentin
 Basketballspielerin
 Viertklässlerin
-Amtmannin
+Amtmännin
 Exponentin
 Geschäftsleiterin
 Stockholmerin
@@ -1575,7 +1575,7 @@ Kulturstaatsministerin
 Masseurin
 Staatsdienerin
 Skandinavierin
-Kleinbauerin
+Kleinbäuerin
 Antifaschistin
 Vizechefin
 Musikwissenschaftlerin
@@ -1585,7 +1585,7 @@ Sozialwissenschaftlerin
 Gerichtsmedizinerin
 Schwarzwälderin
 Südamerikanerin
-Biobauerin
+Biobäuerin
 Leiharbeiterin
 Mannschaftsführerin
 Sicherheitsberaterin
@@ -1633,7 +1633,7 @@ Spätaussiedlerin
 Medaillengewinnerin
 Bankkundin
 Visionärin
-Bezirksratin
+Bezirksrätin
 Sprayerin
 Verwaltungsdirektorin
 Rückraumspielerin
@@ -1776,7 +1776,7 @@ Referatsleiterin
 Mannschaftskameradin
 Abweichlerin
 Hauptaktionärin
-Weinbauerin
+Weinbäuerin
 Normalbürgerin
 Baltin
 Wegbegleiterin
@@ -1806,7 +1806,7 @@ Küchenmeisterin
 Kaufinteressentin
 Waffenhändlerin
 Kellin
-Rundfunkratin
+Rundfunkrätin
 Einkäuferin
 Finanzreferentin
 Doktorandin
@@ -1850,7 +1850,7 @@ Postbotin
 Melkerin
 Osteuropäerin
 Asiatin
-Kirchenratin
+Kirchenrätin
 Tagessiegerin
 Bremserin
 Ladendiebin
@@ -2066,14 +2066,14 @@ Jugendfreundin
 Nationalheldin
 Gerichtspräsidentin
 Kürschnerin
-Burggrafin
+Burggräfin
 Erfolgstrainerin
 Behördensprecherin
 Ideengeberin
 Funktionsträgerin
 Zynikerin
 Asiatin
-Amtsarztin
+Amtsärztin
 Pathologin
 Honorarprofessorin
 Preisrichterin
@@ -2115,7 +2115,7 @@ Parteifunktionärin
 Comiczeichnerin
 Mitkonkurrentin
 Landessiegerin
-Assistenzarztin
+Assistenzärztin
 Verschwörerin
 Büßerin
 Emittentin
@@ -2143,7 +2143,7 @@ Büttenrednerin
 Gerichtssprecherin
 Flamin
 Zweiradfahrerin
-Chefkochin
+Chefköchin
 Langstreckenläuferin
 Subunternehmerin
 Wachtmeisterin
@@ -2157,7 +2157,7 @@ Stadtverordnetenvorsteherin
 Partisanin
 Erntehelferin
 Libyerin
-Kreisratin
+Kreisrätin
 Delinquentin
 Gesinnungsgenossin
 Mitinhaberin
@@ -2201,7 +2201,7 @@ Westlerin
 Topspielerin
 Wasserballerin
 Senkrechtstarterin
-Bergbauerin
+Bergbäuerin
 Befreierin
 Fahranfängerin
 Forstwirtin
@@ -2245,7 +2245,7 @@ Weltenbummlerin
 Landschaftsmalerin
 Astrologin
 Konzernsprecherin
-Oberkirchenratin
+Oberkirchenrätin
 Popsängerin
 Gemeindepfarrerin
 Heimwerkerin
@@ -2320,7 +2320,7 @@ Abgängerin
 Stromkundin
 Humoristin
 Funkerin
-Oberstudienratin
+Oberstudienrätin
 Diskutantin
 Trösterin
 Seniorchefin
@@ -2354,7 +2354,7 @@ Eifelerin
 Arbeitsvermittlerin
 Rotarierin
 Fahnenträgerin
-Studienratin
+Studienrätin
 Latschin
 Novizin
 Nachwuchsmusikerin
@@ -2519,7 +2519,7 @@ Maoistin
 Wanderwartin
 Kraftwerksbetreiberin
 Trainingspartnerin
-Jungbauerin
+Jungbäuerin
 Nostalgikerin
 Ersthelferin
 Marketingchefin
@@ -2645,7 +2645,7 @@ Dekanatskantorin
 Elektroingenieurin
 Skiläuferin
 Spielkameradin
-Jugendgemeinderatin
+Jugendgemeinderätin
 Mehrheitseigentümerin
 Tipperin
 Anästhesistin
@@ -2752,7 +2752,7 @@ Außenamtssprecherin
 Schleiferin
 Organisationsleiterin
 Zecherin
-Amtstierarztin
+Amtstierärztin
 Invasorin
 Landesministerin
 Spielgestalterin
@@ -2848,7 +2848,7 @@ Gästespielerin
 Dermatologin
 Schreinermeisterin
 Steherin
-Halbgottin
+Halbgöttin
 Mikrobiologin
 Regierungsdirektorin
 Widerständlerin
@@ -2864,7 +2864,7 @@ Hellseherin
 Proletarierin
 Klassenfeindin
 Protektorin
-Meisterkochin
+Meisterköchin
 Umweltpolitikerin
 Fixerin
 Kugelstoßerin
@@ -2902,7 +2902,7 @@ Umweltaktivistin
 Umfallerin
 Wirtschaftskammerpräsidentin
 Weitspringerin
-Blaserin
+Bläserin
 Ghostwriterin
 Autistin
 Hochschülerin
@@ -2954,10 +2954,10 @@ Vorpommerin
 Sprachforscherin
 Arierin
 Etruskerin
-Gemeindearztin
+Gemeindeärztin
 Nationalratskandidatin
 Popmusikerin
-Handlerin
+Händlerin
 Bolschewikin
 Neckarstädterin
 Neofaschistin
@@ -2973,12 +2973,12 @@ Spartenleiterin
 Geschichtslehrerin
 Nachwuchswissenschaftlerin
 Nehmerin
-Sportarztin
+Sportärztin
 Jungwählerin
 Medienwissenschaftlerin
 Schülerlotsin
 Unterdrückerin
-Kommerzienratin
+Kommerzienrätin
 Trafikantin
 Menschenrechtsaktivistin
 Auswahlspielerin
@@ -3029,7 +3029,7 @@ Sprengmeisterin
 Metallarbeiterin
 Hilfspolizistin
 Bundesbeamtin
-Fernsehkochin
+Fernsehköchin
 Infrastrukturministerin
 Schachmeisterin
 Solingerin
@@ -3109,7 +3109,7 @@ Hausverwalterin
 Menschenfreundin
 Auswechselspielerin
 Juniorenmeisterin
-Angelsachsin
+Angelsächsin
 Musikstudentin
 Bundesgenossin
 Gastdozentin
@@ -3380,7 +3380,7 @@ Bausparerin
 Schachweltmeisterin
 Entomologin
 Asketin
-Nervenarztin
+Nervenärztin
 Seismologin
 Schiffbauerin
 Fernsehdirektorin
@@ -3389,7 +3389,7 @@ Schreibtischtäterin
 Vertragshändlerin
 Überzeugungstäterin
 Interimspräsidentin
-Oberregierungsratin
+Oberregierungsrätin
 Protestwählerin
 Redenschreiberin
 Gastreferentin
@@ -3401,7 +3401,7 @@ Seminarleiterin
 Fachreferentin
 Klavierspielerin
 Fachministerin
-Reichsgrafin
+Reichsgräfin
 Festivalbesucherin
 Fernsehreporterin
 Gralshüterin
@@ -3409,7 +3409,7 @@ Briefmarkensammlerin
 Dekorateurin
 Langzeitstudentin
 Linksabbiegerin
-Jagerin
+Jägerin
 Musikprofessorin
 Gafferin
 Immobilienhändlerin
@@ -3486,7 +3486,7 @@ Akkordeonspielerin
 Blumenhändlerin
 Hauptabteilungsleiterin
 Phönizierin
-Großbauerin
+Großbäuerin
 Landessprecherin
 Medienberaterin
 Parteipolitikerin
@@ -3501,7 +3501,7 @@ Skatspielerin
 Jugendbuchautorin
 Theologiestudentin
 Schulsozialarbeiterin
-Gegenpapstin
+Gegenpäpstin
 Vorbeterin
 Jugendanwaltin
 Kunstprofessorin
@@ -3536,7 +3536,7 @@ Ruanderin
 Heimatkundlerin
 Gemeindevorsteherin
 Tierquälerin
-Umweltgemeinderatin
+Umweltgemeinderätin
 Bühnenarbeiterin
 Schlittschuhläuferin
 Werbetexterin
@@ -3546,7 +3546,7 @@ Mischlingshundin
 Bundesforschungsministerin
 Jazztrompeterin
 Herzensbrecherin
-Tanzerin
+Tänzerin
 Landschaftsplanerin
 Tanzpartnerin
 Taxilenkerin
@@ -3561,7 +3561,7 @@ Ausstellungsleiterin
 Mittdreißigerin
 Friseurmeisterin
 Hubschrauberpilotin
-Oberschulratin
+Oberschulrätin
 Hauptschuldirektorin
 Meinungsmacherin
 Kettenraucherin
@@ -3644,7 +3644,7 @@ Dauerrivalin
 Unterhaltungskünstlerin
 Friedensforscherin
 Jungschützenkönigin
-Bezirksschulratin
+Bezirksschulrätin
 Briefschreiberin
 Diskussionspartnerin
 Dompredigerin
@@ -3689,7 +3689,7 @@ Postmeisterin
 Stadtratskandidatin
 Inserentin
 Korrektorin
-Amtsratin
+Amtsrätin
 Landgerichtspräsidentin
 Kompromisskandidatin
 Bühnenautorin
@@ -3795,7 +3795,7 @@ Vollidiotin
 Rechnungshofpräsidentin
 Kindergärtnerin
 Lückenbüßerin
-Schularztin
+Schulärztin
 Studienfreundin
 Gastsängerin
 Mitgestalterin
@@ -3812,7 +3812,7 @@ Imperialistin
 Häretikerin
 Latschin
 Wichtigtuerin
-Allgemeinarztin
+Allgemeinärztin
 Kernkraftgegnerin
 Spätzünderin
 Stichlerin
@@ -3907,7 +3907,7 @@ Belegschaftsvertreterin
 Ecuadorianerin
 Präsidentenberaterin
 Monegassin
-Betriebsarztin
+Betriebsärztin
 Antragsstellerin
 Erforscherin
 Volkspolizistin
@@ -4019,7 +4019,7 @@ Deutschtürkin
 Sozialamtsleiterin
 Wachsoldatin
 Huldin
-Kriegsgottin
+Kriegsgöttin
 Kurdin
 Pornodarstellerin
 Balletttänzerin
@@ -4071,7 +4071,7 @@ Gesangslehrerin
 Gesundheitssprecherin
 Exekutivdirektorin
 Logikerin
-Altbauerin
+Altbäuerin
 Chefberaterin
 Familienforscherin
 Eisfuchsin

@@ -115,6 +115,7 @@ class Marking_Tool:
         else:
             self.parse_list[pos][1] = Lexicon_Fem.feminize_word(word_parse)
     
+    # This function neutralizes the word that has been selected. Then, all dependent words in the sentence are neutralized.
     def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
         # Neutralize a Noun
@@ -131,9 +132,19 @@ class Marking_Tool:
                 self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
             # words ending on -mann or -frau:
             elif line == -2:
-                self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
+                self.parse_list[pos][1] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos])
                 feats = self.parse_list[pos][5].split("|")
                 if feats[0] == "Masc" and feats[2] == "Sg":
+                    for child in self.nounphrases.get(pos+1):
+                        article_pos = min(self.nounphrases.get(pos+1))
+                        self.feminize_word(child-1, article_pos)
+                return
+            # The Word "Mann", "Frau", "Herr", "Dame":
+            elif line == -4:
+                self.parse_list[pos][1] = Lexicon.neutralize_mann_frau(self.parse_list[pos])
+                feats = self.parse_list[pos][5].split("|")
+                if feats[0] == "Masc" and feats[2] == "Sg":
+                    print("here")
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
                         self.feminize_word(child-1, article_pos)
@@ -149,7 +160,7 @@ class Marking_Tool:
                 pass
             # Special neologisms    
             elif line <= -3:
-                self.parse_list[pos][1] = Lexicon.neutralize_special_nouns(self.parse_list[pos], line)
+                self.parse_list[pos][1] = Lexicon.neutralize_neologism(self.parse_list[pos])
             # Noun is the Special case "Beamter" (line 88)
             elif line == 88:
                 article_pos = pos+1
@@ -249,7 +260,12 @@ class Marking_Tool:
             elif word_parse[3] == "$." or word_parse[3] == "$,":
                 nouns = nouns[:-1] + word_parse[1] + " "
             elif word_parse[3] == "$(":
-                nouns += word_parse[1]
+                if word_parse[1] == "(":
+                    nouns += word_parse[1]
+                elif word_parse[1] == ")":
+                    nouns = nouns[:-1] + word_parse[1] + " "
+                else:
+                    nouns += word_parse[1]
             else:
                nouns += word_parse[1] + " "
         print(self.nounphrases)
