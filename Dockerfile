@@ -17,7 +17,7 @@ RUN apt-get update &&  apt-get -y install \
     python3-pexpect \
     python-is-python3
 
-RUN pip install --no-cache-dir flask pexpect
+RUN pip install --no-cache-dir flask pexpect gunicorn
 
 RUN (bash install.sh)
 
@@ -28,5 +28,5 @@ EXPOSE 4000
 # Define environment variable (if needed)
 # ENV NAME World
 
-# Run your Flask app when the container launches
-CMD python __init__.py run
+# Run your Flask app using Gunicorn when the container launches
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "__init__:app"]

@@ -70,10 +70,13 @@ def load_arguments():
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hi:lo:p:vq", ["help", "input=", "linewise", "output=", "verbose", "secedges", "projective", "quiet"])
     except getopt.GetoptError as err:
-        # print help information and exit:
-        sys.stderr.write(err) # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
+        print("Warning: Ignored unexpected options")
+        opts = []  # Set opts to an empty list to avoid further errors
+        # Old version before using Gunicorn:
+        # # print help information and exit:
+        # sys.stderr.write(err) # will print something like "option -a not recognized"
+        # usage()
+        # sys.exit(2)
     output = None
     inputformat = None
     linewise = False

@@ -38,14 +38,26 @@ Docker:
 
 You can build the docker image by calling:
 ```console
-~$: sudo docker build -t your_image_name .
+~$: sudo docker build -t docker_image .
 ```
 
 To then run the image in a container, you can call:
 ```console
-~$: sudo docker run -p 4000 your_image_name
+~$: sudo docker run -p 80:80 docker_image
 ```
-You will then find the app running on the second IP adress shown in the command line.
+You will then find the app running on http://localhost:80.
+
+In order to run transfer the docker image to a server, you need to pack it into a tar file and then copy to the server using scp:
+```console
+~$: sudo docker save -o docker_image.tar docker_image
+~$: sudo scp -i ~/.ssh/id_rsa docker_image.tar root@<server-ip>:/root/ 
+```
+On the server, you need to unpack the docker image and the run it:
+```console
+~$: docker load -i docker_image.tar
+~$: docker run -p 80:80 docker_image
+```
+
 
 Possible Errors:
 ---------------
