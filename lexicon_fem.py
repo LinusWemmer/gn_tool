@@ -9,7 +9,7 @@ class Lexicon_Fem:
     
     ARTIKEL_DER = {"Nom": "die",
                 "Gen": "der",
-                "Dat": "den",
+                "Dat": "der",
                 "Acc": "die"}
     
     ARTIKEL_UNSER = {"Nom": "unsere",
