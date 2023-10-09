@@ -245,6 +245,9 @@ class Lexicon:
     def neutralize_adjectives(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
         article = article_parse[1]
+        # Plural adjectives don't need to be changed
+        if feats[3] == "Pl":
+            return word_parse[1]
         # This is a weird hack to make sure "anders" works correctly
         if word_parse[2].startswith("ander"):
             word_parse[2] = "ander"
@@ -260,17 +263,13 @@ class Lexicon:
             adjective = word_parse[2]
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
         if article_parse[3] == "ART" or article_parse[4] == "APPRART":
-            if feats[3] == "Pl":
-                return word_parse[1]
+            # Differentiate case
+            if feats[2] == "Acc" or feats[2] == "Nom":
+                adjective = adjective + "e"
+                return adjective.capitalize() if word_parse[0] == "1" else adjective
             else:
-                # Differentiate case
-                if feats[2] == "Acc" or feats[2] == "Nom":
-                    adjective = adjective + "e"
-                    return adjective.capitalize() if word_parse[0] == "1" else adjective
-                else:
-                    adjective = adjective + "en"
-                    return adjective.capitalize() if word_parse[0] == "1" else adjective
-                return word_parse[1]
+                adjective = adjective + "en"
+                return adjective.capitalize() if word_parse[0] == "1" else adjective
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
