@@ -125,7 +125,7 @@ class Marking_Tool:
         if self.parse_list[pos][3] == "N":
             # Noun is a substantivized adjective 
             if line == -1:
-                article_pos = pos+1
+                article_pos = pos
                 nounphrase = self.nounphrases.get(pos+1)
                 if nounphrase:
                     for child_pos in nounphrase: 

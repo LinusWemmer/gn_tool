@@ -51,8 +51,9 @@ class Lexicon:
 
     ENGLISH_NOUNS = ["Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie"]
 
-    NEOLOGISMS = [r"(Bruder)|(Schwester)", r"(Vater)|(Mutter)", r"O(p|m)a", r"(Onkel)|(Tante)", r"Cousine?", r"Tochter|Sohn", r"Jungfrau", r"Mädchen|Junge"]
-    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Tonke", "Couse", "Spross", "Jungfere", "Kid"]
+    NEOLOGISMS = [r"(Bruder)|(Schwester)", r"(Vater)|(Mutter)", r"O(p|m)a", r"(Onkel)|(Tante)", r"Cousine?", r"Tochter|Sohn", r"Jungfrau", r"Mädchen|Jung(e|s)", r"Neffe|Nichte"]  
+    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Tonke", "Couse", "Spross", "Jungfere", "Kid", "Nefte"]
+    NEOLOGSIMS_PLURAL = ["Geschwister", "Eltern", "Otas", "Tonken", "Cousernen", "Sprosse", "Jungferne", "Kids", "Neften"]
 
     # The next section generates List of Male/Female role nouns an their corresponding neutral forms
     # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
@@ -176,15 +177,14 @@ class Lexicon:
             if re.match(neologism, noun):
                 line = index
                 break
-        noun = Lexicon.NEOLOGISMS_NEUTRAL[line]
         if feats[2] == "Pl":
-            if noun.endswith("ere"):
-                noun = noun[:-2]
-            if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
-                return noun + "rne"
-            if feats[1] ==  "Dat":
-                return noun + "rnen"
+            noun = Lexicon.NEOLOGSIMS_PLURAL[line]
+            if line == 0 and feats[1] == "Dat":
+                return "Geschwistern"
+            else:
+                return noun
         else:
+            noun = Lexicon.NEOLOGISMS_NEUTRAL[line]
             if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
                 return noun
             elif feats[1] == ("Gen"):
