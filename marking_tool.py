@@ -186,8 +186,10 @@ class Marking_Tool:
                 if "-" in self.parse_list[pos][1]:
                     word_split = self.parse_list[pos][1].split("-")
                     self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)
+                elif self.parse_list[pos][1].startswith(Lexicon.MALE_NOUNS[line][:-1]): # Weird check to see if our noun is split or not, this should work most of the time
+                    self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line) 
                 else:
-                    self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line)
+                    self.parse_list[pos][1] = Lexicon.neutralize_split_noun(feats, line, self.parse_list[pos][2])
         # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])

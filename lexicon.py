@@ -77,6 +77,23 @@ class Lexicon:
         for line in f_sub_adj:
             PART_NOUNS.append(line.rstrip())
 
+    def neutralize_split_noun(feats:list, index:int, root_word:str) -> str:
+            if feats[0] == "Masc":
+                rexp_m = re.compile(Lexicon.MALE_NOUNS[index].lower() + "(.*)")
+                match = re.search(rexp_m, root_word)
+                noun = match.group(0)
+                return root_word.replace(noun, Lexicon.neutralize_noun(feats, index).lower())
+            elif feats[0] == "Fem":
+                rexp_f = re.compile(Lexicon.FEMALE_NOUNS[index].lower() + "(.*)")
+                match = re.search(rexp_f, root_word)
+                noun = match.group(0)
+                return root_word.replace(noun, Lexicon.neutralize_noun(feats, index).lower())
+            else:
+                rexp_m = re.compile(Lexicon.MALE_NOUNS[index].lower() + "(.*)")
+                match = re.search(rexp_m, root_word)
+                noun = match.group(0)
+                return root_word.replace(noun, Lexicon.neutralize_noun(feats, index).lower())
+
     def neutralize_noun(feats:list, index:int) -> str:
         # Case: Noun is in Singular
         if feats[2] == "Sg":
@@ -427,7 +444,7 @@ class Lexicon:
                     return i
                 elif i >= length:
                     break
-        else:    
+        elif gender == "_":    
             for i, line in enumerate(Lexicon.MALE_NOUNS):
                 if line == noun:
                     return i
@@ -469,6 +486,31 @@ class Lexicon:
                 return -1
         if re.match(r".*sprachige", noun):
             return -1    
+        # Check the List if our word ends with a role noun in our list:
+        if gender == "M":
+            for i, line in enumerate(Lexicon.MALE_NOUNS):
+                if noun.endswith(line.lower()):
+                    return i
+                elif i >= length:
+                    break
+        elif gender == "F":
+            for i, line in enumerate(Lexicon.FEMALE_NOUNS):
+                if noun.endswith(line.lower()):
+                    return i
+                elif i >= length:
+                    break
+        elif gender == "_":    
+            for i, line in enumerate(Lexicon.MALE_NOUNS):
+                if noun.endswith(line.lower()):
+                    return i
+                elif i >= length:
+                    i = 0
+                    break
+            for i, line in enumerate(Lexicon.FEMALE_NOUNS):
+                if noun.endswith(line.lower()):
+                    return i
+                elif i >= length:
+                    break
         return False
     
     def __init__(self):
