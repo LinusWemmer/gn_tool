@@ -28,8 +28,10 @@ class Sentence_Test(unittest.TestCase):
         test_sentence_19 = ("Der Schüler, der dort steht, ist nett.", "De Schülere, de dort steht, ist nett.", ((2,6), (4,0)))
         test_sentence_20 = ("Aufgrund ihrer Krankheit wird sie leider nicht dabei sein.", "Aufgrund enser Krankheit wird en leider nicht dabei sein.", ((2,0),(4,0)))
         test_sentence_21 = ("Mein Opa liegt im Krankenhaus.", "Mein Ota liegt im Krankenhaus.", ((2,-3),))
+        test_sentence_22 = ("Einer von den beiden wird kommen.", "Einey von den beiden wird kommen.", ((1,0),))
         test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10,
-                           test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17, test_sentence_18, test_sentence_19, test_sentence_20, test_sentence_21]
+                           test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17, test_sentence_18, test_sentence_19, test_sentence_20, test_sentence_21,
+                           test_sentence_22]
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])

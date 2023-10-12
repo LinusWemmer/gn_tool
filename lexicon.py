@@ -261,7 +261,6 @@ class Lexicon:
 
     def neutralize_adjectives(word_parse, article_parse) -> str:
         feats = word_parse[5].split("|")
-        article = article_parse[1]
         # Plural adjectives don't need to be changed
         if feats[3] == "Pl":
             return word_parse[1]
@@ -360,7 +359,7 @@ class Lexicon:
             return pronoun.capitalize() if is_capitalized else pronoun
 
     def neutralize_word(word_parse) -> str:
-        # For Plural Cases, I think this doesn't have to be changed. Check with testing.
+        # Plural cases don't have to be changed and can be ignored
         if "Pl" in word_parse[5]:
             return word_parse[1]
         # neutralize Articles

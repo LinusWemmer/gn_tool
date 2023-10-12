@@ -202,11 +202,20 @@ class Marking_Tool:
         #Neutralize everything else
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
-
-        # Neutralize the other words in the nounphrase
+        # Neutralize the remaining words in the nounphrase:
+        plural = False
         for child in self.nounphrases.get(pos+1):
+            word_parse = self.parse_list[child-1]
+            if "Pl" in word_parse[5]:
+                plural = True
+                break
             article_pos = min(self.nounphrases.get(pos+1))
             self.neutralize_word(child-1, article_pos)
+        if not plural:
+            for child in self.nounphrases.get(pos+1):
+                article_pos = min(self.nounphrases.get(pos+1))
+                self.neutralize_word(child-1, article_pos)
+
 
     # Generates the html form, with noun phrases marked 
     def get_marking_form(self, sentence_number) -> str:
