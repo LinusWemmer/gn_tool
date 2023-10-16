@@ -9,16 +9,17 @@ import re
 #   - converting a nounphrase into the inklusive form based on the de-e System.
 
 class Marking_Tool:
-    def __init__(self, words):
-        # List of the 
-        self.words = words
+    def __init__(self, parse_list, nounphrases = {}):
+    
         # List of the conll parse strings split into a list 
         # The format of the list is as follows (conll format):
         # 0:POSTION 1:FORM 2:STEM 3:CPOSTAG 4:POSTAG 5:FEATS 6:HEAD 7:DEPREL 8:PHEAD
-        self.parse_list = []
-        for word in words:
-            self.parse_list.append(word.split("\t"))
-        self.nounphrases = {}
+        self.parse_list = parse_list
+        self.nounphrases = nounphrases
+
+    def serialize(self):
+        return {"parse_list": self.parse_list,
+                "nounphrases": self.nounphrases}
 
     # Returns the sentence underlying the parse.
     def get_sentence(self, split_list = []) -> str:
