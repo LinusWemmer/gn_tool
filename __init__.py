@@ -15,6 +15,13 @@ def get_parse(text: str):
     #sentence_data.clear_marking_tools()
     return sentences
 
+def add_split(split_words:dict, sentence_nr:int, word_nr:int):
+    if sentence_nr in split_words.keys():
+        splits = split_words[sentence_nr]
+        splits.append(word_nr)
+        split_words[sentence_nr] = splits
+    else:
+        split_words[sentence_nr] = [word_nr]
 
 def mark_nouns(sentences: list):
     nouns = ""
@@ -36,6 +43,8 @@ def mark_nouns(sentences: list):
 # To ensure correct parsing, 
 def split_prepositions(input_text: str) ->str:
     sentences = re.split(r"(\.|\!|\?)", input_text)
+    # Dict of where words have been split in two. Key: Sentence , Value: List of Positions in that sentence
+    split_words = {}                   
     output = ""
     for i,sentence in enumerate(sentences):
         words = sentence.split(" ")
@@ -43,54 +52,55 @@ def split_prepositions(input_text: str) ->str:
         for j, word in enumerate(words):
             if word =="beim":
                 output += "bei dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "Beim":
                 output +="Bei dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "zum":
                 output += "zu dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "Zum":
                 output += "Zu dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "zur":
                 output += "zu der "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "Zur":
                 output += "Zu der "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "im":
                 output += "in dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "Im":
                 output += "In dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "vom":
                 output += "von dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "Vom":
                 output += "Von dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "am":
                 output += "an dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             elif word == "Am":
                 output += "An dem "
-                sentence_data.add_split(i,j+k+1)
+                add_split(split_words, i,j+k+1)
                 k += 1
             else:
                 output += word + " "
+    session["split_words"] = split_words
     return output
 
 app = Flask(__name__)
@@ -104,8 +114,9 @@ def index():
 def parse_text():
     if request.method == "POST":
         input_text = request.form["inputText"]
-        sentence_data.clear_marking_tools()
+        session.clear()
         input_text = split_prepositions(input_text)
+        print(session["split_words"])
         parse = get_parse(input_text)
         print(parse)
         marked_nouns = mark_nouns(parse)
@@ -127,7 +138,6 @@ def parse_text():
 def neutralize_marked():
     selected_nouns = request.form
     sentence_number = session.get("sentence_number")
-    print(sentence_number)
     marking_tool_list = []
     neutralized_text = ""
     for i in range(sentence_number):
@@ -144,8 +154,13 @@ def neutralize_marked():
         marking_tool.neutralize_nounphrase(int(noun_data[1])-1, int(noun_data[2]))
     #neutralized_text = sentence_data.get_text()
     neutralized_text = ""
+    split_words =  {int(k):v for k,v in session["split_words"].items()}
+    #print(split_words)
     for i in range(sentence_number):
-        neutralized_text += marking_tool_list[i].get_sentence()
+        if i in split_words.keys():
+            neutralized_text += marking_tool_list[i].get_sentence(split_words[i])
+        else:
+            neutralized_text += marking_tool_list[i].get_sentence()
     return render_template("index.html", outputText = neutralized_text)
 
 if __name__ == "__main__":
