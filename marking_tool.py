@@ -148,7 +148,6 @@ class Marking_Tool:
                 self.parse_list[pos][1] = Lexicon.neutralize_mann_frau(self.parse_list[pos])
                 feats = self.parse_list[pos][5].split("|")
                 if feats[0] == "Masc" and feats[2] == "Sg":
-                    print("here")
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
                         self.feminize_word(child-1, article_pos)
@@ -187,8 +186,10 @@ class Marking_Tool:
                 if "-" in self.parse_list[pos][1]:
                     word_split = self.parse_list[pos][1].split("-")
                     self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)
+                # Noun is a normal word in our List of movierbare Substantive
                 elif self.parse_list[pos][1].startswith(Lexicon.MALE_NOUNS[line][:-1]): # Weird check to see if our noun is split or not, this should work most of the time
                     self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line) 
+                # Noun is zusammengesetzt ohne Bindestrich
                 else:
                     self.parse_list[pos][1] = Lexicon.neutralize_split_noun(feats, line, self.parse_list[pos][2])
         # Neutralize Personal Pronouns

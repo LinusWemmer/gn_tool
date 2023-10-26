@@ -24,7 +24,7 @@ def add_split(split_words:dict, sentence_nr:int, word_nr:int):
         split_words[sentence_nr] = [word_nr]
 
 def mark_nouns(sentences: list):
-    nouns = ""
+    marking_form = ""
     sentence_number = 0
     for sentence in sentences:
         words = sentence.split("\n")
@@ -35,10 +35,10 @@ def mark_nouns(sentences: list):
         marking_tool = Marking_Tool(parse_list)
         session[f"markingtool{sentence_number}"] = marking_tool.__dict__
         #sentence_data.add_marking_tool(sentence_number, marking_tool)
-        nouns += marking_tool.get_marking_form(sentence_number)
+        marking_form += marking_tool.get_marking_form(sentence_number)
         sentence_number += 1
     session["sentence_number"] = sentence_number
-    return nouns
+    return marking_form
 
 # To ensure correct parsing, 
 def split_prepositions(input_text: str) ->str:
@@ -147,6 +147,7 @@ def neutralize_marked():
         nounphrases = {int(k):v for k,v in nounphrases.items()}
         marking_tool = Marking_Tool(parse_list, nounphrases)
         marking_tool_list.append(marking_tool)
+    # Neutralize all selected words of the form
     for selected_noun in selected_nouns:
         print(selected_noun)
         noun_data = selected_noun.split("|")
