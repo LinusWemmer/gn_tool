@@ -118,12 +118,29 @@ class Marking_Tool:
             self.parse_list[pos][1] = Lexicon_Fem.feminize_adjectives(word_parse, self.parse_list[article_pos-1])
         else:
             self.parse_list[pos][1] = Lexicon_Fem.feminize_word(word_parse)
+
+    def determine_number(self, pos:int, feats:list, plural:bool):
+        article = False
+        for child in self.nounphrases.get(pos+1):
+            if self.parse_list[child-1][3] == "ART":
+                article = True
+                break
+        if article:
+            feats[2] = "Sg"
+        elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])][1]):
+            feats[2] = "Pl"
     
     # This function neutralizes the word that has been selected. Then, all dependent words in the sentence are neutralized.
     def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
+        plural = True
+
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
+            if feats[2] == "_":
+                self.determine_number(pos,feats,plural)
+            if feats[2] == "Sg":
+                plural = False
             # Noun is a substantivized adjective 
             if line == -1:
                 article_pos = pos
@@ -205,14 +222,6 @@ class Marking_Tool:
         else:
             self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
         # Neutralize the remaining words in the nounphrase:
-        plural = False
-        for child in self.nounphrases.get(pos+1):
-            word_parse = self.parse_list[child-1]
-            if "Pl" in word_parse[5]:
-                plural = True
-                break
-            article_pos = min(self.nounphrases.get(pos+1))
-            self.neutralize_word(child-1, article_pos)
         if not plural:
             for child in self.nounphrases.get(pos+1):
                 article_pos = min(self.nounphrases.get(pos+1))
