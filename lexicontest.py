@@ -37,7 +37,10 @@ class Sentence_Test(unittest.TestCase):
             parse = ParZu.main(test[0])
             words = parse[0].split("\n")
             words = words[:-2]
-            marking_tool = Marking_Tool(words)
+            parse_list = []
+            for word in words:
+                parse_list.append(word.split("\t"))
+            marking_tool = Marking_Tool(parse_list)
             for nounphrase in test[2]:
                 marking_tool.find_nounphrase(marking_tool.parse_list[nounphrase[0] - 1])
             for nounphrase in test[2]:
