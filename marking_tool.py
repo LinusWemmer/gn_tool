@@ -75,13 +75,14 @@ class Marking_Tool:
         else:
             return word
 
-    # Finds all "nounphrases" of the sentence and stores them in a dict.
-    # Returns True if the word is a role noun, otherwise false.
+    # Adds a single nounphrase to the dictionary "nounphrases". The key is
+    # the index of the head of the nounphrase, while the value is the list of
+    # all indices of its children.
     def find_nounphrase(self, word_parse):
         self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0])
         print(self.nounphrases)
     
-    # Finds all nounphrases of the sentence that come role nouns
+    # Apparently the following is not used in the code:
     def find_nounphrases(self):
         for word_parse in self.parse_list:
             if word_parse[3] == "N":
@@ -127,9 +128,49 @@ class Marking_Tool:
                 break
         if article:
             feats[2] = "Sg"
-        elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])][1]):
+        elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):
+            print(self.parse_list[pos][1])
+            print("nicht von 'als' abhängig.")
             feats[2] = "Pl"
+        else:
+            index_of_last_np_before_als = self.find_last_np_before_index(int(self.parse_list[pos][6]))
+            if index_of_last_np_before_als > 0:
+                otherfeats = self.parse_list[index_of_last_np_before_als-1][5].split("|")
+                if self.parse_list[index_of_last_np_before_als-1][3] == "N":
+                    feats[1] = otherfeats[1]
+                    feats[2] = otherfeats[2]
+                elif self.parse_list[index_of_last_np_before_als-1][3] == "PRO":
+                    feats[1] = otherfeats[3]
+                    feats[2] = otherfeats[1]
+                # Hier oben und unten werden wahrscheinlich noch mehr Fälle als "N" und "PRO" benötigt, zum Beispiel für den Fall, dass "jemand" als Adjektiv geparst wird.
+            else:
+                index_of_first_np_after_als_construct = self.find_first_np_after_index(pos+1)
+                print("index_of_first_np_after_als")
+                print(index_of_first_np_after_als_construct)
+                if index_of_first_np_after_als_construct > 0:
+                    otherfeats = self.parse_list[index_of_first_np_after_als_construct-1][5].split("|")
+                    if self.parse_list[index_of_first_np_after_als_construct-1][3] == "N":
+                        feats[2] = otherfeats[2]
+                    elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "PRO":
+                        feats[2] = otherfeats[1]
+                else:
+                    feats[2] = "Sg"
     
+    def find_last_np_before_index(self, als_index:int):
+        for i in range(als_index-1,0,-1):
+            if i in self.nounphrases:
+                return i
+        return 0
+    
+    def find_first_np_after_index(self, als_index:int):
+        print("als_index")
+        print(als_index)
+        for i in range(als_index+1,len(self.parse_list)+1):
+            if i in self.nounphrases:
+                return i
+        return 0
+
+
     # This function neutralizes the word that has been selected. Then, all dependent words in the sentence are neutralized.
     def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
@@ -139,7 +180,7 @@ class Marking_Tool:
         if self.parse_list[pos][3] == "N":
             if feats[2] == "_":
                 self.determine_number(pos,feats,plural)
-            if feats[2] == "Sg":
+            if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
             # Noun is a substantivized adjective 
             if line == -1:
@@ -242,9 +283,10 @@ class Marking_Tool:
                 nouns += input_form
             # Case: Noun
             elif word_parse[3] == "N":
+                self.find_nounphrase(word_parse)
                 line = Lexicon.check_role_noun(word_parse)
                 if line:
-                    self.find_nounphrase(word_parse)
+                    #self.find_nounphrase(word_parse)
                     input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select">
                     <label for="{sentence_number}|{word_parse[0]}|{line}">{"<u>" + word_parse[1] + "</u>"}</label> """
                     nouns += input_form

@@ -26,12 +26,19 @@ class Sentence_Test(unittest.TestCase):
         test_sentence_17 = ("Als Vorsitzender hat Kim viel zu tun.", "Als Vorsitzendey hat Kim viel zu tun.", ((2,-1),))
         test_sentence_18 = ("Sicher kaum einer!", "Sicher kaum einey!", ((3,0),))
         test_sentence_19 = ("Der Schüler, der dort steht, ist nett.", "De Schülere, de dort steht, ist nett.", ((2,6), (4,0)))
-        test_sentence_20 = ("Aufgrund ihrer Krankheit wird sie leider nicht dabei sein.", "Aufgrund enser Krankheit wird en leider nicht dabei sein.", ((2,0),(4,0)))
+        test_sentence_20 = ("Aufgrund ihrer Krankheit wird sie leider nicht dabei sein.", "Aufgrund enser Krankheit wird en leider nicht dabei sein.", ((2,0),(5,0)))
         test_sentence_21 = ("Mein Opa liegt im Krankenhaus.", "Mein Ota liegt im Krankenhaus.", ((2,-3),))
         test_sentence_22 = ("Einer von den beiden wird kommen.", "Einey von den beiden wird kommen.", ((1,0),))
+        test_sentence_23 = ("Als guter Lehrer kann er das.", "Als gutey Lehrere kann en das.", ((3,34),(5,0)))
+        test_sentence_24 = ("Die Mitglieder nehmen als gute Lehrer teil.", "Die Mitglieder nehmen als gute Lehrerne teil.", ((6,34),))
+        test_sentence_25 = ("Das Mitglied nimmt als guter Lehrer teil.", "Das Mitglied nimmt als gutey Lehrere teil.", ((6,34),))
+        test_sentence_26 = ("Er nimmt als guter Lehrer teil.", "En nimmt als gutey Lehrere teil.", ((1,0),(5,34)))
+        test_sentence_27 = ("Als gute Lehrer nehmen die Mitglieder teil.", "Als gute Lehrerne nehmen die Mitglieder teil.", ((1,0),(5,34)))
+        test_sentence_28 = ("Kim arbeitet mit anderen Aktivisten zusammen.", "Kim arbeitet mit anderen Aktivisternen zusammen.", ((5,473),))
+        test_sentence_29 = ("Ich kenne andere Schüler.", "Ich kenne andere Schülerne. ", ((4,6),))
         test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10,
                            test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17, test_sentence_18, test_sentence_19, test_sentence_20, test_sentence_21,
-                           test_sentence_22]
+                           test_sentence_22, test_sentence_23, test_sentence_24, test_sentence_25, test_sentence_26, test_sentence_27]
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])
