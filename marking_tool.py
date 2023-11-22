@@ -179,6 +179,8 @@ class Marking_Tool:
         # Neutralize a Noun
         if self.parse_list[pos][3] == "N":
             if feats[2] == "_":
+                print("Noun without number:")
+                print(self.parse_list[pos][1])
                 self.determine_number(pos,feats,plural)
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False

@@ -33,12 +33,13 @@ class Sentence_Test(unittest.TestCase):
         test_sentence_24 = ("Die Mitglieder nehmen als gute Lehrer teil.", "Die Mitglieder nehmen als gute Lehrerne teil.", ((6,34),))
         test_sentence_25 = ("Das Mitglied nimmt als guter Lehrer teil.", "Das Mitglied nimmt als gutey Lehrere teil.", ((6,34),))
         test_sentence_26 = ("Er nimmt als guter Lehrer teil.", "En nimmt als gutey Lehrere teil.", ((1,0),(5,34)))
-        test_sentence_27 = ("Als gute Lehrer nehmen die Mitglieder teil.", "Als gute Lehrerne nehmen die Mitglieder teil.", ((1,0),(5,34)))
+        test_sentence_27 = ("Als gute Lehrer nehmen die Mitglieder teil.", "Als gute Lehrerne nehmen die Mitglieder teil.", ((3,34),))
         test_sentence_28 = ("Kim arbeitet mit anderen Aktivisten zusammen.", "Kim arbeitet mit anderen Aktivisternen zusammen.", ((5,473),))
-        test_sentence_29 = ("Ich kenne andere Schüler.", "Ich kenne andere Schülerne. ", ((4,6),))
+        test_sentence_29 = ("Ich kenne andere Schüler.", "Ich kenne andere Schülerne.", ((4,6),))
         test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10,
                            test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17, test_sentence_18, test_sentence_19, test_sentence_20, test_sentence_21,
-                           test_sentence_22, test_sentence_23, test_sentence_24, test_sentence_25, test_sentence_26, test_sentence_27]
+                           test_sentence_22, test_sentence_23, test_sentence_24, test_sentence_25, test_sentence_26, test_sentence_27, test_sentence_28, test_sentence_29]
+        #test_sentences = [test_sentence_27]
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])
@@ -47,9 +48,12 @@ class Sentence_Test(unittest.TestCase):
             parse_list = []
             for word in words:
                 parse_list.append(word.split("\t"))
-            marking_tool = Marking_Tool(parse_list)
-            for nounphrase in test[2]:
-                marking_tool.find_nounphrase(marking_tool.parse_list[nounphrase[0] - 1])
+            marking_tool = Marking_Tool(parse_list,{})
+            marking_form = marking_tool.get_marking_form(0)
+            # for nounphrase in test[2]:
+            #    marking_tool.find_nounphrase(marking_tool.parse_list[nounphrase[0] - 1])
+            print("Noun phrases:")
+            print(marking_tool.nounphrases)
             for nounphrase in test[2]:
                 marking_tool.neutralize_nounphrase(nounphrase[0] - 1, nounphrase[1])
             self.assertEqual(marking_tool.get_sentence(), test[1] + " ",f"Text {i+1} doesn't have correct output.") 
