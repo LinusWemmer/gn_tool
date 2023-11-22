@@ -121,40 +121,48 @@ class Marking_Tool:
             self.parse_list[pos][1] = Lexicon_Fem.feminize_word(word_parse)
 
     def determine_number(self, pos:int, feats:list, plural:bool):
-        article = False
-        for child in self.nounphrases.get(pos+1):
-            if self.parse_list[child-1][3] == "ART":
-                article = True
-                break
-        if article:
-            feats[2] = "Sg"
-        elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):
-            print(self.parse_list[pos][1])
-            print("nicht von 'als' abhängig.")
+        if self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
+            feats[1] = "Dat"
             feats[2] = "Pl"
         else:
-            index_of_last_np_before_als = self.find_last_np_before_index(int(self.parse_list[pos][6]))
-            if index_of_last_np_before_als > 0:
-                otherfeats = self.parse_list[index_of_last_np_before_als-1][5].split("|")
-                if self.parse_list[index_of_last_np_before_als-1][3] == "N":
-                    feats[1] = otherfeats[1]
-                    feats[2] = otherfeats[2]
-                elif self.parse_list[index_of_last_np_before_als-1][3] == "PRO":
-                    feats[1] = otherfeats[3]
-                    feats[2] = otherfeats[1]
-                # Hier oben und unten werden wahrscheinlich noch mehr Fälle als "N" und "PRO" benötigt, zum Beispiel für den Fall, dass "jemand" als Adjektiv geparst wird.
+            article = False
+            for child in self.nounphrases.get(pos+1):
+                if self.parse_list[child-1][3] == "ART":
+                    article = True
+                    break
+            if article:
+                feats[2] = "Sg"
+            elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):
+                print(self.parse_list[pos][1])
+                print("nicht von 'als' abhängig.")
+                feats[2] = "Pl"
             else:
-                index_of_first_np_after_als_construct = self.find_first_np_after_index(pos+1)
-                print("index_of_first_np_after_als")
-                print(index_of_first_np_after_als_construct)
-                if index_of_first_np_after_als_construct > 0:
-                    otherfeats = self.parse_list[index_of_first_np_after_als_construct-1][5].split("|")
-                    if self.parse_list[index_of_first_np_after_als_construct-1][3] == "N":
+                index_of_last_np_before_als = self.find_last_np_before_index(int(self.parse_list[pos][6]))
+                print("index_of_last_np_before_als")
+                print(index_of_last_np_before_als)
+                if index_of_last_np_before_als > 0:
+                    otherfeats = self.parse_list[index_of_last_np_before_als-1][5].split("|")
+                    if self.parse_list[index_of_last_np_before_als-1][3] == "N":
+                        feats[1] = otherfeats[1]
                         feats[2] = otherfeats[2]
-                    elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "PRO":
+                    elif self.parse_list[index_of_last_np_before_als-1][3] == "PRO":
+                        feats[1] = otherfeats[3]
                         feats[2] = otherfeats[1]
+                        print("feats:")
+                        print(feats)
+                    # Hier oben und unten werden wahrscheinlich noch mehr Fälle als "N" und "PRO" benötigt, zum Beispiel für den Fall, dass "jemand" als Adjektiv geparst wird.
                 else:
-                    feats[2] = "Sg"
+                    index_of_first_np_after_als_construct = self.find_first_np_after_index(pos+1)
+                    print("index_of_first_np_after_als")
+                    print(index_of_first_np_after_als_construct)
+                    if index_of_first_np_after_als_construct > 0:
+                        otherfeats = self.parse_list[index_of_first_np_after_als_construct-1][5].split("|")
+                        if self.parse_list[index_of_first_np_after_als_construct-1][3] == "N":
+                            feats[2] = otherfeats[2]
+                        elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "PRO":
+                            feats[2] = otherfeats[1]
+                    else:
+                        feats[2] = "Sg"
     
     def find_last_np_before_index(self, als_index:int):
         for i in range(als_index-1,0,-1):
@@ -187,13 +195,17 @@ class Marking_Tool:
             # Noun is a substantivized adjective 
             if line == -1:
                 article_pos = pos
+                print("article_pos:")
+                print(article_pos)
                 nounphrase = self.nounphrases.get(pos+1)
+                print("nounphrase:")
+                print(nounphrase)
                 if nounphrase:
                     for child_pos in nounphrase: 
                         if self.parse_list[child_pos-1][3] == "ART":
                             article_pos = child_pos
                     #article_pos = min(nounphrase)
-                self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1])
+                self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1], feats)
             # words ending on -mann or -frau:
             elif line == -2:
                 self.parse_list[pos][1] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos])
@@ -235,13 +247,6 @@ class Marking_Tool:
                 self.parse_list[pos][1] = Lexicon.neutralize_beamter(self.parse_list[pos], self.parse_list[article_pos-1])
             # Noun is a classical role noun
             else:
-                # Parzu sometimes doesn't correctly mark singular/plural, so we check these cases and mark them ourselves
-                if feats[2] == "_":
-                    if self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
-                        feats[1] = "Dat"
-                        feats[2] = "Pl"
-                    else:
-                        feats[2] = "Sg"
                 #Special handling if the role noun is a split word with "-"
                 if "-" in self.parse_list[pos][1]:
                     word_split = self.parse_list[pos][1].split("-")

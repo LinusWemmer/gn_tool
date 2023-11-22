@@ -36,9 +36,12 @@ class Sentence_Test(unittest.TestCase):
         test_sentence_27 = ("Als gute Lehrer nehmen die Mitglieder teil.", "Als gute Lehrerne nehmen die Mitglieder teil.", ((3,34),))
         test_sentence_28 = ("Kim arbeitet mit anderen Aktivisten zusammen.", "Kim arbeitet mit anderen Aktivisternen zusammen.", ((5,473),))
         test_sentence_29 = ("Ich kenne andere Schüler.", "Ich kenne andere Schülerne.", ((4,6),))
+        test_sentence_30 = ("Sie war als Jugendliche mit dem Studenten befreundet.", "En war als Jugendlichey mit derm Studente befreundet.", ((1,0),(4,-1),(7,50)))
+        test_sentence_31 = ("Ich habe ihn schon als Jugendlichen kennengelernt.", "Ich habe en schon als Jugendlichey kennengelernt.", ((3,0),(6,-1)))
+        test_sentence_32 = ("Das Brett steht zwischen den Spielern.", "Das Brett steht zwischen den Spielernen.", ((6,10),))
         test_sentences = [test_sentence_1, test_sentence_2, test_sentence_3, test_sentence_4,test_sentence_5, test_sentence_6, test_sentence_7, test_sentence_8, test_sentence_9, test_sentence_10,
                            test_sentence_11, test_sentence_12, test_sentence_13, test_sentence_14, test_sentence_15, test_sentence_16, test_sentence_17, test_sentence_18, test_sentence_19, test_sentence_20, test_sentence_21,
-                           test_sentence_22, test_sentence_23, test_sentence_24, test_sentence_25, test_sentence_26, test_sentence_27, test_sentence_28, test_sentence_29]
+                           test_sentence_22, test_sentence_23, test_sentence_24, test_sentence_25, test_sentence_26, test_sentence_27, test_sentence_28, test_sentence_29, test_sentence_30, test_sentence_31, test_sentence_32]
         #test_sentences = [test_sentence_27]
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")

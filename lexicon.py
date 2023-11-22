@@ -126,13 +126,13 @@ class Lexicon:
             #raise Exception(f"Somehow the word is neither singular nor plural:{feats}")
 
     # Neutralizes substantivized adjective
-    def neutralize_sub_adj(word_parse, article_parse) -> str:
-        feats = word_parse[5].split("|")
+    def neutralize_sub_adj(word_parse, article_parse, feats) -> str:
         # Test for now: If we don't mark singular or plural, be conservative and leave as is, as plural often isn't marked correctly
+        print("feats[2]):")
+        print(feats[2])
         if feats[2] != "Sg":
             if not word_parse[1].endswith("er"):
                 return word_parse[1]
-        article = article_parse[1]
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[1] == "_":
             feats[1] = "Nom"
@@ -144,6 +144,8 @@ class Lexicon:
                 return word_parse[2] + "n"
         # Strong Flexion, on it's own
         if word_parse[1].endswith("e"):
+            print("feats[1]:")
+            print(feats[1])
             noun =  word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
         else:
             noun =  word_parse[1][:-2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
