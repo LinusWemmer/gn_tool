@@ -32,7 +32,7 @@ def mark_nouns(sentences: list):
         parse_list = []
         for word in words:
            parse_list.append(word.split("\t"))
-        marking_tool = Marking_Tool(parse_list)
+        marking_tool = Marking_Tool(parse_list,{})
         session[f"markingtool{sentence_number}"] = marking_tool.__dict__
         #sentence_data.add_marking_tool(sentence_number, marking_tool)
         marking_form += marking_tool.get_marking_form(sentence_number)

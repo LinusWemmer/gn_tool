@@ -252,7 +252,7 @@ class Marking_Tool:
                     word_split = self.parse_list[pos][1].split("-")
                     self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)
                 # Noun is a normal word in our List of movierbare Substantive
-                elif self.parse_list[pos][1].startswith(Lexicon.MALE_NOUNS[line][:-1]): # Weird check to see if our noun is split or not, this should work most of the time
+                elif self.parse_list[pos][2].startswith(Lexicon.MALE_NOUNS[line][:-1]) or self.parse_list[pos][2].startswith(Lexicon.FEMALE_NOUNS[line][:-1]): # Weird check to see if our noun is split or not, this should work most of the time
                     self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line) 
                 # Noun is zusammengesetzt ohne Bindestrich
                 else:
@@ -300,7 +300,7 @@ class Marking_Tool:
                 else: 
                     nouns += word_parse[1] + " "
             # Case: Pronoun
-            elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "alle":
+            elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "alle" and not word_parse[2] == "etwas":
                 self.find_nounphrase(word_parse)
                 input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
                 <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
