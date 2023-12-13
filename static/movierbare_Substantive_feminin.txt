@@ -549,7 +549,7 @@ Verkehrsteilnehmerin
 Münchnerin
 Patin
 Prophetin
-Oberin
+%Oberin
 Gemeindepräsidentin
 Legionärin
 Angelin
@@ -1672,7 +1672,7 @@ Klarinettistin
 Hilfsarbeiterin
 Automobilistin
 Controllerin
-Gelin
+%Gelin
 Wärterin
 Krefelderin
 Synchronsprecherin
@@ -2250,8 +2250,8 @@ Popsängerin
 Gemeindepfarrerin
 Heimwerkerin
 Vorarbeiterin
-Bossin
-Kehrin
+Signora
+Influencerin
 Bezirksvorsteherin
 Privatpatientin
 Ressortleiterin

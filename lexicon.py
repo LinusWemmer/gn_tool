@@ -266,8 +266,26 @@ class Lexicon:
         # Plural adjectives don't need to be changed
         if feats[3] == "Pl":
             return word_parse[1]
-        # This is a weird hack to make sure "anders" works correctly
-        if word_parse[2].startswith("ander"):
+        # This is a hack to make sure "letzt-" works correctly
+        if word_parse[2] == ("letzte"):
+            word_parse[2] = "letzt"
+        # This is a hack to make sure that adjectival usage of "jed-", "jen-" etc works correctly  
+        if word_parse[2] == ("jede"):
+            word_parse[2] = "jed"
+        if word_parse[2] == ("jene"):
+            word_parse[2] = "jen"
+        if word_parse[2] == ("jedwede"):
+            word_parse[2] = "jedwed"
+        if word_parse[2] == ("diese"):
+            word_parse[2] = "dies"
+        if word_parse[2] == ("welche"):
+            word_parse[2] = "welch"
+        if word_parse[2] == ("solche"):
+            word_parse[2] = "solch"
+        if word_parse[2] == ("manche"):
+            word_parse[2] = "manch"
+        # This is a hack to make sure "ander-" works correctly
+        if word_parse[2].startswith("ander") and len(word_parse[2]) < 8:
             word_parse[2] = "ander"
         # Differentiate Superlative/Comparative/Normal adjectives
         adjective = ""
@@ -365,7 +383,7 @@ class Lexicon:
         if "Pl" in word_parse[5]:
             return word_parse[1]
         # neutralize Articles
-        elif word_parse[3] == "ART":
+        elif word_parse[3] == "ART" and not word_parse[4] == "PIDAT":
             return Lexicon.neutralize_article(word_parse)
         # neutralize Pronouns
         elif word_parse[3] == "PRO":

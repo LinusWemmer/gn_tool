@@ -549,7 +549,7 @@ Verkehrsteilnehmere
 Münchnere
 Patere
 Prophete
-Oberre
+%Oberre
 Gemeindepräsidente
 Legionäre
 Angele
@@ -1078,7 +1078,7 @@ Thronfolgere
 Hofrate
 Afghanere
 Sparere
-Nachfahrre
+Nachfahre
 Torschützenkönige
 Surfere
 Ostberlinere
@@ -1249,7 +1249,7 @@ Wikingere
 Universitätsprofessore
 Mitbewohnere
 Klassenkamerade
-Hirte
+Hirtere
 Altbürgermeistere
 Politikwissenschaftlere
 Autolenkere
@@ -1672,7 +1672,7 @@ Klarinettiste
 Hilfsarbeitere
 Automobiliste
 Controllere
-Gele
+%Gele
 Wärtere
 Krefeldere
 Synchronsprechere
@@ -2250,8 +2250,8 @@ Popsängere
 Gemeindepfarrere
 Heimwerkere
 Vorarbeitere
-Bossre
-Kehrre
+Signorere
+Influencere
 Bezirksvorstehere
 Privatpatiente
 Ressortleitere
@@ -3556,7 +3556,7 @@ Heizungsbauere
 Blutere
 Jugendpfarrere
 Kleinkünstlere
-Vorfahrre
+Vorfahre
 Ausstellungsleitere
 Mittdreißigere
 Friseurmeistere

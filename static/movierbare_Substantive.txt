@@ -549,7 +549,7 @@ Verkehrsteilnehmer
 Münchner
 Pate
 Prophet
-Obere
+%Obere
 Gemeindepräsident
 Legionär
 Angel
@@ -1672,7 +1672,7 @@ Klarinettist
 Hilfsarbeiter
 Automobilist
 Controller
-Gel
+%Gel
 Wärter
 Krefelder
 Synchronsprecher
@@ -2250,8 +2250,8 @@ Popsänger
 Gemeindepfarrer
 Heimwerker
 Vorarbeiter
-Bosse
-Kehre
+Signore
+Influencer
 Bezirksvorsteher
 Privatpatient
 Ressortleiter
