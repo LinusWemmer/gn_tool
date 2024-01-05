@@ -41,6 +41,7 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich habe ihn schon als Jugendlichen kennengelernt.", "Ich habe en schon als Jugendlichey kennengelernt.", ((3,0),(6,-1))))
         test_sentences.append(("Das Brett steht zwischen den Spielern.", "Das Brett steht zwischen den Spielernen.", ((6,10),)))
         test_sentences.append(("Wir verteidigen die Rechte eines jeden Bürgers.", "Wir verteidigen die Rechte einers jeden Bürgeres.", ((7,12),)))
+        test_sentences.append(("Jeder Lehrer kennt das.", "Jedey Lehrere kennt das.", ((2,34),)))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             parse = ParZu.main(test[0])

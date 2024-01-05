@@ -383,7 +383,7 @@ class Lexicon:
         if "Pl" in word_parse[5]:
             return word_parse[1]
         # neutralize Articles
-        elif word_parse[3] == "ART" and not word_parse[4] == "PIDAT":
+        elif word_parse[3] == "ART": # and not word_parse[4] == "PIDAT":
             return Lexicon.neutralize_article(word_parse)
         # neutralize Pronouns
         elif word_parse[3] == "PRO":

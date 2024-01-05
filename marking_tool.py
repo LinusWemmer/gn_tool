@@ -108,7 +108,7 @@ class Marking_Tool:
             # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
             # flexion, the parent has to included when neutralizing the word.
             self.parse_list[pos][1] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
-        elif word_parse[4] == "PIDAT":
+        elif word_parse[4] == "PIDAT" and pos != article_pos-1:
             # This case covers morphologically adjectival determiners like the word "jeden" in "eines jeden Bürgers".
             # Since the feature list of a PIDAT determiner has a differnt structure than that of an
             # adjective, we need to first adapt its structure:
@@ -216,7 +216,7 @@ class Marking_Tool:
             elif line == -2:
                 self.parse_list[pos][1] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos])
                 feats = self.parse_list[pos][5].split("|")
-                if feats[0] == "Masc" and feats[2] == "Sg":
+                if feats[0] == "Masc" and feats[2] != "Pl":
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
                         self.feminize_word(child-1, article_pos)

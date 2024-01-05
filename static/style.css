@@ -1,4 +1,66 @@
 .paragraph {
-    width:42%;
-    float: right;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #7A3DC5; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+.description {
+    flex: 1;
+    order: 2; /* Places the description on the right */
+}
+
+.text-area {
+    flex: 1;
+    order: 1; /* Places the text area on the left */
+    padding-right: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+#toggleIcon {
+    display: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    #toggleIcon {
+        display: inline; /* Show icon */
+        font-size: 1em;
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    .description h2:hover #toggleIcon {
+        cursor: pointer;
+        transform: rotate(90deg);
+    }
+
+    .text-area {
+        padding-right: 0; /* Resets padding for mobile view */
+    }
+
+    .container {
+        flex-direction: column;
+    }
+
+    .description, .text-area {
+        order: 0; /* Resets order for mobile view */
+    }
+
+    #explanatoryText {
+        display: none;
+    }
 }

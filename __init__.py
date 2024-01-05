@@ -114,6 +114,7 @@ def index():
 def parse_text():
     if request.method == "POST":
         input_text = request.form["inputText"]
+        original_input_text = input_text # This is needed for returning the original input text in unaltered form back to the input textarea.
         session.clear()
         input_text = split_prepositions(input_text)
         print(session["split_words"])
@@ -122,9 +123,10 @@ def parse_text():
         marked_nouns = mark_nouns(parse)
         #session["sentencedata"] = sentence_data.__dict__
         if "checkbox" in marked_nouns:
-            return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
+            return render_template("index.html", input_text=original_input_text, dataToRender= f"""<form action="/mark" method="POST">
+            <button id="selectAllButton" type="button" style="margin-top: 20px;">Alle auswählbaren Wörter auswählen</button>
             <p>{marked_nouns}</p>
-            <button type="submit" >Ausgewählte Wörter neutralisieren.</button>
+            <button type="submit" >Ausgewählte Wörter geschlechtsneutral machen</button>
             </form>""")
         else:
             return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
