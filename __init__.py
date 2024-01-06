@@ -129,7 +129,7 @@ def parse_text():
             <button type="submit" >Ausgewählte Wörter geschlechtsneutral machen</button>
             </form>""")
         else:
-            return render_template("index.html", dataToRender= f"""<form action="/mark" method="POST">
+            return render_template("index.html", input_text=original_input_text, dataToRender= f"""<form action="/mark" method="POST">
             <p>{marked_nouns}</p>
             <button type="reset" style="color:Red">Keine neutralisierbare Personenbezeichnung gefunden.</button>
             </form>""")
@@ -164,7 +164,7 @@ def neutralize_marked():
             neutralized_text += marking_tool_list[i].get_sentence(split_words[i])
         else:
             neutralized_text += marking_tool_list[i].get_sentence()
-    return render_template("index.html", outputText = neutralized_text)
+    return render_template("index.html", input_text=original_input_text, outputText = neutralized_text)
 
 if __name__ == "__main__":
     # Docker shouldn't be in debug mode
