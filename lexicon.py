@@ -391,7 +391,7 @@ class Lexicon:
         elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
             return Lexicon.neutralize_preposition(word_parse)
         else:
-            return word_parse[1]
+            return word_parse[-2]
 
     # Neutralize nouns that are romanisms
     def neutralize_romanism(word_parse) -> str:

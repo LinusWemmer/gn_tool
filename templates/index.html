@@ -19,17 +19,19 @@
 
             <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als potentielle Personenbezeichungen interpretiert und deswegen ein Kästchen daneben erscheinen lässt. Zum Beispiel wird das Wort „er“ immer als potentielle Personenbezeichnung interpretiert, auch wenn es sich zum Beispiel auf einen Tisch und nicht auf eine männliche Person bezieht. Außerdem werden mehrdeutige Wörter wie „Rechner“ und „Beirat“, die manchmal Dinge und manchmal Personen bezeichnen, generell als potentielle Personenbezeichnungen interpretiert. Wenn ein Wort, das in dem Eingabetext nicht als Personenbezeichnung gemeint war, trotzdem als potentielle Personenbezeichnung erkannt wurde, sollte darauf geachtet werden, dass dieses nicht für die geschlechtsneutrale Umformulierung markiert wird, da der Ausgabetext sonst nicht sinnvoll ist.</p>
 
-            <p>Die Possessivform „ihr“ (z.&nbsp;B.&nbsp;„ihre Stifte“) wird im ersten Schritt immer als potentielle Personenbezeichung interpretiert, da es sein kann, dass es sich im Ausgangstext auf eine weibliche Person bezieht und diese feminine Bezugnahme durch eine geschlchtsneutrale ersetzt werden soll. Es kann allerdings auch vorkommen, dass „ihr“ sich auf mehrere Personen bezieht. In diesem Fall sollte es nicht markiert werden, da das plurale „ihr“ im De&#8209;e-System unverändert bleibt, daer De-e-Automat aber ein markiertes „ihr“ immer als Singular-Femininum-Possessivform interpretiert.</p>
+            <p>Die Possessivform „ihr“ (z.&nbsp;B.&nbsp;„ihre Stifte“) wird im ersten Schritt immer als potentielle Personenbezeichung interpretiert, da es sein kann, dass es sich im Ausgangstext auf eine weibliche Person bezieht und diese feminine Bezugnahme durch eine geschlchtsneutrale ersetzt werden soll. Es kann allerdings auch vorkommen, dass „ihr“ sich auf mehrere Personen bezieht. In diesem Fall sollte es nicht markiert werden, da das plurale „ihr“ im De&#8209;e-System unverändert bleibt, der De&#8209;e-Automat aber ein markiertes „ihr“ immer als Singular-Femininum-Possessivform interpretiert.</p>
 
             <p>Der De&#8209;e-Automat ist derzeit nicht darauf ausgelegt, Komposita zu erkennen und anzupassen, in denen das erste Element eine Personenbezeichnung ist (z.&nbsp;B.&nbsp;„Schülervertretung“).</p>
 
             <p>Die Textverarbeitung im De&#8209;e-Automaten basiert auf dem an der Universität Zürich entwickelten <a href="https://pub.cl.uzh.ch/demo/parzu/">ParZu-Parser</a> für die deutsche Sprache. In einigen Fällen erkennt dieser Parser den grammatischen Fall, die Einzahl/Mehrzahl-Unterscheidung oder die grammatische Struktur des Satzes nicht richtig, was vereinzelt zu einer fehlerhaften Umwandlung ins De&#8209;e-System führen kann. Diese Fälle treten sehr selten auf. Hier sind einige uns bekannte Fehler dieser Art:</p>
             <ul>
-            <li>„Es gab einen Konflikt zwischen Bauern und Regierung.“ – Hier wird nicht korrekt erkannt, dass „Bauern“ im Dativ steht. Dadurch steht im Output des De&#8209;e-Automaten die Form „Bauerne“ statt der korrekten Form „Bauernen“.</li>
-            <li> „Sind das Deine Ahnen?“ – Hier wird nicht korrekt erkannt, dass „Deine Ahnen“ im Plural steht. Dadurch steht im Output des De&#8209;e-Automaten „Dein Ahne“ statt „Deine Ahnerne“. </li>
             <li> „Ich haben einen netten und einen unfreundlichen Kollegen.“ – Hier wird nicht erkannt, dass sich „einen netten“ auch auf „Kollegen“ bezieht. Daher bleibt „einen netten“ im Output des De&#8209;e-Automaten unverändert, obwohl es im De&#8209;e-System eigentlich die Form „ein nette“ annehmen sollte.</li>
             <li> „Jeder hilft jedem anderen.“ – Hier wird nicht korrekt erkannt, dass das Wortpaar „jedem anderen“ eine Einheit bildet, und dass dadurch „anderen“ hier auch im Dativ steht. Dadurch wird daraus im Output des De&#8209;e-Automaten fehlerhafterweise „jedem anderey“ statt der korrekten Form „jederm anderen“.</li>
+            <li> „Es gab einen Konflikt zwischen Bauern und Regierung.“ – Hier wird nicht korrekt erkannt, dass „Bauern“ im Dativ steht. Dadurch steht im Output des De&#8209;e-Automaten die Form „Bauerne“ statt der korrekten Form „Bauernen“.</li>
+            <li> „Sind das Deine Ahnen?“ – Hier wird nicht korrekt erkannt, dass „Deine Ahnen“ im Plural steht. Dadurch steht im Output des De&#8209;e-Automaten „Dein Ahne“ statt „Deine Ahnerne“. </li>
             </ul>
+
+            <p>Der De&#8209;e-Automat wurde von Linus Wemmer und Marcos Cramer programmiert. Dieses Web-Interface des De&#8209;e-Automaten wird vom <a href="https://geschlechtsneutral.net/verein">Verein für geschlechtsneutrales Deutsch&nbsp;e.&nbsp;V.</a> bereitgestellt.</p>
 
         </div>
     </div>
@@ -40,7 +42,7 @@
             <button type="submit">Personenbezeichnungen ermitteln</button>
         </form>
         {{ dataToRender|safe }}
-        <p>{{outputText}}</p>
+        <p>{{ outputText|safe }}</p>
     </div>
 </div>
 <script>

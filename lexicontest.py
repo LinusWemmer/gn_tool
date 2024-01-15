@@ -2,6 +2,7 @@ from lexicon import Lexicon
 from marking_tool import Marking_Tool
 import parzu_class as parzu
 import unittest
+from __init__ import split_prepositions
 
 
 class Sentence_Test(unittest.TestCase):
@@ -42,15 +43,20 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Das Brett steht zwischen den Spielern.", "Das Brett steht zwischen den Spielernen.", ((6,10),)))
         test_sentences.append(("Wir verteidigen die Rechte eines jeden Bürgers.", "Wir verteidigen die Rechte einers jeden Bürgeres.", ((7,12),)))
         test_sentences.append(("Jeder Lehrer kennt das.", "Jedey Lehrere kennt das.", ((2,34),)))
+        test_sentences.append(("Ich war beim Bergmann und gehe zum Feuerwehrmann.", "Ich war bei der Bergperson und gehe zur Feuerwehrperson.", ((5,-2),(10,-2))))
+        test_sentences.append(("Die Lehrerin steht beim Schüler und schaut zum Direktor.", "De Lehrere steht bei derm Schülere und schaut zurm Direktore.", ((2,34),(6,6),(11,72))))
+        test_sentences.append(("Der Nachbar im Nachbarhaus ist nett.", "De Nachbare im Nachbarhaus ist nett.", ((2,82),)))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
-            parse = ParZu.main(test[0])
+            input_text_with_split_prepositions = split_prepositions(test[0])
+            parse = ParZu.main(input_text_with_split_prepositions)
             words = parse[0].split("\n")
             words = words[:-2]
             parse_list = []
             for word in words:
                 parse_list.append(word.split("\t"))
             marking_tool = Marking_Tool(parse_list,{})
+            parse_list = Marking_Tool.find_realizations(marking_tool,test[0])
             marking_form = marking_tool.get_marking_form(0)
             # for nounphrase in test[2]:
             #    marking_tool.find_nounphrase(marking_tool.parse_list[nounphrase[0] - 1])
@@ -58,7 +64,7 @@ class Sentence_Test(unittest.TestCase):
             print(marking_tool.nounphrases)
             for nounphrase in test[2]:
                 marking_tool.neutralize_nounphrase(nounphrase[0] - 1, nounphrase[1])
-            self.assertEqual(marking_tool.get_sentence(), test[1] + " ",f"Text {i+1} doesn't have correct output.") 
+            self.assertEqual(marking_tool.get_sentence(), test[1], f"Text {i+1} doesn't have correct output.") 
 
 
 if __name__ == "__main__":

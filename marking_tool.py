@@ -22,27 +22,31 @@ class Marking_Tool:
                 "nounphrases": self.nounphrases}
 
     # Returns the sentence underlying the parse.
-    def get_sentence(self, split_list = []) -> str:
+    #def get_sentence(self, split_list = []) -> str:
+    def get_sentence(self) -> str:
         sentence = ""
         for word_parse in self.parse_list:
             print(word_parse)
-            if word_parse[3]== ("$.") or word_parse[3]== ("$,"):
-                sentence = sentence[:-1] + word_parse[1] + " "
-            elif word_parse[3] == ("$("):
-                if word_parse[1] == "(":
-                    sentence += word_parse[1]
-                else:
-                    sentence = sentence[:-1] + word_parse[1] + " "
-            else:
-                if int(word_parse[0]) in split_list:
-                    preposition = word_parse[1] + " " + self.parse_list[int(word_parse[0])][1]
-                    sentence += self.get_prepositions(preposition) + " "
-                elif int(word_parse[0]) - 1 in split_list:
-                    pass
-                else:
-                    sentence += word_parse[1] + " "
+            #if word_parse[3]== ("$.") or word_parse[3]== ("$,"):
+            #    sentence = sentence[:-1] + word_parse[1] + " "
+            #elif word_parse[3] == ("$("):
+            #    if word_parse[1] == "(":
+            #        sentence += word_parse[1]
+            #    else:
+            #        sentence = sentence[:-1] + word_parse[1] + " "
+            #else:
+            #    if int(word_parse[0]) in split_list:
+            #        preposition = word_parse[1] + " " + self.parse_list[int(word_parse[0])][1]
+            #        sentence += self.get_prepositions(preposition) + " "
+            #    elif int(word_parse[0]) - 1 in split_list:
+            #        pass
+            #    else:
+            #        sentence += word_parse[1] + " "
+            sentence += word_parse[-2]
+            sentence += word_parse[-1]
         return sentence
 
+    # no longer needed:
     def get_prepositions(self, word) -> str:
         if word =="bei dem":
             return "beim"
@@ -107,24 +111,40 @@ class Marking_Tool:
         if word_parse[3] == "ADJA":
             # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
             # flexion, the parent has to included when neutralizing the word.
-            self.parse_list[pos][1] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
+            self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
         elif word_parse[4] == "PIDAT" and pos != article_pos-1:
             # This case covers morphologically adjectival determiners like the word "jeden" in "eines jeden Bürgers".
             # Since the feature list of a PIDAT determiner has a differnt structure than that of an
             # adjective, we need to first adapt its structure:
             word_parse[5] = "POS|" + word_parse[5] + "|_|"
-            self.parse_list[pos][1] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
+            self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
         else:
-            self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
+            neutralized_word = Lexicon.neutralize_word(self.parse_list[pos])
+            if neutralized_word == "derm" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
+                self.parse_list[pos-1][-1] = ""
+                self.parse_list[pos][-2] = "rm"
+            elif neutralized_word == "derm" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
+                self.parse_list[pos-1][-1] = " "
+                self.parse_list[pos][-2] = "derm"
+            else:
+                self.parse_list[pos][-2] = neutralized_word
 
     def feminize_word(self, pos:int, article_pos:int):
         word_parse = self.parse_list[pos]
         if word_parse[3] == "ADJA":
             # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
             # flexion, the parent has to included when neutralizing the word.
-            self.parse_list[pos][1] = Lexicon_Fem.feminize_adjectives(word_parse, self.parse_list[article_pos-1])
+            self.parse_list[pos][-2] = Lexicon_Fem.feminize_adjectives(word_parse, self.parse_list[article_pos-1])
         else:
-            self.parse_list[pos][1] = Lexicon_Fem.feminize_word(word_parse)
+            feminized_word = Lexicon_Fem.feminize_word(self.parse_list[pos])
+            if feminized_word == "der" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
+                self.parse_list[pos-1][-1] = ""
+                self.parse_list[pos][-2] = "r"
+            elif feminized_word == "der" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
+                self.parse_list[pos-1][-1] = " "
+                self.parse_list[pos][-2] = "der"
+            else:
+                self.parse_list[pos][-2] = feminized_word
 
     def determine_number(self, pos:int, feats:list, plural:bool):
         if self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
@@ -196,6 +216,8 @@ class Marking_Tool:
                 print("Noun without number:")
                 print(self.parse_list[pos][1])
                 self.determine_number(pos,feats,plural)
+            if feats[1] == "_" and self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
+                feats[1] = "Dat"
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
             # Noun is a substantivized adjective 
@@ -211,10 +233,10 @@ class Marking_Tool:
                         if self.parse_list[child_pos-1][3] == "ART":
                             article_pos = child_pos
                     #article_pos = min(nounphrase)
-                self.parse_list[pos][1] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1], feats)
+                self.parse_list[pos][-2] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1], feats)
             # words ending on -mann or -frau:
             elif line == -2:
-                self.parse_list[pos][1] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos])
+                self.parse_list[pos][-2] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos])
                 feats = self.parse_list[pos][5].split("|")
                 if feats[0] == "Masc" and feats[2] != "Pl":
                     for child in self.nounphrases.get(pos+1):
@@ -223,7 +245,7 @@ class Marking_Tool:
                 return
             # The Word "Mann", "Frau", "Herr", "Dame":
             elif line == -4:
-                self.parse_list[pos][1] = Lexicon.neutralize_mann_frau(self.parse_list[pos])
+                self.parse_list[pos][-2] = Lexicon.neutralize_mann_frau(self.parse_list[pos])
                 feats = self.parse_list[pos][5].split("|")
                 if feats[0] == "Masc" and feats[2] == "Sg":
                     for child in self.nounphrases.get(pos+1):
@@ -232,16 +254,16 @@ class Marking_Tool:
                 return
             # Noun is a romanism
             elif line == -10:
-                self.parse_list[pos][1] = Lexicon.neutralize_romanism(self.parse_list[pos])
+                self.parse_list[pos][-2] = Lexicon.neutralize_romanism(self.parse_list[pos])
             # Noun is irregular
             elif line == -11:
-                self.parse_list[pos][1] = Lexicon.neutralize_irregular_noun(self.parse_list[pos])
+                self.parse_list[pos][-2] = Lexicon.neutralize_irregular_noun(self.parse_list[pos])
             # Noun is already neutral:
             elif line == -12:
                 pass
             # Special neologisms    
             elif line <= -3:
-                self.parse_list[pos][1] = Lexicon.neutralize_neologism(self.parse_list[pos])
+                self.parse_list[pos][-2] = Lexicon.neutralize_neologism(self.parse_list[pos])
             # Noun is the Special case "Beamter" (line 88)
             elif line == 88:
                 article_pos = pos+1
@@ -250,31 +272,33 @@ class Marking_Tool:
                     for child_pos in nounphrase: 
                         if self.parse_list[child_pos-1][3] == "ART":
                             article_pos = child_pos
-                self.parse_list[pos][1] = Lexicon.neutralize_beamter(self.parse_list[pos], self.parse_list[article_pos-1])
+                self.parse_list[pos][-2] = Lexicon.neutralize_beamter(self.parse_list[pos], self.parse_list[article_pos-1])
             # Noun is a classical role noun
             else:
                 #Special handling if the role noun is a split word with "-"
                 if "-" in self.parse_list[pos][1]:
                     word_split = self.parse_list[pos][1].split("-")
-                    self.parse_list[pos][1] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)
+                    self.parse_list[pos][-2] = word_split[0] + "-" + Lexicon.neutralize_noun(feats, line)
                 # Noun is a normal word in our List of movierbare Substantive
                 elif self.parse_list[pos][2].startswith(Lexicon.MALE_NOUNS[line][:-1]) or self.parse_list[pos][2].startswith(Lexicon.FEMALE_NOUNS[line][:-1]): # Weird check to see if our noun is split or not, this should work most of the time
-                    self.parse_list[pos][1] = Lexicon.neutralize_noun(feats, line) 
+                    self.parse_list[pos][-2] = Lexicon.neutralize_noun(feats, line) 
                 # Noun is zusammengesetzt ohne Bindestrich
                 else:
-                    self.parse_list[pos][1] = Lexicon.neutralize_split_noun(feats, line, self.parse_list[pos][2])
+                    self.parse_list[pos][-2] = Lexicon.neutralize_split_noun(feats, line, self.parse_list[pos][2])
         # Neutralize Personal Pronouns
         elif self.parse_list[pos][4] == "PPOSAT":
+            self.parse_list[pos][-2] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
+            # Here we additionally need to modify the input possessive pronoun, so that the output is correct when this pronoun needs to be modified further due to the noun it modifies being put into the inklusivum.
             self.parse_list[pos][1] = Lexicon.neutralize_possesive_pronoun(self.parse_list[pos])
         # Neutralized attributing relative pronoun
         elif self.parse_list[pos][4] == "PRELAT":
-            self.parse_list[pos][1] = Lexicon.neutralize_attributing_relative_pronoun(self.parse_list[pos])
+            self.parse_list[pos][-2] = Lexicon.neutralize_attributing_relative_pronoun(self.parse_list[pos])
         elif re.match(r"(J|j)emand(e?)s" , self.parse_list[pos][1]):
                 print("here")
-                self.parse_list[pos][1] = Lexicon.neutralize_pos_jemand(self.parse_list[pos])
+                self.parse_list[pos][-2] = Lexicon.neutralize_pos_jemand(self.parse_list[pos])
         #Neutralize everything else
         else:
-            self.parse_list[pos][1] = Lexicon.neutralize_word(self.parse_list[pos])
+            self.parse_list[pos][-2] = Lexicon.neutralize_word(self.parse_list[pos])
         # Neutralize the remaining words in the nounphrase:
         if not plural:
             for child in self.nounphrases.get(pos+1):
@@ -291,8 +315,7 @@ class Marking_Tool:
                 # A possesive pronoun should only be selectable to be neutralized if it is in third person
                 # Parzu doesn't tag this, so we have to filter out the other cases manually.
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
             # Case: Noun
             elif word_parse[3] == "N":
@@ -300,53 +323,114 @@ class Marking_Tool:
                 line = Lexicon.check_role_noun(word_parse)
                 if line:
                     #self.find_nounphrase(word_parse)
-                    input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select">
-                    <label for="{sentence_number}|{word_parse[0]}|{line}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{line}" name="{sentence_number}|{word_parse[0]}|{line}" value="select"><label for="{sentence_number}|{word_parse[0]}|{line}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                     nouns += input_form
                 else: 
-                    nouns += word_parse[1] + " "
+                    nouns += word_parse[-2]
+                    nouns += word_parse[-1]
             # Case: Pronoun
             elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "alle" and not word_parse[2] == "etwas":
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
             # case: jemand (sometimes marked as adjective, should still be neutralizable in that case)
             elif re.match(r"(J|j)emand(e?)s" , word_parse[1]):
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
             elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
             elif word_parse[4] == "PRELAT":
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
             elif word_parse[4] == "PRELS" and word_parse[6] == "0":
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
             elif word_parse[3] == "ART" and word_parse[6] == "0":
                 self.find_nounphrase(word_parse)
-                input_form = f"""<input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select">
-                <label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[1] + "</u>"}</label> """
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
-            elif word_parse[3] == "$." or word_parse[3] == "$,":
-                nouns = nouns[:-1] + word_parse[1] + " "
-            elif word_parse[3] == "$(":
-                if word_parse[1] == "(":
-                    nouns += word_parse[1]
-                elif word_parse[1] == ")":
-                    nouns = nouns[:-1] + word_parse[1] + " "
-                else:
-                    nouns += word_parse[1]
+            #elif word_parse[3] == "$." or word_parse[3] == "$,":
+            #    nouns = nouns[:-1] + word_parse[1] + " "
+            #elif word_parse[3] == "$(":
+            #    if word_parse[1] == "(":
+            #        nouns += word_parse[1]
+            #    elif word_parse[1] == ")":
+            #        nouns = nouns[:-1] + word_parse[1] + " "
+            #    else:
+            #        nouns += word_parse[1]
             else:
-               nouns += word_parse[1] + " "
+               nouns += word_parse[-2]
+               nouns += word_parse[-1]
         print(self.nounphrases)
         return nouns
+    
+    def final_whitespace(self, S):
+        # Initialize an empty string to store the final whitespace
+        whitespace = ""
+        
+        # Loop through each character in the string
+        for char in reversed(S):
+            # Check if the character is whitespace
+            if char == " " or char == "\n" or char == "\r" or char == "\t":
+                # Add the whitespace character to the result
+                whitespace = char + whitespace
+            else:
+                # Break the loop if a non-whitespace character is found
+                break
+        
+        return whitespace
+
+    def find_realizations(self, input_text: str):
+        position_after_preposition = False
+        for word in self.parse_list:
+            if position_after_preposition == True and word[1].startswith("d") and len(word[1]) == 3:
+                pattern = re.escape(word[1]) + "|" + re.escape(word[1][2])
+            elif word[1] == "in":
+                pattern = "in|i(?!n)"
+            elif word[1] == "an":
+                pattern = "an|a(?!n)"
+            elif word[1] == "von":
+                pattern = "von|vo(?!n)"
+            else:
+                pattern = re.escape(word[1])
+            match = re.search("^" + pattern, input_text)
+            if match:
+                realization = match.group(0)
+                remaining_text = input_text[match.end():]
+                whitespace_pattern = "^( |\n|\r|\t)*"
+                whitespace_match = re.search(whitespace_pattern,remaining_text)
+                input_text = remaining_text[whitespace_match.end():]
+                white_realization = whitespace_match.group(0)
+            else:
+                print(input_text)
+                raise Exception("The word \"" + pattern + "\" could not be found in the input text, even though it was expected according to the parse list")
+            #realization, input_text = self.find_prefix_regex(pattern,input_text)
+            word.append(realization)
+            word.append(white_realization)
+            if word[1] in ["bei","Bei","zu","zu","in","In","von","Von","vor","Vor","an","An","auf","Auf","für","Für"]:
+                position_after_preposition = True
+            else:
+                position_after_preposition = False
+        return input_text
+    
+    #no longer needed:
+    def find_prefix_regex(self, pattern, S2):
+        # Search for the pattern in S2
+        match = re.search(pattern, S2)
+        
+        # Check if the pattern is found in S2
+        if match:
+            # Return the prefix of S2 ending with the occurrence of the pattern
+            prefix = S2[:match.end()]
+            S2_modified = S2[match.end():]
+            return prefix, S2_modified
+        else:
+            # Return an error message if the pattern is not found in S2
+            raise Exception("The word \"" + pattern + "\" could not be found in the input text, even though it was expected according to the parse list")
+
+
