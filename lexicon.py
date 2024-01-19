@@ -1,4 +1,5 @@
 import re
+import itertools
 
 
  # This class holds all the necessary information to construct the inclusivum form.
@@ -53,7 +54,7 @@ class Lexicon:
 
     NEOLOGISMS = [r"(Bruder)|(Schwester)", r"(Vater)|(Mutter)", r"O(p|m)a", r"(Onkel)|(Tante)", r"Cousine?", r"Tochter|Sohn", r"Jungfrau", r"Mädchen|Jung(e|s)", r"Neffe|Nichte"]  
     NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Tonke", "Couse", "Spross", "Jungfere", "Kid", "Nefte"]
-    NEOLOGSIMS_PLURAL = ["Geschwister", "Eltern", "Otas", "Tonken", "Cousernen", "Sprosse", "Jungferne", "Kids", "Neften"]
+    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Otas", "Tonken", "Cousernen", "Sprosse", "Jungferne", "Kids", "Neften"]
 
     # The next section generates List of Male/Female role nouns an their corresponding neutral forms
     # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
@@ -184,30 +185,40 @@ class Lexicon:
         feats = word_parse[5].split("|")
         if feats[2] == "Sg" or feats[2] == "_":
             return "Person"
-        elif feats[2] == "Pl": 
-            return "Leute"
+        elif feats[2] == "Pl":
+            if feats[1] == "Dat":
+                return "Leuten"
+            else: 
+                return "Leute"
 
     # Neutralizes words where a neologism is the neutral form 
     def neutralize_neologism(word_parse) -> str:
-        line = 0
+        print("word_parse:")
+        print(word_parse)
         noun = word_parse[2]
         feats = word_parse[5].split("|")
-        for index, neologism in enumerate(Lexicon.NEOLOGISMS):
-            if re.match(neologism, noun):
-                line = index
-                break
-        if feats[2] == "Pl":
-            noun = Lexicon.NEOLOGSIMS_PLURAL[line]
-            if line == 0 and feats[1] == "Dat":
-                return "Geschwistern"
-            else:
-                return noun
-        else:
-            noun = Lexicon.NEOLOGISMS_NEUTRAL[line]
-            if feats[1] == "Nom" or feats[1] ==  "Dat" or feats[1] == "Acc" or feats[1] == "_":
-                return noun
-            elif feats[1] == ("Gen"):
-                return noun + "s"
+        # Search in noun for the latest position at which a pattern from the pattern list Lexicon.NEOLOGISMS
+        # can be matched. Replace the matched part of the string and everything after it with the corresponding
+        # element from Lexicon.NEOLOGISMS_PLURAL or Lexicon.NEOLOGISMS_NEUTRAL.
+        for i in range(len(noun)-1, -1, -1):
+            for index, neologism in enumerate(Lexicon.NEOLOGISMS):
+                if re.match(rf"(?i){neologism}", noun[i:]):
+                    if feats[2] == "Pl":
+                        noun = noun[:i] + Lexicon.NEOLOGISMS_PLURAL[index].lower()
+                        noun = noun.capitalize()
+                        if index in [0,5,6] and feats[1] == "Dat":
+                            return noun + "n"
+                        else:
+                            return noun
+                    else:
+                        noun = noun[:i] + Lexicon.NEOLOGISMS_NEUTRAL[index].lower()
+                        noun = noun.capitalize()
+                        if feats[1] == ("Gen") and index == 5:
+                            return noun + "es"
+                        elif feats[1] == ("Gen"):
+                            return noun + "s"
+                        else:
+                            return noun
         
     def neutralize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
@@ -231,6 +242,8 @@ class Lexicon:
             return article.capitalize() if is_capitalized else article
         # Case Indifinitive Artikels, only ein
         elif feats[0] == "Indef":
+            if feats[2] == "_":
+                feats[2] = "Nom"
             article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
             return article.capitalize() if is_capitalized else article
         # All other types of article
@@ -363,12 +376,12 @@ class Lexicon:
                     word_parse[2] = word_parse[2][:-1]
                 pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
-        elif word_parse[4] == "PRELS":
+        elif word_parse[4] == "PRELS" and word_parse[1].startswith("d"):
             if feats[1] == "_":
                 feats[1] = "Nom"
             pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
-        elif word_parse[4] == "PDS":
+        elif word_parse[4] == "PRELS" or word_parse[4] == "PDS":
             for start in Lexicon.JEDER_PARADIGM:
                 if word_parse[1].startswith(start):
                     pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
@@ -398,10 +411,10 @@ class Lexicon:
         line = 0
         noun = word_parse[1]
         feats = word_parse[5].split("|")
-        for index, start in enumerate(Lexicon.ROMAN_NOUN_STARTS):
-            if noun.startswith(start):
-                line = index
-        noun = Lexicon.ROMAN_NOUN_STARTS[line] + "e"
+        # Make a regular expression that matches any string in the list Lexicon.ROMAN_NOUN_STARTS:
+        roman_noun_start = "|".join(Lexicon.ROMAN_NOUN_STARTS)
+        # Find last instance of roman_noun_start in noun (case-insensitive) and replace everything after that instance with "e":
+        noun = re.sub(rf"(?i)(.*{roman_noun_start}).*", r"\1e", noun)
         if not len(feats)<=1:
             if feats[2] == "Pl":
                 if feats[1] == "Nom" or feats[1] == "Acc" or feats[1] == ("Gen") or feats[1] == "_":
@@ -453,49 +466,55 @@ class Lexicon:
         # Checks the List of role Nouns to check if word is a role noun
         if gender == "M":
             for i, line in enumerate(Lexicon.MALE_NOUNS):
-                if line == noun:
+                if noun.lower().endswith(line.lower()):
                     return i
                 elif i >= length:
                     break
         elif gender == "F":
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
-                if line == noun:
+                if noun.lower().endswith(line.lower()):
                     return i
                 elif i >= length:
                     break
         elif gender == "_":    
             for i, line in enumerate(Lexicon.MALE_NOUNS):
-                if line == noun:
+                if noun.lower().endswith(line.lower()):
                     return i
                 elif i >= length:
                     i = 0
                     break
             for i, line in enumerate(Lexicon.FEMALE_NOUNS):
-                if line == noun:
+                if noun.lower().endswith(line.lower()):
                     return i
                 elif i >= length:
                     break
         # Neologisms:
         for neologism in Lexicon.NEOLOGISMS:
-            if re.match(neologism, noun):
+            neologism = neologism + "$"
+            if re.search(neologism.lower(), noun.lower()):
                 return "-3"
         # Words ending on -mann or -frau:
-        if re.match(r".+m(a|ä)nn(er)?", noun) or re.match(r".+frau", noun):
+        # If noun ends with pattern r".+m(a|ä)nn(er)?" or with "frau":
+        if re.match(r".+m(a|ä)nn(er)?$", noun) or re.match(r".+frau(en)?$", noun):
             return -2
         # The Word "Mann", "Frau", "Herr", "Dame":
         if noun == "Mann" or noun =="Frau" or noun == "Herr" or noun == "Dame":
             return -4
         #Romanisms:
         for romanism in Lexicon.ROMAN_NOUNS:
-            if re.match(romanism, noun):
+            romanism = romanism + "$"
+            if re.search(romanism.lower(), noun.lower()):
                 return "-10"
         # Irregular role Nouns:
+        # TODO: Enable composite nouns ending in an irregular noun.
         for irregular_noun in Lexicon.IRREGULAR_NOUNS:
+            irregular_noun = irregular_noun + "$"
             if re.match(irregular_noun, noun):
                 return "-11"
         # Noun is already neutral, but article should be declinated
-        if noun in Lexicon.ENGLISH_NOUNS or noun in Lexicon.GRAMM_MAlE_NEUTRAL_NOUNS:
-            return -12
+        for neutral_noun in itertools.chain(Lexicon.ENGLISH_NOUNS, Lexicon.GRAMM_MAlE_NEUTRAL_NOUNS):
+            if noun.lower().endswith(neutral_noun.lower()):
+                return "-12"
         # Check substantivized adjectives
         if word_parse[5][-2:] == "Pl":
             return False
@@ -503,33 +522,11 @@ class Lexicon:
             subadj = line
             if noun == subadj or noun == subadj + "r" or noun == subadj + "n":
                 return -1
-        if re.match(r".*sprachige", noun):
-            return -1    
-        # Check the List if our word ends with a role noun in our list:
-        if gender == "M":
-            for i, line in enumerate(Lexicon.MALE_NOUNS):
-                if noun.endswith(line.lower()):
-                    return i
-                elif i >= length:
-                    break
-        elif gender == "F":
-            for i, line in enumerate(Lexicon.FEMALE_NOUNS):
-                if noun.endswith(line.lower()):
-                    return i
-                elif i >= length:
-                    break
-        elif gender == "_":    
-            for i, line in enumerate(Lexicon.MALE_NOUNS):
-                if noun.endswith(line.lower()):
-                    return i
-                elif i >= length:
-                    i = 0
-                    break
-            for i, line in enumerate(Lexicon.FEMALE_NOUNS):
-                if noun.endswith(line.lower()):
-                    return i
-                elif i >= length:
-                    break
+        if re.search(r"sprachige(r|n|m|s)?$", noun):
+            return -1
+        # The following lines make sure that a lonely adjective that was capitalized before reparsing is treated like a substantivized adjective.
+        if word_parse[1][0].isupper() and word_parse[-2][0].islower():
+            return -1
         return False
     
     def __init__(self):

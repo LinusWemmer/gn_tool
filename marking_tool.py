@@ -45,39 +45,30 @@ class Marking_Tool:
             sentence += word_parse[-2]
             sentence += word_parse[-1]
         return sentence
+    
 
-    # no longer needed:
-    def get_prepositions(self, word) -> str:
-        if word =="bei dem":
-            return "beim"
-        elif word == "Bei dem":
-            return "beim"
-        elif word == "zu dem":
-            return "zum"
-        elif word == "Zu dem":
-            return "Zum"
-        elif word == "zu der":
-            return "zur"
-        elif word == "Zu der":
-            return "Zur"
-        elif word == "zu derm":
-            return "zurm"
-        elif word == "Zu derm":
-            return "Zurm"
-        elif word == "in dem":
-            return "im"
-        elif word == "In dem":
-            return "Im"
-        elif word == "von dem":
-            return "vom"
-        elif word == "Von dem":
-            return "Vom"
-        elif word == "an dem":
-            return "am"
-        elif word == "An dem":
-            return "Am"
-        else:
-            return word
+    def get_internal_sentence(self) -> str:
+        sentence = ""
+        for word_parse in self.parse_list:
+            print(word_parse)
+            #if word_parse[3]== ("$.") or word_parse[3]== ("$,"):
+            #    sentence = sentence[:-1] + word_parse[1] + " "
+            #elif word_parse[3] == ("$("):
+            #    if word_parse[1] == "(":
+            #        sentence += word_parse[1]
+            #    else:
+            #        sentence = sentence[:-1] + word_parse[1] + " "
+            #else:
+            #    if int(word_parse[0]) in split_list:
+            #        preposition = word_parse[1] + " " + self.parse_list[int(word_parse[0])][1]
+            #        sentence += self.get_prepositions(preposition) + " "
+            #    elif int(word_parse[0]) - 1 in split_list:
+            #        pass
+            #    else:
+            #        sentence += word_parse[1] + " "
+            sentence += word_parse[1]
+            sentence += word_parse[-1]
+        return sentence
 
     # Adds a single nounphrase to the dictionary "nounphrases". The key is
     # the index of the head of the nounphrase, while the value is the list of
@@ -111,13 +102,13 @@ class Marking_Tool:
         if word_parse[3] == "ADJA":
             # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
             # flexion, the parent has to included when neutralizing the word.
-            self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
+            self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(word_parse, self.parse_list[article_pos-1])
         elif word_parse[4] == "PIDAT" and pos != article_pos-1:
             # This case covers morphologically adjectival determiners like the word "jeden" in "eines jeden Bürgers".
             # Since the feature list of a PIDAT determiner has a differnt structure than that of an
             # adjective, we need to first adapt its structure:
             word_parse[5] = "POS|" + word_parse[5] + "|_|"
-            self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(self.parse_list[pos], self.parse_list[article_pos-1])
+            self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(word_parse, self.parse_list[article_pos-1])
         else:
             neutralized_word = Lexicon.neutralize_word(self.parse_list[pos])
             if neutralized_word == "derm" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
@@ -150,14 +141,22 @@ class Marking_Tool:
         if self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
             feats[1] = "Dat"
             feats[2] = "Pl"
+        # Wenn bei "Ahnen"/"Vorfahren"/"Nachfahren" erkannt wird, dass es Nominativ ist, aber kein Numerus erkannt wird, dann ist es ein Plural.
+        elif (self.parse_list[pos][1] == "Ahnen" or self.parse_list[pos][1] == "Vorfahren" or self.parse_list[pos][1] == "Nachfahren") and feats[1] == "Nom":
+                feats[2] = "Pl"
         else:
             article = False
             for child in self.nounphrases.get(pos+1):
                 if self.parse_list[child-1][3] == "ART":
                     article = True
+                    article_position = child-1
                     break
             if article:
-                feats[2] = "Sg"
+                # Wenn ein Substantiv einen Artikel hat und im Parzu-Parse kein Numerus hat, im Dativ steht und sich ein auf "-en" endender Artikel drauf bezieht, dann ist das Substantiv im Plural.
+                if feats[1] == "Dat" and self.parse_list[article_position][1].endswith("en"):
+                    feats[2] = "Pl"
+                else:
+                    feats[2] = "Sg"
             elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):
                 print(self.parse_list[pos][1])
                 print("nicht von 'als' abhängig.")
@@ -208,6 +207,9 @@ class Marking_Tool:
     # This function neutralizes the word that has been selected. Then, all dependent words in the sentence are neutralized.
     def neutralize_nounphrase(self, pos:int, line:int):
         feats = self.parse_list[pos][5].split("|")
+        if len(feats) == 1:
+            feats.append("_")
+            feats.append("_")
         plural = True
 
         # Neutralize a Noun
@@ -218,6 +220,15 @@ class Marking_Tool:
                 self.determine_number(pos,feats,plural)
             if feats[1] == "_" and self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
                 feats[1] = "Dat"
+            # Nach "zwischen", "unter", "vor", "hinter", "neben" nicht erkanntes Kasus zu Dativ machen.
+            if feats[1] == "_":
+                if int(self.parse_list[pos][6]) != 0:
+                    if self.parse_list[int(self.parse_list[pos][6])-1][2] in ["zwischen","unter","vor","hinter","neben"]:
+                        feats[1] = "Dat"
+                    elif int(self.parse_list[int(self.parse_list[pos][6])-1][6]) != 0:
+                        if int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6]) != 0:
+                            if self.parse_list[int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6])-1][2] in ["zwischen","unter","vor","hinter","neben"]:
+                                feats[1] = "Dat"
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
             # Noun is a substantivized adjective 
@@ -233,7 +244,11 @@ class Marking_Tool:
                         if self.parse_list[child_pos-1][3] == "ART":
                             article_pos = child_pos
                     #article_pos = min(nounphrase)
-                self.parse_list[pos][-2] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1], feats)
+                # If self.parse_list[pos][-2] starts with a small letter, it should stay that way.
+                if self.parse_list[pos][-2][0].islower():
+                    self.parse_list[pos][-2] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1], feats).lower()
+                else:
+                    self.parse_list[pos][-2] = Lexicon.neutralize_sub_adj(self.parse_list[pos], self.parse_list[article_pos-1], feats)
             # words ending on -mann or -frau:
             elif line == -2:
                 self.parse_list[pos][-2] = Lexicon.neutralize_gendered_suffix(self.parse_list[pos])
@@ -388,6 +403,8 @@ class Marking_Tool:
     def find_realizations(self, input_text: str):
         position_after_preposition = False
         for word in self.parse_list:
+            print("word:")
+            print(word)
             if position_after_preposition == True and word[1].startswith("d") and len(word[1]) == 3:
                 pattern = re.escape(word[1]) + "|" + re.escape(word[1][2])
             elif word[1] == "in":
@@ -398,7 +415,7 @@ class Marking_Tool:
                 pattern = "von|vo(?!n)"
             else:
                 pattern = re.escape(word[1])
-            match = re.search("^" + pattern, input_text)
+            match = re.search("^" + pattern, input_text, re.IGNORECASE)
             if match:
                 realization = match.group(0)
                 remaining_text = input_text[match.end():]
@@ -417,20 +434,4 @@ class Marking_Tool:
             else:
                 position_after_preposition = False
         return input_text
-    
-    #no longer needed:
-    def find_prefix_regex(self, pattern, S2):
-        # Search for the pattern in S2
-        match = re.search(pattern, S2)
-        
-        # Check if the pattern is found in S2
-        if match:
-            # Return the prefix of S2 ending with the occurrence of the pattern
-            prefix = S2[:match.end()]
-            S2_modified = S2[match.end():]
-            return prefix, S2_modified
-        else:
-            # Return an error message if the pattern is not found in S2
-            raise Exception("The word \"" + pattern + "\" could not be found in the input text, even though it was expected according to the parse list")
-
 

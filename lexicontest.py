@@ -2,7 +2,10 @@ from lexicon import Lexicon
 from marking_tool import Marking_Tool
 import parzu_class as parzu
 import unittest
+import re
+from __init__ import get_parse
 from __init__ import split_prepositions
+from __init__ import search_lonely_adjectives
 
 
 class Sentence_Test(unittest.TestCase):
@@ -46,20 +49,57 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich war beim Bergmann und gehe zum Feuerwehrmann.", "Ich war bei der Bergperson und gehe zur Feuerwehrperson.", ((5,-2),(10,-2))))
         test_sentences.append(("Die Lehrerin steht beim Schüler und schaut zum Direktor.", "De Lehrere steht bei derm Schülere und schaut zurm Direktore.", ((2,34),(6,6),(11,72))))
         test_sentences.append(("Der Nachbar im Nachbarhaus ist nett.", "De Nachbare im Nachbarhaus ist nett.", ((2,82),)))
+        test_sentences.append(("Wer das nicht weiß, der hat keine Chance bei den Frauen.", "Wer das nicht weiß, de hat keine Chance bei den Leuten.", ((6,0),(12,-4))))
+        test_sentences.append(("eine Schülerin", "ein Schülere", ((2,6),)))
+        test_sentences.append(("Ich gebe es meiner Kollegin.", "Ich gebe es meinerm Kollegere.", ((5,27),)))
+        test_sentences.append(("Ich gebe es meinen Kollegen.", "Ich gebe es meinen Kollegernen.", ((5,27),)))
+        test_sentences.append(("Er sprach auch mit seinen Studenten.", "En sprach auch mit seinen Studenternen.", ((1,0),(6,50))))
+        test_sentences.append(("Sind das Deine Ahnen?", "Sind das Deine Ahnerne?", ((4,1146),)))
+        test_sentences.append(("Es gab einen Konflikt zwischen Studenten und Regierung.", "Es gab einen Konflikt zwischen Studenternen und Regierung.", ((6,50),)))
+        test_sentences.append(("Es gab einen Konflikt zwischen Regierung und Studenten.", "Es gab einen Konflikt zwischen Regierung und Studenternen.", ((8,50),)))
+        test_sentences.append(("Es gab einen Konflikt unter Studenten.", "Es gab einen Konflikt unter Studenternen.", ((6,50),)))
+        test_sentences.append(("Vor Studenten spricht er immer laut.", "Vor Studenternen spricht en immer laut.", ((2,50),(4,0))))
+        test_sentences.append(("Hinter Studenten steht immer ein Lehrer.", "Hinter Studenternen steht immer ein Lehrere.", ((2,50),(6,34))))
+        test_sentences.append(("Neben Studenten steht immer ein Lehrer.", "Neben Studenternen steht immer ein Lehrere.", ((2,50),(6,34))))
+        test_sentences.append(("Ich habe einen netten und einen unfreundlichen Kollegen.", "Ich habe ein nette und ein unfreundliche Kollegere.", ((4,-1),(8,27))))
+        test_sentences.append(("Jedem anderen habe ich das gegeben.", "Jederm anderen habe ich das gegeben.", ((2,-1),)))
+        test_sentences.append(("Ich habe es jedem anderen gegeben.", "Ich habe es jederm anderen gegeben.", ((5,-1),)))
+        test_sentences.append(("Jeder hilft jedem anderen.", "Jedey hilft jederm anderen.", ((1,0),(4,-1))))
+        test_sentences.append(("Der Bruder meiner Mutter hilft der Cousine meines Sohnes.", "De Geschwister meiners Elters hilft derm Couse meiners Sprosses.", ((2,-3),(4,-3),(7,-3),(9,-3))))
+        test_sentences.append(("Die Supermutter spielt mit ihrem Minisohn.", "De Superelter spielt mit enserm Minispross.", ((2,-3),(5,0),(6,-3))))
+        test_sentences.append(("Der Hauptcharakter bleibt.", "De Hauptcharakter bleibt.", ((2,-12),)))
+        test_sentences.append(("Ich glaube ihr nicht.", "Ich glaube em nicht.", ((3,0),)))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text_with_split_prepositions = split_prepositions(test[0])
-            parse = ParZu.main(input_text_with_split_prepositions)
-            words = parse[0].split("\n")
-            words = words[:-2]
-            parse_list = []
-            for word in words:
-                parse_list.append(word.split("\t"))
-            marking_tool = Marking_Tool(parse_list,{})
-            parse_list = Marking_Tool.find_realizations(marking_tool,test[0])
+            parse = get_parse(input_text_with_split_prepositions)
+
+            modified_text, capitalized_adj_addresses, glauben, change = search_lonely_adjectives(parse,test[0])
+            if not change:
+                marking_tool = Marking_Tool(parse[0],{})
+            else:
+                print("Parsing again with capitalized adjectives.")
+                parse = get_parse(modified_text)
+                print(parse)            
+                marking_tool = Marking_Tool(parse[0],{})
+                modified_text = Marking_Tool.find_realizations(marking_tool,modified_text)
+                for capitalized_adj_address in capitalized_adj_addresses:
+                    print(capitalized_adj_address)
+                    parse[0][capitalized_adj_address[1]][2] = parse[0][capitalized_adj_address[1]][2].lower()
+                    parse[0][capitalized_adj_address[1]][-2] = parse[0][capitalized_adj_address[1]][-2].lower()
+                    if parse[0][capitalized_adj_address[1]][2].startswith("andere") and len(parse[0][capitalized_adj_address[1]][2]) < 8:
+                        parse[0][capitalized_adj_address[1]][2] = "andere"
+                for glauben_address in glauben:
+                    parse[0][glauben_address[1]][1] = re.sub(r"schreib", "glaub", parse[0][glauben_address[1]][1])
+                    parse[0][glauben_address[1]][1] = re.sub(r"Schreib", "Glaub", parse[0][glauben_address[1]][1])
+                    parse[0][glauben_address[1]][2] = re.sub(r"schreib", "glaub", parse[0][glauben_address[1]][2])
+                    parse[0][glauben_address[1]][-2] = re.sub(r"schreib", "glaub", parse[0][glauben_address[1]][-2])
+                    parse[0][glauben_address[1]][-2] = re.sub(r"Schreib", "Glaub", parse[0][glauben_address[1]][-2])
+            print(parse)
+
             marking_form = marking_tool.get_marking_form(0)
             # for nounphrase in test[2]:
-            #    marking_tool.find_nounphrase(marking_tool.parse_list[nounphrase[0] - 1])
+            #    marking_tool.find_nounphrase(parse[0][nounphrase[0] - 1])
             print("Noun phrases:")
             print(marking_tool.nounphrases)
             for nounphrase in test[2]:
