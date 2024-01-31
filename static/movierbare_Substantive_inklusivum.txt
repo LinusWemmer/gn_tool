@@ -3,7 +3,7 @@
 % Mitglied ?
 Präsidente
 Trainere
-% Tor (?)
+Tore
 Schülere
 Herre
 Mitarbeitere
@@ -150,7 +150,7 @@ Anwohnere
 Anbietere
 Dichtere
 Generalsekretäre
-Obmann (?)e
+% Obmann
 Tirolere
 Vorgängere
 Webere
@@ -176,7 +176,7 @@ Italienere
 Juriste
 Trägere
 Dirigente
-Erbre
+Erbere
 Mietere
 Passagiere
 Britere
@@ -186,7 +186,7 @@ Hessere
 Jägere
 % Katze (?)
 Ansprechpartnere
-Serbre
+Serbere
 Abenteuere
 Kickere
 Vizepräsidente
@@ -238,7 +238,7 @@ Premierministere
 Reitere
 % Klassiker
 Rentnere
-Niedersachsre
+Niedersachsere
 Verteidigungsministere
 Gründere
 Moderatore
@@ -322,7 +322,7 @@ Muslime
 Einbrechere
 Kämpfere
 Springere
-%Gestre
+%Gestere
 Mastere
 Kommuniste
 Chinesere
@@ -363,7 +363,7 @@ Griechere
 Außenseitere
 Assistente
 Chefredakteure
-Torschützre
+Torschützere
 Kommandante
 Christdemokrate
 Kroatere
@@ -384,7 +384,7 @@ Potsdamere
 Pädagogere
 Befürwortere
 Londonere
-Polizeibeamtre
+%Polizeibeamtere
 Doktore
 Parlamentariere
 Gutachtere
@@ -412,7 +412,7 @@ Erfindere
 Rivalere
 Protagoniste
 Diktatore
-Schwabre
+Schwabere
 Technikere
 % Koalitionspartner (?)
 Gesetzgebere
@@ -428,8 +428,8 @@ Empfängere
 Rechnere
 Agente
 Physikere
-Polre
-Zeitgenossre
+Polere
+Zeitgenossere
 Bernere
 Albanere
 Gesellschaftere
@@ -437,7 +437,7 @@ Niederländere
 Düsseldorfere
 Umweltministere
 Indianere
-Teamkollegre
+Teamkollegere
 % Fort (?)
 Schwedere
 Tschechere
@@ -447,7 +447,7 @@ Verfassere
 Torjägere
 Verfolgere
 Baslere
-Pilotre
+Pilotere
 Asylbewerbere
 Leipzigere
 Stuttgartere
@@ -497,7 +497,7 @@ Kennere
 Barone
 Förstere
 Zahnarzte
-Augenzeugre
+Augenzeugere
 Holländere
 Vorfahre
 %Type (?)
@@ -565,7 +565,7 @@ Mathematikere
 Handballere
 Riesere
 Anführere
-Wartre
+%Wartere
 Bundesbürgere
 %Polster (?)
 Naturfreunde
@@ -652,7 +652,7 @@ Pfadfindere
 Ringere
 Millionäre
 Ortschefe
-Amtskollegre
+Amtskollegere
 Protestante
 Publiziste
 Schöpfere
@@ -677,13 +677,13 @@ Rumänere
 Augsburgere
 Afrikanere
 Kriegere
-%Artist (?)
+Artiste
 Stammspielere
 Betrügere
 Astronaute
 Kommentatore
 Spaziergängere
-Freire
+Freiere
 % Schub
 %Pol
 Gönnere
@@ -729,7 +729,7 @@ Portugiesere
 Anwendere
 Verursachere
 Nationaliste
-Preußre
+Preußere
 Lokalmatadore
 Hoteliere
 Wettbewerbere
@@ -772,7 +772,7 @@ Gastwirte
 Münchenere
 Kielere
 Dramatikere
-Zeitzeugre
+Zeitzeugere
 Warschauere
 Kuriere
 Hochschullehrere
@@ -783,13 +783,13 @@ Gratulante
 Wächtere
 Detektive
 Schreinere
-% Mohr (?)
+Mohre
 Hackere
 Komikere
 Notare
 Akademikere
 Jüngere
-Lebensgefährtre
+Lebensgefährtere
 Gymnasiaste
 Entertainere
 Samere
@@ -820,7 +820,7 @@ Marschall(?)e
 Firmenchefe
 Arbeitsministere
 Therapeute
-%Patriarch
+Patriarche
 %Pin(?)
 Dealere
 Antragstellere
@@ -831,11 +831,11 @@ Würzburgere
 Ureinwohnere
 Mailändere
 Finaliste
-%Diakon(?)
+Diakone
 Bergsteigere
 Freiburgere
 Aussiedlere
-Südhessre
+Südhessere
 Maklere
 Landesmeistere
 %Lacher
@@ -855,7 +855,7 @@ Sportsfreunde
 %Drucker(?)
 Ukrainere
 Zuwandere
-Weggefährtre
+Weggefährtere
 Dissidente
 Kontrolleure
 Hirtere
@@ -869,7 +869,7 @@ Kunsthistorikere
 Bikere
 %Storch(?)
 Lyrikere
-%Monarch
+Monarche
 Basketballere
 %Tanne(?)
 Slowakere
@@ -932,7 +932,7 @@ Drahtziehere
 Versorgere
 Kremsere
 Choreografe
-%Greis
+Greise
 Mittlere
 Jurore
 Gefährtere
@@ -969,7 +969,7 @@ Geologere
 Ehepartnere
 Sympathisante
 Finanzchefe
-%Mandatar(?)
+Mandatare
 Oberarzte
 Landtagspräsidente
 Rostockere
@@ -1011,7 +1011,7 @@ Bauunternehmere
 Ordnungshütere
 Optimiste
 Eisenbahnere
-Privatkundre
+Privatkundere
 Statthaltere
 Gewalttätere
 Schulabgängere
@@ -1021,7 +1021,7 @@ Magiere
 Amtsleitere
 Reserviste
 Namensgebere
-Eidgenossre
+Eidgenossere
 Patriote
 Germanere
 Urenkele
@@ -1032,7 +1032,7 @@ Informante
 Gastarbeitere
 Schaustellere
 Bürgerrechtlere
-Hennre
+%Hennere
 Dolmetschere
 Chroniste
 Vorstehere
@@ -1052,21 +1052,21 @@ Kassenwarte
 Erzeugere
 Generalstaatsanwalte
 Rheinländere
-Schmiedre
+Schmiede
 Kinderarzte
 Zürchere
 Rekrute
 Absendere
 Unterhändlere
 Kraftfahrere
-Erzrivalre
+Erzrivalere
 Börsianere
 Pensionäre
 Spandauere
-Junggesellre
+Junggesellere
 Abenteurere
 Großmeistere
-Artgenossre
+Artgenossere
 Vorjahressiegere
 Hundehaltere
 Duisburgere
@@ -1096,7 +1096,7 @@ Tibetere
 Lobbyiste
 Unfallverursachere
 Probande
-Finanzexpertre
+Finanzexpertere
 Emigrante
 Informatikere
 Chefdirigente
@@ -1105,7 +1105,7 @@ Idiote
 Galeriste
 Abwehrchefe
 Hauseigentümere
-Westre
+%Westere
 Bietere
 Konstrukteure
 Sportwarte
@@ -1121,7 +1121,7 @@ Fleischere
 Psychotherapeute
 Verwaltungschefe
 Praktikere
-Sportschützre
+Sportschützere
 Jazzmusikere
 Jugendwarte
 Wallisere
@@ -1162,7 +1162,7 @@ Amsterdamere
 Hanseate
 Eignere
 Kultursenatore
-Ehegattre
+Ehegattere
 Bauträgere
 Zusehere
 Goalgettere
@@ -1178,9 +1178,9 @@ Celliste
 Neusiedlere
 Germaniste
 Regierungsvertretere
-Sozialpädagogre
+Sozialpädagogere
 Nutznießere
-Kriminalbeamtre
+Kriminalbeamtere
 Instrumentaliste
 Erzherzoge
 Administratore
@@ -1222,7 +1222,7 @@ Schachspielere
 Hundebesitzere
 Passauere
 Importeure
-Gesellere
+Geselle
 Schützenkönige
 Grundstückseigentümere
 Elektrikere
@@ -1237,7 +1237,7 @@ Burere
 Testere
 Tübingere
 Songwritere
-Stammkundre
+Stammkundere
 Streitere
 Lektore
 Bandleadere
@@ -1254,7 +1254,7 @@ Altbürgermeistere
 Politikwissenschaftlere
 Autolenkere
 Parkere
-Hordre
+%Hordere
 Schulträgere
 Kubanere
 Würdenträgere
@@ -1291,10 +1291,10 @@ Naturwissenschaftlere
 Tyranne
 Mittelstürmere
 Senne
-Pantomimre
+Pantomimere
 Erbauere
 Athenere
-Patronre
+Patronere
 Bundesarbeitsministere
 Berichterstattere
 Patrone
@@ -1303,7 +1303,7 @@ Arsche
 Augenarzte
 Bandite
 Philologere
-Machre
+Machere
 Bühnenbildnere
 Keglere
 Restauratore
@@ -1327,12 +1327,12 @@ Biografe
 Gaunere
 Realiste
 Tierfreunde
-Kronzeugre
+Kronzeugere
 Personalchefe
 Kleinaktionäre
 Tschetschenere
 Humaniste
-Parteikollegre
+Parteikollegere
 Theoretikere
 Alleinunterhaltere
 Hofmeistere
@@ -1370,14 +1370,14 @@ Lügnere
 Lastwagenfahrere
 Nachahmere
 Superintendente
-Wirtschaftsexpertre
+Wirtschaftsexpertere
 Haftrichtere
 Bausenatore
 Handelspartnere
 Karikaturiste
 Dachdeckere
 Amokläufere
-Arbeitskollegre
+Arbeitskollegere
 Turniersiegere
 Realschülere
 Metallere
@@ -1392,16 +1392,16 @@ Persere
 Gesamtsiegere
 Angstgegnere
 Treibere
-Rüdre
+%Rüdere
 Heimleitere
-Generalre
+%Generalere
 Werbeträgere
 Fahrradfahrere
 Amtsvorgängere
 Lotsere
 Spinnere
 Zugführere
-Olivre
+%Olivere
 Haupttätere
 Grundbesitzere
 Erpressere
@@ -1416,7 +1416,7 @@ Bibliothekare
 Vegetariere
 Anarchiste
 Bohrere
-Altersgenossre
+Altersgenossere
 Nähere
 Warte
 Strickere
@@ -1444,7 +1444,7 @@ Illustratore
 Pressewarte
 Besetzere
 Vikare
-Schimpansre
+Schimpansere
 Schlichtere
 Keyboardere
 Trommlere
@@ -1466,11 +1466,11 @@ Freiberuflere
 Türstehere
 Lebenspartnere
 Agrarministere
-Vereinskollegre
+Vereinskollegere
 Nomadere
 Kelte
 Nationalstürmere
-Großkundre
+Großkundere
 Kosmonaute
 Werkleitere
 Editore
@@ -1488,9 +1488,9 @@ Aussteigere
 Georgiere
 Interniste
 Nachtschwärmere
-Verkehrsexpertre
+Verkehrsexpertere
 Goldschmiede
-Bogenschützre
+Bogenschützere
 Samaritere
 Bürokrate
 Kleingärtnere
@@ -1524,7 +1524,7 @@ Schleichere
 Tokiotere
 Unionspolitikere
 Afroamerikanere
-Musikpädagogre
+Musikpädagogere
 Dienstherre
 Kirchenmusikere
 Zuhältere
@@ -1537,19 +1537,19 @@ Ministrante
 Joggere
 Trinkere
 Spielführere
-Fortre
+%Fortere
 Gehilfere
 Langweilere
 Treuhändere
 Südkoreanere
-Solre
+%Solere
 Syrere
 Antisemite
 Ratspräsidente
 Bergführere
 Pfalzgrafe
 Bereichsleitere
-Vorstandskollegre
+Vorstandskollegere
 Mesnere
 Blutspendere
 Idealiste
@@ -1562,7 +1562,7 @@ Stabschefe
 Überfliegere
 Betriebsratschefe
 Arrangeure
-Rutre
+%Rutere
 Peinigere
 Buddhiste
 Wahlhelfere
@@ -1609,7 +1609,7 @@ Neueinsteigere
 Bäckermeistere
 Rezensente
 Neurologere
-Fluglotsre
+Fluglotsere
 Kidnappere
 Bundesrichtere
 Einsendere
@@ -1622,7 +1622,7 @@ Staatsmeistere
 Literaturkritikere
 Installateure
 Wahlkämpfere
-Mannschaftskollegre
+Mannschaftskollegere
 Slawere
 Litauere
 Jugendpflegere
@@ -1631,7 +1631,7 @@ Sprachwissenschaftlere
 Hebere
 Spätaussiedlere
 Medaillengewinnere
-Bankkundre
+Bankkundere
 Visionäre
 Bezirksrate
 Sprayere
@@ -1662,7 +1662,7 @@ Frauenarzte
 Weltrekordlere
 Gruppenleitere
 Schornsteinfegere
-Regierungsbeamtre
+Regierungsbeamtere
 Benediktinere
 Nebendarstellere
 Katalanere
@@ -1699,17 +1699,17 @@ Quereinsteigere
 Jungsozialiste
 Ausstellungsmachere
 Friesere
-Scharfschützre
+Scharfschützere
 Kriegsgegnere
 Erlösere
 Schmugglere
 Lebensrettere
 Vereinschefe
-Sicherheitsexpertre
+Sicherheitsexpertere
 Baudirektore
 Nachtwächtere
 Parteipräsidente
-Finanzbeamtre
+Finanzbeamtere
 Allgäuere
 Währungshütere
 Fernsehmoderatore
@@ -1725,7 +1725,7 @@ Versagere
 Kopenhagenere
 Optikere
 Tarifpartnere
-Mimre
+Mimere
 Kunstsammlere
 Jugendspielere
 Hobbykünstlere
@@ -1739,7 +1739,7 @@ Religionslehrere
 Fondsmanagere
 Assistenztrainere
 Isländere
-Standesbeamtre
+Standesbeamtere
 Gerichtsvollziehere
 Luzernere
 Monopoliste
@@ -1780,7 +1780,7 @@ Weinbauere
 Normalbürgere
 Baltere
 Wegbegleitere
-Jungschützre
+Jungschützere
 Westschweizere
 Großgrundbesitzere
 Fachbesuchere
@@ -1789,7 +1789,7 @@ Kanzleramtsministere
 Tischtennisspielere
 Programmdirektore
 Glücksbringere
-Rechtsexpertre
+Rechtsexpertere
 Freiheitskämpfere
 Namensvettere
 Orthopädere
@@ -1805,7 +1805,7 @@ Fälschere
 Küchenmeistere
 Kaufinteressente
 Waffenhändlere
-Kellre
+%Kellere
 Rundfunkrate
 Einkäufere
 Finanzreferente
@@ -1842,8 +1842,8 @@ Redaktionsleitere
 Insulanere
 Geschäftsinhabere
 Kumpane
-Passre
-Zollbeamtre
+%Passere
+Zollbeamtere
 Kreditnehmere
 Jenaere
 Postbotere
@@ -1858,7 +1858,7 @@ Ministerialrate
 Ideologere
 Kurdirektore
 Vorrednere
-Hämmerlre
+%Hämmerlere
 Generalgouverneure
 Drechslere
 Schuldirektore
@@ -1871,9 +1871,9 @@ Wahlleitere
 Privatdetektive
 Trickdiebe
 Massenmördere
-Geschäftskundre
+Geschäftskundere
 Putschiste
-Fraktionskollegre
+Fraktionskollegere
 Alpiniste
 Hauptakteure
 Gemeindechefe
@@ -1926,7 +1926,7 @@ Freischärlere
 Bundesligaspielere
 Gymnasiallehrere
 Vorkämpfere
-Klubkollegre
+Klubkollegere
 Vorlesere
 Flügelspielere
 Nachfahre
@@ -1937,14 +1937,14 @@ Pförtnere
 Interessenvertretere
 Skippere
 Skirennläufere
-Alpre
+%Alpere
 Falknere
 Bale
 Medizinstudente
 Doppelgängere
 Veterinäre
 Beschützere
-Weißrussre
+Weißrussere
 Elternvertretere
 Landschaftsarchitekte
 Berufssoldate
@@ -1972,15 +1972,15 @@ Aspirante
 Zeitungsverlegere
 Schnäppchenjägere
 Bewachere
-Elfre
-Berufskollegre
+Elfe
+Berufskollegere
 Dörflere
 Pennere
 Ausrüstere
 Oberstufenschülere
 Offensivspielere
 Wahlbeobachtere
-Exotre
+Exotere
 Denkmalpflegere
 Songschreibere
 Navigatore
@@ -2054,8 +2054,8 @@ Münsteranere
 Schwerverbrechere
 Turnierleitere
 Superhelde
-Heckenschützre
-Verwaltungsbeamtre
+Heckenschützere
+Verwaltungsbeamtere
 Inländere
 Wohltätere
 Gemeindeschreibere
@@ -2089,12 +2089,12 @@ Barkeepere
 Sozialpolitikere
 Wertungsrichtere
 Bezwingere
-Postbeamtre
+Postbeamtere
 Steuersündere
 Landeswahlleitere
 Verführere
 Provokateure
-Vanillre
+%Vanillere
 Klassensiegere
 Redaktore
 Geschichtenerzählere
@@ -2107,7 +2107,7 @@ Marketingleitere
 Leistungssportlere
 Hauptkonkurrente
 Volkshelde
-Gigantre
+Gigante
 Fallschirmspringere
 Schrittmachere
 Vizekönige
@@ -2121,7 +2121,7 @@ Büßere
 Emittente
 Gone
 Zisterziensere
-Altphilologre
+Altphilologere
 Übersiedlere
 Handelsministere
 Ökologere
@@ -2134,14 +2134,14 @@ Titelhelde
 Buchbindere
 Entsorgere
 Skilangläufere
-Gesundheitsexpertre
+Gesundheitsexpertere
 Zürichere
 Schulmeistere
 Laiendarstellere
 Kriminalhauptkommissare
 Büttenrednere
 Gerichtssprechere
-Flamre
+Flamere
 Zweiradfahrere
 Chefkoche
 Langstreckenläufere
@@ -2159,10 +2159,10 @@ Erntehelfere
 Libyere
 Kreisrate
 Delinquente
-Gesinnungsgenossre
+Gesinnungsgenossere
 Mitinhabere
 Bauministere
-Parteigenossre
+Parteigenossere
 Zugbegleitere
 Dokumentarfilmere
 Ghanaere
@@ -2188,7 +2188,7 @@ Olympiateilnehmere
 Erstsemestere
 Handwerksmeistere
 Ravere
-Quintre
+%Quintere
 Kassenpatiente
 Zeitsoldate
 Außenpolitikere
@@ -2299,7 +2299,7 @@ Sportmedizinere
 Packere
 Finanzberatere
 Seriensiegere
-Haushaltsexpertre
+Haushaltsexpertere
 Tagelöhnere
 Schlossherre
 Staatsrechtlere
@@ -2317,7 +2317,7 @@ Auktionatore
 Berufsberatere
 Mitinitiatore
 Abgängere
-Stromkundre
+Stromkundere
 Humoriste
 Funkere
 Oberstudienrate
@@ -2334,7 +2334,7 @@ Urologere
 Mormonere
 Bundespolitikere
 Osloere
-Rankre
+%Rankere
 Stromerzeugere
 Spitzenfunktionäre
 Kirchenpräsidente
@@ -2408,7 +2408,7 @@ Zwischenhändlere
 Rettungsassistente
 Aargauere
 Gewerkschaftsführere
-Sozialexpertre
+Sozialexpertere
 Librettiste
 Prorektore
 Industrieministere
@@ -2453,7 +2453,7 @@ Versammlungsleitere
 Oppositionschefe
 Kleinbürgere
 Bundesbauministere
-Trauzeugre
+Trauzeugere
 Musterschülere
 Chefanklägere
 Altenpflegere
@@ -2461,7 +2461,7 @@ Hinterbänklere
 Frühaufstehere
 Werkzeugmachere
 Kartografe
-Leidensgenossre
+Leidensgenossere
 Stadtbaurate
 Schwarzafrikanere
 Bewährungshelfere
@@ -2490,7 +2490,7 @@ Perkussioniste
 Weltbürgere
 Märchenerzählere
 Scorere
-Sorbre
+Sorbere
 Eisschnellläufere
 Informationsministere
 Radiomoderatore
@@ -2513,7 +2513,7 @@ Vorbesitzere
 Schlesiere
 Exzentrikere
 Gewerkschaftssekretäre
-Kabinettskollegre
+Kabinettskollegere
 Vagabunde
 Maoiste
 Wanderwarte
@@ -2524,7 +2524,7 @@ Nostalgikere
 Ersthelfere
 Marketingchefe
 Personalvertretere
-Umweltexpertre
+Umweltexpertere
 Lebensmittelhändlere
 Zeitarbeitere
 Israelite
@@ -2568,7 +2568,7 @@ Kunstturnere
 Radiologere
 Württembergere
 Finanzdezernente
-Staatsbeamtre
+Staatsbeamtere
 Skirennfahrere
 Maschinenschlossere
 Verkehrssenatore
@@ -2587,7 +2587,7 @@ Somaliere
 Wirtschaftsführere
 Rechtsvertretere
 Volksschullehrere
-Kripobeamtre
+Kripobeamtere
 Querulante
 Hauslehrere
 Schuldezernente
@@ -2626,7 +2626,7 @@ Dienststellenleitere
 Heimtrainere
 Protestlere
 Sportwissenschaftlere
-Mettre
+%Mettere
 Demagogere
 Zehntklässlere
 Leadsängere
@@ -2635,7 +2635,7 @@ Pastoralassistente
 Theaterbesuchere
 Fremdlinge
 Zoodirektore
-Pistolenschützre
+Pistolenschützere
 Fluglehrere
 Heizere
 Lappere
@@ -2656,11 +2656,11 @@ Postministere
 Methodiste
 Niederlassungsleitere
 Volkskundlere
-Innenexpertre
+Innenexpertere
 Jugendmeistere
 Flügelstürmere
 Tutore
-Energieexpertre
+Energieexpertere
 Interviewpartnere
 Hauptrednere
 Zweitklässlere
@@ -2672,7 +2672,7 @@ Nörglere
 Unterländere
 Schwärmere
 Mitwissere
-Ratskollegre
+Ratskollegere
 Tanzlehrere
 Zauberkünstlere
 Drogenkonsumente
@@ -2731,7 +2731,7 @@ Institutsleitere
 Friedensaktiviste
 Austauschschülere
 Lebenskünstlere
-Ministerialbeamtre
+Ministerialbeamtere
 Sportkeglere
 Ägyptologere
 Wahrsagere
@@ -2742,11 +2742,11 @@ Bezirksrichtere
 Umsteigere
 Erziehungswissenschaftlere
 Asylwerbere
-Teamgefährtre
+Teamgefährtere
 Jamaikanere
 Talkmastere
 Personalleitere
-Sennre
+%Sennere
 Vollblutmusikere
 Außenamtssprechere
 Schleifere
@@ -2771,10 +2771,10 @@ Domorganiste
 Wuchere
 Hehlere
 Kokone
-Ladre
+%Ladere
 Landratskandidate
-Synodalre
-Ostfriesre
+Synodalere
+Ostfriesere
 Weltklassespielere
 Hockeyspielere
 Wirtschaftspolitikere
@@ -2787,7 +2787,7 @@ Behördenleitere
 Moabitere
 Pflichtverteidigere
 Studienleitere
-Justizbeamtre
+Justizbeamtere
 Cartooniste
 Weinliebhabere
 Großverdienere
@@ -2807,10 +2807,10 @@ Museumsbesuchere
 Gesundheitsstadtrate
 Hauptgesellschaftere
 Programmchefe
-Steuerexpertre
+Steuerexpertere
 Potentate
 Alleinherrschere
-Arbeitsmarktexpertre
+Arbeitsmarktexpertere
 Neidere
 Saisonarbeitere
 Fasnachtere
@@ -2832,7 +2832,7 @@ Ehrensenatore
 Transportunternehmere
 Notenwarte
 Etappensiegere
-Vollzugsbeamtre
+Vollzugsbeamtere
 Anstiftere
 Motorradlenkere
 Liquidatore
@@ -2854,11 +2854,11 @@ Regierungsdirektore
 Widerständlere
 Baselbietere
 Seminarteilnehmere
-Antipodre
+Antipodere
 Erblassere
 Heimatdichtere
 Gärtnermeistere
-Diakonissre
+Diakonissere
 Rechtsbrechere
 Hellsehere
 Proletariere
@@ -2882,7 +2882,7 @@ Fabrikarbeitere
 Jugendreferente
 Biertrinkere
 Achtklässlere
-Grenzbeamtre
+Grenzbeamtere
 Modellbauere
 Dressurreitere
 Rennläufere
@@ -2895,7 +2895,7 @@ Heilsbringere
 Bewahrere
 Sunde
 Volksanwalte
-Erfüllungsgehilfre
+Erfüllungsgehilfere
 Helfershelfere
 Quäkere
 Umweltaktiviste
@@ -2913,7 +2913,7 @@ Viehzüchtere
 Ministerialdirektore
 Stadtschulrate
 Straßenfegere
-Unfallzeugre
+Unfallzeugere
 Landschaftsgärtnere
 Maschinenbauingenieure
 Solokünstlere
@@ -2935,14 +2935,14 @@ Senegalesere
 Linksextremiste
 Bobfahrere
 Jugendrichtere
-Taufpatre
+Taufpatere
 Aktienhändlere
 Ausbildnere
 Grenzpoliziste
 Konvertite
 Profiboxere
 Punktrichtere
-Nichtjudre
+Nichtjudere
 Kundenberatere
 Romanautore
 Hochschulprofessore
@@ -2976,7 +2976,7 @@ Nehmere
 Sportarzte
 Jungwählere
 Medienwissenschaftlere
-Schülerlotsre
+Schülerlotsere
 Unterdrückere
 Kommerzienrate
 Trafikante
@@ -2989,7 +2989,7 @@ Forschungsministere
 Monarchiste
 Kosmopolite
 Personalberatere
-Bildungsexpertre
+Bildungsexpertere
 Schülersprechere
 Pressefotografe
 Virologere
@@ -3014,7 +3014,7 @@ Altkommuniste
 Gewerkschaftlere
 Erfolgsautore
 Schriftsetzere
-Fachkollegre
+Fachkollegere
 Haitianere
 Augenoptikere
 Cheforganisatore
@@ -3028,7 +3028,7 @@ Bundesjustizministere
 Sprengmeistere
 Metallarbeitere
 Hilfspoliziste
-Bundesbeamtre
+Bundesbeamtere
 Fernsehkoche
 Infrastrukturministere
 Schachmeistere
@@ -3037,7 +3037,7 @@ Wirtschaftsingenieure
 Landstreichere
 Primarlehrere
 Dienstbotere
-Computerexpertre
+Computerexpertere
 Mehrheitseignere
 Verhaltensforschere
 Schnüfflere
@@ -3104,14 +3104,14 @@ Autogrammjägere
 Nichtschwimmere
 Superministere
 Behindertensportlere
-Kressre
+%Kressere
 Hausverwaltere
 Menschenfreunde
 Auswechselspielere
 Juniorenmeistere
-Angelsachsre
+Angelsachsere
 Musikstudente
-Bundesgenossre
+Bundesgenossere
 Gastdozente
 Architekturstudente
 Ahnherre
@@ -3135,7 +3135,7 @@ Feuilletoniste
 Setzere
 Revoluzzere
 Tagungsteilnehmere
-Molre
+%Molere
 Restaurantbesitzere
 Leihgebere
 Volksschauspielere
@@ -3162,14 +3162,14 @@ Achtundsechzigere
 Jungpolitikere
 Prinzipale
 Kammermusikere
-Telefonkundre
+Telefonkundere
 Verbandsvertretere
 Obmannstellvertretere
 Meeresbiologere
 Mittvierzigere
 Realschullehrere
 Punktesammlere
-Studienkollegre
+Studienkollegere
 Haushaltspolitikere
 Sportredakteure
 Friedensstiftere
@@ -3179,7 +3179,7 @@ Sportdezernente
 Reisebegleitere
 Catchere
 Diskuswerfere
-Postkundre
+Postkundere
 Strebere
 Toningenieure
 Bronzemedaillengewinnere
@@ -3187,10 +3187,10 @@ Nachlassverwaltere
 Prozessbeobachtere
 Umweltberatere
 Hauptorganisatore
-Spitzbubre
+Spitzbubere
 Auslandskorrespondente
 Grenzschützere
-Parteistrategre
+Parteistrategere
 Festivalleitere
 Arbeiterführere
 Nestbeschmutzere
@@ -3218,7 +3218,7 @@ Dialysepatiente
 Kantonalpräsidente
 Assyrere
 Jobbere
-Einzelschützre
+Einzelschützere
 Wirtschaftsstaatssekretäre
 Fernsehmachere
 Wohnungsbesitzere
@@ -3245,12 +3245,12 @@ Erstwählere
 Karrieriste
 Schülervertretere
 Chefdramaturge
-Künstlerkollegre
+Künstlerkollegere
 Rauschgifthändlere
 Taxiunternehmere
 Musikschulleitere
 Vertreibere
-Hausgenossre
+Hausgenossere
 Kammerrate
 Tourismusministere
 Vogelschützere
@@ -3295,11 +3295,11 @@ Reinigere
 Nachfragere
 Schichtarbeitere
 Verkehrspolitikere
-Fahrzeuginsassre
+Fahrzeuginsassere
 Klassensprechere
 Ansagere
 Byzantinere
-Rheinhessre
+Rheinhessere
 Schatzsuchere
 Regionalleitere
 Goldmedaillengewinnere
@@ -3318,7 +3318,7 @@ Metallurge
 Parksündere
 Oppositionskandidate
 Pizzabäckere
-Verteidigungsexpertre
+Verteidigungsexpertere
 Unterhaltere
 Melancholikere
 Philanthrope
@@ -3333,7 +3333,7 @@ Raumausstattere
 Holzschnitzere
 Sachgebietsleitere
 Kirchenpatrone
-Medienexpertre
+Medienexpertere
 Feuerschluckere
 Bundesbildungsministere
 Europacupsiegere
@@ -3355,7 +3355,7 @@ Fitnesstrainere
 Organisationschefe
 Ernährungswissenschaftlere
 Umweltlandesrate
-Nabre
+%Nabere
 Realpolitikere
 Hammerwerfere
 Revisioniste
@@ -3365,7 +3365,7 @@ Südländere
 Kunstradfahrere
 Luftpirate
 Zentralsekretäre
-Marketingexpertre
+Marketingexpertere
 Ausnahmekönnere
 Rotarmiste
 Bundesagrarministere
@@ -3422,7 +3422,7 @@ Freidenkere
 Hauptmietere
 Fraktionspräsidente
 Schriftleitere
-Anzeigenkundre
+Anzeigenkundere
 Hauptamtsleitere
 Anstreichere
 Bezirkspolitikere
@@ -3460,7 +3460,7 @@ Feministe
 Geigenbauere
 Mulle
 Elektromeistere
-Kunstexpertre
+Kunstexpertere
 Werksfahrere
 Stoppere
 Verschwendere
@@ -3567,8 +3567,8 @@ Meinungsmachere
 Kettenrauchere
 Fotojournaliste
 Graveure
-Belastungszeugre
-Kampfgefährtre
+Belastungszeugere
+Kampfgefährtere
 Befehlsempfängere
 Ergotherapeute
 Silberschmiede
@@ -3596,7 +3596,7 @@ Reitlehrere
 Waldbauere
 Typografe
 Krankengymnaste
-Maischre
+%Maischere
 Notenbankpräsidente
 Naturbahnrodlere
 Skijägere
@@ -3606,7 +3606,7 @@ Steigbügelhaltere
 Schwarzsehere
 Posthaltere
 Aufrührere
-Schulkollegre
+Schulkollegere
 Strichere
 Parlamentschefe
 Fotoreportere
@@ -3623,7 +3623,7 @@ Wanderpredigere
 Bratschiste
 Sadiste
 Landesdirektore
-Heilpädagogre
+Heilpädagogere
 Stromverbrauchere
 Kickboxere
 Langstrecklere
@@ -3631,7 +3631,7 @@ Gemeindesekretäre
 Tretere
 Bundesverfassungsrichtere
 Ballettchefe
-Zystre
+%Zystere
 Verächtere
 Mitunterzeichnere
 Hauptfeinde
@@ -3640,7 +3640,7 @@ Oberkellnere
 Beirutere
 Chefingenieure
 Straßenbahnere
-Dauerrivalre
+Dauerrivalere
 Unterhaltungskünstlere
 Friedensforschere
 Jungschützenkönige
@@ -3693,13 +3693,13 @@ Amtsrate
 Landgerichtspräsidente
 Kompromisskandidate
 Bühnenautore
-Volksgenossre
+Volksgenossere
 Weintrinkere
 Königsmachere
 Hauptgläubigere
 Stichwortgebere
 Illusioniste
-Gefängnisinsassre
+Gefängnisinsassere
 Gesamtleitere
 Babyloniere
 Infante
@@ -3708,7 +3708,7 @@ Bauzeichnere
 Lehramtsstudente
 Wirtschaftspartnere
 Gewerkschaftssprechere
-Ahnre
+Ahne
 Flugschülere
 Pflegedienstleitere
 Konsortialführere
@@ -3756,7 +3756,7 @@ Börsenhändlere
 Koautore
 Radiohörere
 Wagenlenkere
-Hauptbelastungszeugre
+Hauptbelastungszeugere
 Familienrichtere
 Waldensere
 Fuhrunternehmere
@@ -3774,7 +3774,7 @@ Gefängnisdirektore
 Sektierere
 Gastautore
 Großunternehmere
-Ministerkollegre
+Ministerkollegere
 Sarazenere
 Tonmeistere
 Kopiste
@@ -3802,15 +3802,15 @@ Mitgestaltere
 Neubrandenburgere
 Feinmechanikere
 Filmautore
-Atomexpertre
-Jugendwartre
+Atomexpertere
+Jugendwartere
 Mehrheitsbeschaffere
 Parodiste
 Textdichtere
 Hausierere
 Imperialiste
 Häretikere
-Latschre
+%Latschere
 Wichtigtuere
 Allgemeinarzte
 Kernkraftgegnere
@@ -3853,7 +3853,7 @@ Kassenführere
 Mehrere
 Zeichenlehrere
 Agnostikere
-Theaterpädagogre
+Theaterpädagogere
 Umweltstaatssekretäre
 Oberinspektore
 Styliste
@@ -3923,11 +3923,11 @@ Ersatzkandidate
 Moraltheologere
 Testamentsvollstreckere
 Zeithistorikere
-Nationalmannschaftskollegre
+Nationalmannschaftskollegere
 Kommunikationswissenschaftlere
 Kretere
 Theaterchefe
-Spielgefährtre
+Spielgefährtere
 Stuckateure
 Vorturnere
 Zagrebere
@@ -3964,18 +3964,18 @@ Zuträgere
 Regionalmanagere
 Kirchenlehrere
 Welthandballere
-Agrarexpertre
+Agrarexpertere
 Agraringenieure
 Nachwuchsschauspielere
 Starspielere
 Flughafensprechere
 Aufnahmeleitere
-Rentenexpertre
+Rentenexpertere
 Festspielchefe
 Fischhändlere
 Religionsphilosophe
 Hassere
-Lagerinsassre
+Lagerinsassere
 Patentanwalte
 Hausfreunde
 Bildungsreferente
@@ -4015,7 +4015,7 @@ Zeitungsmachere
 Drachentötere
 Umschülere
 Sirere
-Deutschtürkre
+Deutschtürkere
 Sozialamtsleitere
 Wachsoldate
 Hulde
@@ -4085,7 +4085,7 @@ Jugendsprechere
 Liberianere
 Zuzüglere
 Vizerektore
-Museumspädagogre
+Museumspädagogere
 Informatikstudente
 Materialiste
 Spießbürgere
@@ -4102,8 +4102,8 @@ Tonsetzere
 Universitätslehrere
 Epileptikere
 Musikschullehrere
-Urahnre
-Bahnbeamtre
+Urahnere
+Bahnbeamtere
 Masochiste
 Personenwagenlenkere
 Tempomachere
@@ -4116,5 +4116,7 @@ Eistänzere
 Exekutore
 Steuerbürgere
 Vereinsgründere
-
-
+Fagottiste
+Comichelde
+Elfe
+Rezeptioniste

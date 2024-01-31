@@ -7,7 +7,7 @@
 
 
 {% block body %}
-<h1>De&#8209;e-Automat (Beta&#8209;Version)</h1>
+<h1>De-e-Automat: Problem-Meldung</h1>
 <div class="container">
     <div class="description">
         <h2 onclick="toggleDescription()">Erläuterungen zum De&#8209;e-Automaten&nbsp;<span id="toggleIcon">&#9660;</span></h2>
@@ -27,24 +27,17 @@
     </div>
 
     <div class="text-area">
-        <form action="/parse" method="POST">
-            <textarea id="textInput" name="inputText">{{ input_text }}</textarea>
-            <br/>
-            <button type="submit" style="cursor: pointer;">Personenbezeichnungen ermitteln</button>
-        </form>
         {{ dataToRender|safe }}
-        <p>{{ outputText|safe }}</p>
-        <br/>
-        <form action="/report" method="POST">
-            <button type="submit" style="cursor: pointer;">Problem melden</button>
+        <form action="/" method="POST">
+            <button type="submit" style="cursor: pointer;">Zurück zum De-e-Automaten</button>
         </form>
         <br/>
     </div>
 </div>
 
 <div class="paragraph bottom-fixed">
-<hr/>
-<p>Der De&#8209;e-Automat wurde von Linus Wemmer und Marcos Cramer programmiert. Dieses Web-Interface des De&#8209;e-Automaten wird vom <a href="https://geschlechtsneutral.net/verein">Verein für geschlechtsneutrales Deutsch&nbsp;e.&nbsp;V.</a> bereitgestellt. Die Textverarbeitung im De&#8209;e-Automaten basiert auf dem an der Universität Zürich entwickelten <a href="https://pub.cl.uzh.ch/demo/parzu/">ParZu-Parser</a> für die deutsche Sprache.</p>
+    <hr/>
+    <p>Der De&#8209;e-Automat wurde von Linus Wemmer und Marcos Cramer programmiert. Dieses Web-Interface des De&#8209;e-Automaten wird vom <a href="https://geschlechtsneutral.net/verein">Verein für geschlechtsneutrales Deutsch&nbsp;e.&nbsp;V.</a> bereitgestellt. Die Textverarbeitung im De&#8209;e-Automaten basiert auf dem an der Universität Zürich entwickelten <a href="https://pub.cl.uzh.ch/demo/parzu/">ParZu-Parser</a> für die deutsche Sprache.</p>
 </div>
 
 <script>
@@ -52,17 +45,13 @@ function toggleDescription() {
     if (window.innerWidth <= 600) {
         var text = document.getElementById("explanatoryText");
         var icon = document.getElementById("toggleIcon");
-        var ext_text = document.getElementById("extendedExplanatoryText");
-        var ext_icon = document.getElementById("toggleIconExt");
 
         if (text.style.display === "none" || text.style.display === "") {
             text.style.display = "block";
             icon.innerHTML = "&#9650;"; // Upward triangle
         } else {
             text.style.display = "none";
-            ext_text.style.display = "none";
             icon.innerHTML = "&#9660;"; // Downward triangle
-            ext_icon.innerHTML = "&#9660;"; // Downward triangle
         }
     }
 }

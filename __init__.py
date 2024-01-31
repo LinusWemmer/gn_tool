@@ -61,7 +61,7 @@ def search_lonely_adjectives(parse: list, input_text: str):
             marking_tool = Marking_Tool(parse_list,{})
             input_text = Marking_Tool.find_realizations(marking_tool,input_text)
             for word_number, word in enumerate(marking_tool.parse_list):
-                if (word[3] == "ADJA" or word[2] == "andere") and (int(word[6] == 0 or parse_list[int(word[6])-1][3] != "N")):
+                if (word[3] == "ADJA" or word[2] == "andere") and word[1][0].islower() and (int(word[6]) == 0 or parse_list[int(word[6])-1][3] != "N"):
                     word[1] = word[1].capitalize()
                     capitalized_words.append([sentence_number,word_number])
                     change = True
@@ -73,26 +73,13 @@ def search_lonely_adjectives(parse: list, input_text: str):
                     glauben.append([sentence_number,word_number])
                     change = True
             modified_text += marking_tool.get_internal_sentence()
-        print("capitalized_words:")
-        print(capitalized_words)
         return modified_text, capitalized_words, glauben, change
 
-def mark_nouns(sentences: list, input_text: str, capitalized_adj_addresses, glauben):
-    print("capitalized_adj_addresses:")
-    print(capitalized_adj_addresses)
+def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
     marking_form = ""
     sentence_number = 0
     for i, parse_list in enumerate(sentences):
-        marking_tool = Marking_Tool(parse_list,{})
-        # print("parse_list:")
-        # print(marking_tool.parse_list)
-        # input_text = Marking_Tool.find_realizations(marking_tool,input_text)
-        # print("marking_tool.parse_list:")
-        # print(marking_tool.parse_list)
-        print("i:")
-        print(i)
-        print("marking_tool.parse_list:")
-        print(marking_tool.parse_list)
+        marking_tool = Marking_Tool(parse_list,{},[])
         for capitalized_adj_address in capitalized_adj_addresses:
             if i == capitalized_adj_address[0]:
                 marking_tool.parse_list[capitalized_adj_address[1]][2] = marking_tool.parse_list[capitalized_adj_address[1]][2].lower()
@@ -106,7 +93,6 @@ def mark_nouns(sentences: list, input_text: str, capitalized_adj_addresses, glau
                 marking_tool.parse_list[glauben_address[1]][2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][-2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"Schreib", "Glaub", marking_tool.parse_list[glauben_address[1]][-2])
-        print(marking_tool.parse_list)
         session[f"markingtool{sentence_number}"] = marking_tool.__dict__
         #sentence_data.add_marking_tool(sentence_number, marking_tool)
         marking_form += marking_tool.get_marking_form(sentence_number)
@@ -116,10 +102,11 @@ def mark_nouns(sentences: list, input_text: str, capitalized_adj_addresses, glau
 
 # To ensure correct parsing, 
 def split_prepositions(input_text: str) ->str:
+    quotation_mark_pattern = r'„|“|”'
+    input_text = re.sub(quotation_mark_pattern, '"', input_text)
     words = re.split('(\s)', input_text)     
     output = ""
     for word in words:
-        print(word)
         if word =="beim":
             output += "bei dem"
         elif word == "Beim":
@@ -180,7 +167,7 @@ def handle_error(error):
         <textarea id="textInput" readonly>{input_text}</textarea><br/><br/>
         Ein unerwartetes Problem ist aufgetreten. Du kannst uns helfen, dieses Problem zu beheben, indem Du auf „Problem melden“ klickst. In diesem Fall wird der von Dir eingegebene Text zusammen mit einer automatisch erzeugten Fehlerbeschreibung an die Entwicklerne des De-e-Automaten gesendet.<br/><br/>
         <form action="/error_report_sent" method="POST">
-        <button type="submit" >Problem melden</button>
+        <button type="submit"  style="cursor: pointer;">Problem melden</button>
         </form>
         <br/><br/>""")
 
@@ -201,34 +188,35 @@ def parse():
         parse = get_parse(input_text_with_split_prepositions)
 
         # If there is an adjective that does not modify a noun, capitalize it and repeat the parsing.
-        modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse,input_text)
-        # print(parse)
+        modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse,stripped_input_text)
         if not change:
-            marked_nouns = mark_nouns(parse,stripped_input_text,[],[])
+            marked_nouns = mark_nouns(parse,[],[])
         else:
             print("Parsing again with capitalized adjectives.")
-            print(modified_text)
-            parse = get_parse(modified_text)
+            modified_text_with_split_prepositions = split_prepositions(modified_text)
+            print(modified_text_with_split_prepositions)
+            parse = get_parse(modified_text_with_split_prepositions)
             for parse_list in parse:
-                marking_tool = Marking_Tool(parse_list,{})
+                marking_tool = Marking_Tool(parse_list,{},[])
                 modified_text = Marking_Tool.find_realizations(marking_tool,modified_text)
-            marked_nouns = mark_nouns(parse,stripped_input_text,capitalized_words, glauben)
+            marked_nouns = mark_nouns(parse,capitalized_words, glauben)
 
         marked_nouns = replace_whitespace_outside_html_tags(marked_nouns)
         session["marked_nouns"] = marked_nouns
         if "checkbox" in marked_nouns:
             return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">
-            <button id="selectAllButton" type="button" style="margin-top: 20px;">Alle auswählbaren Wörter auswählen</button>
+            <button id="selectAllButton" type="button" style="margin-top: 20px; cursor: pointer;">Alle auswählbaren Wörter auswählen</button>
             <br/><br/>{marked_nouns}<br/><br/>
-            <button type="submit" >Ausgewählte Wörter geschlechtsneutral machen</button>
+            <button type="submit" style="cursor: pointer;">Ausgewählte Wörter geschlechtsneutral machen</button>
             </form>""")
         else:
             return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">
             <br/><br/>{marked_nouns}<br/><br/>
-            <button type="reset" style="color:Red">Keine neutralisierbare Personenbezeichnung gefunden.</button>
+            <button type="reset" style="color:Red;">Keine neutralisierbare Personenbezeichnung gefunden.</button>
             </form>""")
     else:
         input_text = session.get("input_text", "")
+        session.clear()
         return render_template("index.html", input_text=input_text)
     
 @app.route("/mark", methods=["POST", "GET"])
@@ -242,22 +230,25 @@ def neutralize_marked():
             marking_tool_dict = session[f"markingtool{i}"]
             parse_list = marking_tool_dict["parse_list"]
             nounphrases = marking_tool_dict["nounphrases"]
+            nounlist = marking_tool_dict["nounlist"]
             nounphrases = {int(k):v for k,v in nounphrases.items()}
-            marking_tool = Marking_Tool(parse_list, nounphrases)
+            marking_tool = Marking_Tool(parse_list, nounphrases, nounlist)
             marking_tool_list.append(marking_tool)
         # Neutralize all selected words of the form
+        list_of_neutralized_nouns = []
         for selected_noun in selected_nouns:
             noun_data = selected_noun.split("|")
-            marking_tool = marking_tool_list[int(noun_data[0])]
-            marking_tool.neutralize_nounphrase(int(noun_data[1])-1, int(noun_data[2]))
-        #neutralized_text = sentence_data.get_text()
+            if [noun_data[0], noun_data[1]] not in list_of_neutralized_nouns:
+                marking_tool = marking_tool_list[int(noun_data[0])]
+                selected_components = []
+                for selected_component in selected_nouns:
+                    component_data = selected_component.split("|")
+                    if component_data[0] == noun_data[0] and component_data[1] == noun_data[1]:
+                        selected_components.append(int(component_data[2]))
+                marking_tool.neutralize_nounphrase(int(noun_data[1])-1, int(noun_data[2]), selected_components)
+                list_of_neutralized_nouns.append([noun_data[0], noun_data[1]])
         neutralized_text = ""
-        #split_words =  {int(k):v for k,v in session["split_words"].items()}
-        #print(split_words)
         for i in range(sentence_number):
-        #    if i in split_words.keys():
-        #        neutralized_text += marking_tool_list[i].get_sentence(split_words[i])
-        #    else:
             neutralized_text += marking_tool_list[i].get_sentence()
         neutralized_text = replace_whitespace_outside_html_tags(neutralized_text)
         input_text = session.get("input_text")
@@ -268,12 +259,13 @@ def neutralize_marked():
         
         
         return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">
-                <button id="selectAllButton" type="button" style="margin-top: 20px;">Alle auswählbaren Wörter auswählen</button>
+                <button id="selectAllButton" type="button" style="margin-top: 20px; cursor: pointer;">Alle auswählbaren Wörter auswählen</button>
                 <br/><br/>{marked_nouns}<br/><br/>
-                <button type="submit" >Ausgewählte Wörter geschlechtsneutral machen</button>
+                <button type="submit" style="cursor: pointer;">Ausgewählte Wörter geschlechtsneutral machen</button>
                 </form>""", outputText = neutralized_text)
     else:
         input_text = session.get("input_text", "")
+        session.clear()
         return render_template("index.html", input_text=input_text)
 
 # This web application should have a button that allows users to report problems with the tool.
@@ -291,7 +283,7 @@ def report():
         Falls Du uns noch weitere Informationen zu dem Problem geben möchtest, kannst Du das hier tun:<br/>
         <form action="/report_sent" method="POST">
         <textarea id="reportText" name="reportText"></textarea>
-        <button type="submit" >Problem-Meldung abschicken</button>
+        <button type="submit" style="cursor: pointer;">Problem-Meldung abschicken</button>
         </form>
         <br/><br/>""")
     
@@ -323,6 +315,7 @@ def report_sent():
         </form>""")
     else:
         input_text = session.get("input_text", "")
+        session.clear()
         return render_template("index.html", input_text=input_text)
     
 @app.route("/error_report_sent", methods=["POST", "GET"])
@@ -351,6 +344,7 @@ def error_report_sent():
         </form>""")
     else:
         input_text = session.get("input_text", "")
+        session.clear()
         return render_template("index.html", input_text=input_text)
 
 if __name__ == "__main__":
