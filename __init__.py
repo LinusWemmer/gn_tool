@@ -94,13 +94,11 @@ def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][-2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"Schreib", "Glaub", marking_tool.parse_list[glauben_address[1]][-2])
         session[f"markingtool{sentence_number}"] = marking_tool.__dict__
-        #sentence_data.add_marking_tool(sentence_number, marking_tool)
         marking_form += marking_tool.get_marking_form(sentence_number)
         sentence_number += 1
     session["sentence_number"] = sentence_number
     return marking_form
 
-# To ensure correct parsing, 
 def split_prepositions(input_text: str) ->str:
     quotation_mark_pattern = r'„|“|”'
     input_text = re.sub(quotation_mark_pattern, '"', input_text)
@@ -153,7 +151,6 @@ def split_prepositions(input_text: str) ->str:
             output += "Für das"
         else:
             output += word
-    # session["split_words"] = split_words
     return output
 
 @app.errorhandler(Exception)
@@ -268,10 +265,6 @@ def neutralize_marked():
         session.clear()
         return render_template("index.html", input_text=input_text)
 
-# This web application should have a button that allows users to report problems with the tool.
-# The button should open a form where users can write a message and send it to the developers.
-# The form should also show the input text, the marked nouns and the output text.
-# The form should be saved to a newly created text file.
 @app.route("/report", methods=["POST", "GET"])
 def report():
     input_text = session.get("input_text")
@@ -286,7 +279,6 @@ def report():
         <button type="submit" style="cursor: pointer;">Problem-Meldung abschicken</button>
         </form>
         <br/><br/>""")
-    
 
 @app.route("/report_sent", methods=["POST", "GET"])
 def report_sent():

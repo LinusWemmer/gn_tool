@@ -318,15 +318,6 @@ class Marking_Tool:
                 self.find_nounphrase(word_parse)
                 input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                 nouns += input_form
-            #elif word_parse[3] == "$." or word_parse[3] == "$,":
-            #    nouns = nouns[:-1] + word_parse[1] + " "
-            #elif word_parse[3] == "$(":
-            #    if word_parse[1] == "(":
-            #        nouns += word_parse[1]
-            #    elif word_parse[1] == ")":
-            #        nouns = nouns[:-1] + word_parse[1] + " "
-            #    else:
-            #        nouns += word_parse[1]
             else:
                nouns += word_parse[-2]
                nouns += word_parse[-1]
@@ -342,22 +333,6 @@ class Marking_Tool:
             if i == len(list)-1 and list[i][3] == "":
                 input_form += word_parse[-1]
         return input_form
-
-    def final_whitespace(self, S):
-        # Initialize an empty string to store the final whitespace
-        whitespace = ""
-        
-        # Loop through each character in the string
-        for char in reversed(S):
-            # Check if the character is whitespace
-            if char == " " or char == "\n" or char == "\r" or char == "\t":
-                # Add the whitespace character to the result
-                whitespace = char + whitespace
-            else:
-                # Break the loop if a non-whitespace character is found
-                break
-        
-        return whitespace
 
     def find_realizations(self, input_text: str):
         position_after_preposition = False

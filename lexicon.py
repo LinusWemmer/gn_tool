@@ -219,27 +219,6 @@ class Lexicon:
         word = "jemanders"
         return word.capitalize() if word_parse[0] == "1" else word
     
-    # Neutralize Prepostions if they are compound articles with prepositions, e.g. zur/im/beim
-    def neutralize_preposition(word_parse) -> str:
-        feats = word_parse[5]
-        # The different shortforms have to be hardcoded, boring
-        if word_parse[1]== "beim" or word_parse[1]== "Beim":
-            preposition = "bei derm"
-            return preposition.capitalize() if word_parse[0] == "1" else preposition
-        if word_parse[1]== "am" or word_parse[1]=="Am":
-            preposition = "an derm"
-            return preposition.capitalize() if word_parse[0] == "1" else preposition
-        if word_parse[1]== "zum" or word_parse[1]=="zur" or word_parse[1]=="Zum" or word_parse[1]=="Zur":
-            preposition = "zurm"
-            return preposition.capitalize() if word_parse[0] == "1" else preposition
-        if word_parse[1]=="im" or word_parse[1]=="Im":
-            preposition = "in derm"
-            return preposition.capitalize() if word_parse[0] == "1" else preposition
-        if word_parse[1] == "vom" or word_parse[1] == "Vom":
-            preposition = "von derm"
-            return preposition.capitalize() if word_parse[0] == "1" else preposition
-        return word_parse[1]
-    
     def neutralize_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
         is_capitalized = word_parse[1][0].isupper()
@@ -291,8 +270,6 @@ class Lexicon:
         # neutralize Pronouns
         elif word_parse[3] == "PRO":
             return Lexicon.neutralize_pronoun(word_parse)
-        elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
-            return Lexicon.neutralize_preposition(word_parse)
         else:
             return word_parse[-2]
 
@@ -647,13 +624,7 @@ class Lexicon:
                             head_base = Lexicon.IRREGULAR_NOUNS_NEUTRAL[j]
 
                         
-                        if feats[2] == "Sg":
-                            if feats[1] == "Gen":
-                                head = head_base + "s"
-                            else:
-                                head = head_base
-                        # Case: Noun is Plural
-                        elif feats[2] == "Pl":
+                        if feats[2] == "Pl":
                             if feats[1] ==  "Dat":
                                 if head_base.endswith("re"):
                                     head = head_base[:-1] + "nen"
@@ -664,6 +635,11 @@ class Lexicon:
                                     head = head_base[:-1] + "ne"
                                 else:
                                     head = head_base + "rne"
+                        else:
+                            if feats[1] == "Gen":
+                                head = head_base + "s"
+                            else:
+                                head = head_base
                     if component[-2] == False:
                         head = head.lower()
                     noun += head
