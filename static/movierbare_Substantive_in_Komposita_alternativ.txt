@@ -227,7 +227,7 @@ Kaiser
 %Pariser
 %%Mond
 %%Messer
-%Offizier
+Offiziers
 %Spitzenreiter
 %Kölner
 %Fürst
@@ -4119,3 +4119,8 @@ Diebs
 %Fagottist
 %Comicheld
 %Elf
+%Rezeptionist
+%Christ
+%Blogger
+%Vlogger
+%Oberst

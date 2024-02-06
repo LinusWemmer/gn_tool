@@ -521,7 +521,7 @@ Hauptdarstellerin
 Auftraggeberin
 Musikantin
 Sekretärin
-% Kumpel (?)
+Kumpelin
 Lieferantin
 % Part (?)
 Ökonomin
@@ -4121,3 +4121,6 @@ Comicheldin
 Elfin
 Rezeptionistin
 Christin
+Bloggerin
+Vloggerin
+Oberstin

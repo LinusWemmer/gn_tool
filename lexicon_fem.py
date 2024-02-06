@@ -99,9 +99,8 @@ class Lexicon_Fem:
                 return word_parse[1]
             raise Exception(f"The Article seems to be not convertable:{word_parse[1]}")
 
-    def feminize_adjectives(word_parse, article_parse) -> str:
+    def feminize_adjectives(word_parse, has_article) -> str:
         feats = word_parse[5].split("|")
-        article = article_parse[1]
         # This is a weird hack to make sure "anders" works correctly
         if word_parse[2].startswith("ander"):
             word_parse[2] = "ander"
@@ -116,7 +115,7 @@ class Lexicon_Fem:
         else:
             adjective = word_parse[2]
         # Weak Flexion, after article der/die/das (de), also "Jeder"-list
-        if article_parse[3] == "ART" or article_parse[4] == "APPRART":
+        if has_article:
             if feats[3] == "Pl":
                 return word_parse[1]
             else:
@@ -126,7 +125,6 @@ class Lexicon_Fem:
                 else:
                     adjective = adjective + "en"
                     return adjective.capitalize() if word_parse[0] == "1" else adjective
-                return word_parse[1]
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":

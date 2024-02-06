@@ -7,7 +7,7 @@
 
 
 {% block body %}
-<h1>De-e-Automat: Problem-Meldung</h1>
+<h1>De&#8209;e&#8209;Automat: Problem&#8209;Meldung</h1>
 <div class="container">
     <div class="description">
         <h2 onclick="toggleDescription()">Erläuterungen zum De&#8209;e-Automaten&nbsp;<span id="toggleIcon">&#9660;</span></h2>
@@ -18,18 +18,16 @@
         </div>
 
             <div class="paragraph" id="extendedExplanatoryText">
-                <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als potentielle Personenbezeichungen interpretiert und deswegen ein Kästchen daneben erscheinen lässt. Zum Beispiel wird das Wort „er“ immer als potentielle Personenbezeichnung interpretiert, auch wenn es sich zum Beispiel auf einen Tisch und nicht auf eine männliche Person bezieht. Außerdem werden mehrdeutige Wörter wie „Rechner“ und „Beirat“, die manchmal Dinge und manchmal Personen bezeichnen, generell als potentielle Personenbezeichnungen interpretiert. Wenn ein Wort, das in dem Eingabetext nicht als Personenbezeichnung gemeint war, trotzdem als potentielle Personenbezeichnung erkannt wurde, sollte darauf geachtet werden, dass dieses nicht für die geschlechtsneutrale Umformulierung markiert wird, da der Ausgabetext sonst nicht sinnvoll ist.</p>
+                <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als solche interpretiert. Zum Beispiel das Wort „er“, auch wenn es sich etwa auf einen Tisch und keine Person bezieht, oder Wörter wie „Rechner“, die manchmal Dinge und manchmal Personen bezeichnen. Dies betrifft auch die Possessivform „ihr“, egal ob diese sich auf eine Person bezieht (wie in „Sie hat ihre Tasche verlegt“) oder auf mehrere („Sie haben ihre Taschen verlegt“). In letzterem Fall sollte „ihr“ nicht markiert werden, da das pluralische „ihr“ im De&#8209;e-System unverändert bleibt.</p>
 
-                <p>Die Possessivform „ihr“ (z.&nbsp;B.&nbsp;„ihre Stifte“) wird im ersten Schritt immer als potentielle Personenbezeichung interpretiert, da es sein kann, dass es sich im Ausgangstext auf eine weibliche Person bezieht und diese feminine Bezugnahme durch eine geschlchtsneutrale ersetzt werden soll. Es kann allerdings auch vorkommen, dass „ihr“ sich auf mehrere Personen bezieht. In diesem Fall sollte es nicht markiert werden, da das plurale „ihr“ im De&#8209;e-System unverändert bleibt, der De&#8209;e-Automat aber ein markiertes „ihr“ immer als Singular-Femininum-Possessivform interpretiert.</p>
-
-                <p>Falls Dir bei der Nutzung des De-e-Automaten ein Problem auffällt, kannst Du dies gerne melden, indem Du auf <a href="/report"">Problem melden</a> klickst.</p>
+                <p>Beim Automaten handelt es sich noch um eine Beta-Version und es können auch Fehler bei der Übersetzung ins De-e-System auftreten. Falls Dir ein Problem auffällt, kannst Du dies gerne melden, indem Du auf „<a href="/report">Problem melden</a>“ klickst.</p>
             </div>
     </div>
 
-    <div class="text-area">
+    <div class="text-area output">
         {{ dataToRender|safe }}
         <form action="/" method="POST">
-            <button type="submit" style="cursor: pointer;">Zurück zum De-e-Automaten</button>
+            <button type="submit" class="green-button">Zurück zum De-e-Automaten</button>
         </form>
         <br/>
     </div>

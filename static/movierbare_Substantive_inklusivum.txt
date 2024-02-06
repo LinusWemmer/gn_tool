@@ -521,7 +521,7 @@ Hauptdarstellere
 Auftraggebere
 Musikante
 Sekretäre
-% Kumpel (?)
+Kumpele
 Lieferante
 % Part (?)
 Ökonome
@@ -4121,3 +4121,6 @@ Comichelde
 Elfe
 Rezeptioniste
 Christe
+Bloggere
+Vloggere
+Oberste

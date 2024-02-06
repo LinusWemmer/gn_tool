@@ -54,7 +54,7 @@ Müller
 Nachfolger
 Pfarrer
 %Hunden
-Bauer
+Bauern
 Schauspieler
 Manager
 Journalisten
@@ -303,7 +303,7 @@ Inhaber
 Hausherren
 Winzer
 Handwerker
-Enkelen
+Enkel
 %Moralen
 Pianisten
 Passanten
@@ -521,7 +521,7 @@ Hauptdarsteller
 Auftraggeber
 Musikanten
 Sekretären
-%Kumpelen
+Kumpel
 Lieferanten
 %Parten
 Ökonomen
@@ -4121,3 +4121,6 @@ Comichelden
 Elfen
 Rezeptionisten
 Christen
+Blogger
+Vlogger
+%Oberst

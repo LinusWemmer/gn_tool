@@ -38,8 +38,8 @@ def get_parse(text: str):
         formatted_sentences.append(parse_list)
     return formatted_sentences
 
+# The following function ensures that whitespace in the input is visible in the output.
 def replace_whitespace_outside_html_tags(text):
-    # Function to replace whitespace in non-tag parts
     def replace_whitespace(match):
         # If it's an HTML tag, return it unchanged
         if match.group(0).startswith('<'):
@@ -52,6 +52,10 @@ def replace_whitespace_outside_html_tags(text):
     pattern = r'(<[^>]+>|[^<]+)'
     return re.sub(pattern, replace_whitespace, text)
 
+# The following function capitalizes adjectives that do not modify a noun. It is a hack that ensures that
+# adjectives in conjunctions like "netten" in "einen netten und einen unfreundlichen Kollegen" can be
+# neutralized. The function also replaces "glauben" by "schreiben" internally, since ParZu does not
+# recognize the dative object of "glauben" as such.
 def search_lonely_adjectives(parse: list, input_text: str):
         change = False
         modified_text = ""
@@ -60,11 +64,32 @@ def search_lonely_adjectives(parse: list, input_text: str):
         for sentence_number, parse_list in enumerate(parse):
             marking_tool = Marking_Tool(parse_list,{})
             input_text = Marking_Tool.find_realizations(marking_tool,input_text)
+            unter = False
+            alles = False
+            an = False
+            am = False
             for word_number, word in enumerate(marking_tool.parse_list):
-                if (word[3] == "ADJA" or word[2] == "andere") and word[1][0].islower() and (int(word[6]) == 0 or parse_list[int(word[6])-1][3] != "N"):
+                # Wir setzen alle im Neutrum stehenden Adjektive, die nicht von einem Nomen abhängen, auf klein.
+                if ((word[3] == "ADJA" and not (am and (word[1] == "häufigsten" or word[1] == "sichtbarsten"))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and (int(word[6]) == 0 or parse_list[int(word[6])-1][3] != "N") and not "Neut" in word[5]:
                     word[1] = word[1].capitalize()
                     capitalized_words.append([sentence_number,word_number])
                     change = True
+                if word[2].lower() == "unter":
+                    unter = True
+                else:
+                    unter = False
+                if word[2].lower() == "alle": # This covers "alles" and declined forms of it.
+                    alles = True
+                else:
+                    alles = False
+                if an and word[1].lower() == "dem":
+                    am = True
+                else:
+                    am = False
+                if word[2].lower() == "an":
+                    an = True
+                else:
+                    an = False
             # Wir ersetzen "glauben" intern durch "schreiben", da ParZu Dativ-Objekte von "glauben" häufig nicht als solche erkennt.
             for word_number, word in enumerate(marking_tool.parse_list):
                 if word[2] == "glauben":
@@ -75,6 +100,8 @@ def search_lonely_adjectives(parse: list, input_text: str):
             modified_text += marking_tool.get_internal_sentence()
         return modified_text, capitalized_words, glauben, change
 
+# The following function creates the marking form for the user interface, i.e. the form that allows the user to select
+# the words that should be neutralized.
 def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
     marking_form = ""
     sentence_number = 0
@@ -99,6 +126,22 @@ def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
     session["sentence_number"] = sentence_number
     return marking_form
 
+# The following function is a hack to ensure that ParZu doesn't cut sentences off at ordinal numbers
+# with dots, e.g. "43. Präsident". The function replaces the dots in such positions with "-tägig rosa".
+# This replacement is undone before the final output.
+def hack_for_ordinal_numbers(input_text: str) -> str:
+    ordinal_number_pattern = r' (\d\d?\d?)\. '
+    input_text = re.sub(ordinal_number_pattern, r' \1-tägig rosa ', input_text)
+    return input_text
+
+def undo_hack_for_ordinal_numbers(input_text: str) -> str:
+    ordinal_number_pattern = r' (\d\d?\d?)-tägig rosa '
+    input_text = re.sub(ordinal_number_pattern, r' \1. ', input_text)
+    return input_text
+
+# The following function splits prepositions that are conjoined with articles. This is necessary because ParZu
+# does not recognize the preposition and the article as separate words, but we need to consider them separately
+# for the neutralization.
 def split_prepositions(input_text: str) ->str:
     quotation_mark_pattern = r'„|“|”'
     input_text = re.sub(quotation_mark_pattern, '"', input_text)
@@ -153,6 +196,8 @@ def split_prepositions(input_text: str) ->str:
             output += word
     return output
 
+# The following function ensures that the user does not see the internal error message of the program,
+# but a more user-friendly error message combined with a form that allows the user to report the error.
 @app.errorhandler(Exception)
 def handle_error(error):
     error_info = str(error) + "\n\n" + traceback.format_exc()
@@ -164,15 +209,17 @@ def handle_error(error):
         <textarea id="textInput" readonly>{input_text}</textarea><br/><br/>
         Ein unerwartetes Problem ist aufgetreten. Du kannst uns helfen, dieses Problem zu beheben, indem Du auf „Problem melden“ klickst. In diesem Fall wird der von Dir eingegebene Text zusammen mit einer automatisch erzeugten Fehlerbeschreibung an die Entwicklerne des De-e-Automaten gesendet.<br/><br/>
         <form action="/error_report_sent" method="POST">
-        <button type="submit"  style="cursor: pointer;">Problem melden</button>
+        <button type="submit" class="grey-button">Problem melden</button>
         </form>
         <br/><br/>""")
 
+# The following function returns the basic user interface.
 @app.route("/", methods=["POST", "GET"])
 def index():
     input_text = session.get("input_text", "")
     return render_template("index.html", input_text=input_text)
-    
+
+# The following function parses the input text and returns the marking form.
 @app.route("/parse", methods=["POST", "GET"])
 def parse():
     if request.method == "POST":
@@ -180,6 +227,7 @@ def parse():
         session.clear()
         session["input_text"] = input_text
         stripped_input_text = input_text.lstrip()
+        stripped_input_text = hack_for_ordinal_numbers(stripped_input_text)
         input_text_with_split_prepositions = split_prepositions(stripped_input_text)
         print(input_text_with_split_prepositions)
         parse = get_parse(input_text_with_split_prepositions)
@@ -198,24 +246,26 @@ def parse():
                 modified_text = Marking_Tool.find_realizations(marking_tool,modified_text)
             marked_nouns = mark_nouns(parse,capitalized_words, glauben)
 
+        marked_nouns = undo_hack_for_ordinal_numbers(marked_nouns)
         marked_nouns = replace_whitespace_outside_html_tags(marked_nouns)
         session["marked_nouns"] = marked_nouns
         if "checkbox" in marked_nouns:
             return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">
-            <button id="selectAllButton" type="button" style="margin-top: 20px; cursor: pointer;">Alle auswählbaren Wörter auswählen</button>
+            <button id="selectAllButton" type="button" class="yellow-button">Alle auswählbaren Wörter auswählen</button>
             <br/><br/>{marked_nouns}<br/><br/>
-            <button type="submit" style="cursor: pointer;">Ausgewählte Wörter geschlechtsneutral machen</button>
+            <button type="submit" class="purple-button">Ausgewählte Wörter geschlechtsneutral machen</button>
             </form>""")
         else:
             return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">
-            <br/><br/>{marked_nouns}<br/><br/>
-            <button type="reset" style="color:Red;">Keine neutralisierbare Personenbezeichnung gefunden.</button>
+            <br/>{marked_nouns}<br/><br/>
+            <button type="reset" class="warning-button">Keine neutralisierbare Personenbezeichnung gefunden.</button>
             </form>""")
     else:
         input_text = session.get("input_text", "")
         session.clear()
         return render_template("index.html", input_text=input_text)
     
+# The following function neutralizes the selected words and returns the neutralized text.
 @app.route("/mark", methods=["POST", "GET"])
 def neutralize_marked():
     if request.method == "POST":
@@ -242,11 +292,12 @@ def neutralize_marked():
                     component_data = selected_component.split("|")
                     if component_data[0] == noun_data[0] and component_data[1] == noun_data[1]:
                         selected_components.append(int(component_data[2]))
-                marking_tool.neutralize_nounphrase(int(noun_data[1])-1, int(noun_data[2]), selected_components)
+                marking_tool.neutralize_nounphrase(int(noun_data[1])-1, selected_components)
                 list_of_neutralized_nouns.append([noun_data[0], noun_data[1]])
         neutralized_text = ""
         for i in range(sentence_number):
             neutralized_text += marking_tool_list[i].get_sentence()
+        neutralized_text = undo_hack_for_ordinal_numbers(neutralized_text)
         neutralized_text = replace_whitespace_outside_html_tags(neutralized_text)
         input_text = session.get("input_text")
         marked_nouns = session.get("marked_nouns")
@@ -256,15 +307,16 @@ def neutralize_marked():
         
         
         return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">
-                <button id="selectAllButton" type="button" style="margin-top: 20px; cursor: pointer;">Alle auswählbaren Wörter auswählen</button>
+                <button id="selectAllButton" type="button" class="yellow-button">Alle auswählbaren Wörter auswählen</button>
                 <br/><br/>{marked_nouns}<br/><br/>
-                <button type="submit" style="cursor: pointer;">Ausgewählte Wörter geschlechtsneutral machen</button>
+                <button type="submit" class="purple-button">Ausgewählte Wörter geschlechtsneutral machen</button>
                 </form>""", outputText = neutralized_text)
     else:
         input_text = session.get("input_text", "")
         session.clear()
         return render_template("index.html", input_text=input_text)
 
+# The following function returns the error report form.
 @app.route("/report", methods=["POST", "GET"])
 def report():
     input_text = session.get("input_text")
@@ -275,11 +327,12 @@ def report():
         <!--Vom De-e-Automat produzierter Ausgabge-Text: <br/>ouput_text<br/><br/>-->
         Falls Du uns noch weitere Informationen zu dem Problem geben möchtest, kannst Du das hier tun:<br/>
         <form action="/report_sent" method="POST">
-        <textarea id="reportText" name="reportText"></textarea>
-        <button type="submit" style="cursor: pointer;">Problem-Meldung abschicken</button>
+        <textarea id="reportText" name="reportText" maxlength="20000"></textarea>
+        <button type="submit" class="grey-button">Problem-Meldung abschicken</button>
         </form>
         <br/><br/>""")
 
+# The following function sends the problem report to the developers and returns a confirmation message.
 @app.route("/report_sent", methods=["POST", "GET"])
 def report_sent():
     if request.method == "POST":
@@ -310,6 +363,7 @@ def report_sent():
         session.clear()
         return render_template("index.html", input_text=input_text)
     
+# The following function sends the error report to the developers and returns a confirmation message.
 @app.route("/error_report_sent", methods=["POST", "GET"])
 def error_report_sent():
     if request.method == "POST":
@@ -339,6 +393,7 @@ def error_report_sent():
         session.clear()
         return render_template("index.html", input_text=input_text)
 
+# The following function determines the execution environment and runs the Flask app accordingly.
 if __name__ == "__main__":
     # Docker shouldn't be in debug mode
     debugging = True

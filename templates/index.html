@@ -18,25 +18,27 @@
         </div>
 
             <div class="paragraph" id="extendedExplanatoryText">
-                <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als potentielle Personenbezeichungen interpretiert und deswegen ein Kästchen daneben erscheinen lässt. Zum Beispiel wird das Wort „er“ immer als potentielle Personenbezeichnung interpretiert, auch wenn es sich zum Beispiel auf einen Tisch und nicht auf eine männliche Person bezieht. Außerdem werden mehrdeutige Wörter wie „Rechner“ und „Beirat“, die manchmal Dinge und manchmal Personen bezeichnen, generell als potentielle Personenbezeichnungen interpretiert. Wenn ein Wort, das in dem Eingabetext nicht als Personenbezeichnung gemeint war, trotzdem als potentielle Personenbezeichnung erkannt wurde, sollte darauf geachtet werden, dass dieses nicht für die geschlechtsneutrale Umformulierung markiert wird, da der Ausgabetext sonst nicht sinnvoll ist.</p>
+                <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als solche interpretiert. Zum Beispiel das Wort „er“, auch wenn es sich etwa auf einen Tisch und keine Person bezieht, oder Wörter wie „Rechner“, die manchmal Dinge und manchmal Personen bezeichnen. Dies betrifft auch die Possessivform „ihr“, egal ob diese sich auf eine Person bezieht (wie in „Sie hat ihre Tasche verlegt“) oder auf mehrere („Sie haben ihre Taschen verlegt“). In letzterem Fall sollte „ihr“ nicht markiert werden, da das pluralische „ihr“ im De&#8209;e-System unverändert bleibt.</p>
 
-                <p>Die Possessivform „ihr“ (z.&nbsp;B.&nbsp;„ihre Stifte“) wird im ersten Schritt immer als potentielle Personenbezeichung interpretiert, da es sein kann, dass es sich im Ausgangstext auf eine weibliche Person bezieht und diese feminine Bezugnahme durch eine geschlchtsneutrale ersetzt werden soll. Es kann allerdings auch vorkommen, dass „ihr“ sich auf mehrere Personen bezieht. In diesem Fall sollte es nicht markiert werden, da das plurale „ihr“ im De&#8209;e-System unverändert bleibt, der De&#8209;e-Automat aber ein markiertes „ihr“ immer als Singular-Femininum-Possessivform interpretiert.</p>
-
-                <p>Falls Dir bei der Nutzung des De-e-Automaten ein Problem auffällt, kannst Du dies gerne melden, indem Du auf <a href="/report"">Problem melden</a> klickst.</p>
+                <p>Beim Automaten handelt es sich noch um eine Beta-Version und es können auch Fehler bei der Übersetzung ins De-e-System auftreten. Falls Dir ein Problem auffällt, kannst Du dies gerne melden, indem Du auf „<a href="/report">Problem melden</a>“ klickst.</p>
             </div>
     </div>
 
     <div class="text-area">
         <form action="/parse" method="POST">
-            <textarea id="textInput" name="inputText">{{ input_text }}</textarea>
+            <textarea id="textInput" name="inputText" maxlength="5000" oninput="updateCharacterCount()">{{ input_text }}</textarea>
             <br/>
-            <button type="submit" style="cursor: pointer;">Personenbezeichnungen ermitteln</button>
+            <button type="submit" class="green-button">Personenbezeichnungen ermitteln</button>
+            <div class="character-count" id="charCountText"><span id="charCount"></span>&nbsp;/&nbsp;5000</div>
         </form>
-        {{ dataToRender|safe }}
-        <p>{{ outputText|safe }}</p>
         <br/>
+        <div class="output">
+        {{ dataToRender|safe }}
+        </div>
+        <p class="output">{{ outputText|safe }}</p>
+        <br/><br/>
         <form action="/report" method="POST">
-            <button type="submit" style="cursor: pointer;">Problem melden</button>
+            <button type="submit" class="grey-button">Problem melden</button>
         </form>
         <br/>
     </div>
@@ -85,5 +87,19 @@ document.getElementById("selectAllButton").addEventListener("click", function() 
         checkboxes[i].checked = true;
     }
 });
+function updateCharacterCount() {
+  var maxLength = 5000;
+  var currentLength = document.getElementById('textInput').value.length;
+  var remaining = maxLength - currentLength;
+  var charCountText = document.getElementById('charCountText');
+  
+  document.getElementById('charCount').textContent = remaining;
+
+  if (remaining <= 0) {
+    charCountText.style.color = 'red';
+  } else {
+    charCountText.style.color = 'rgb(71, 71, 71)';
+  }
+}
 </script>
 {% endblock %}

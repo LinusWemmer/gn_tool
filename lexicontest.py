@@ -6,6 +6,8 @@ import re
 from __init__ import get_parse
 from __init__ import split_prepositions
 from __init__ import search_lonely_adjectives
+from __init__ import hack_for_ordinal_numbers
+from __init__ import undo_hack_for_ordinal_numbers
 
 
 class Sentence_Test(unittest.TestCase):
@@ -87,12 +89,50 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Er ist ein Pole.", "En ist ein Polere."))
         test_sentences.append(("Die Heldentaten der Bürgermeisterin wurden von den anderen Bürgermeisterkandidaten während des Wahlkampes zur Bürgermeisterwahl totgeschwiegen.", "Die Heldernetaten ders Bürgernemeisteres wurden von den anderen Bürgernemeisternekandidaternen während des Wahlkampes zur Bürgernemeisternewahl totgeschwiegen."))
         test_sentences.append(("Jeder andere bleibt im Haus.", "Jedey andere bleibt im Haus."))
+        test_sentences.append(("Im selben Monat stellte ihn der Bundesstaat Georgia u. a. wegen versuchter Wahlbeeinflussung unter Anklage.", "Im selben Monat stellte en der Bundesstaat Georgia u. a. wegen versuchter Wahlbeeinflussung unter Anklage."))
+        test_sentences.append(("Sie wurde unter anderem wegen ihrer Programmierkenntnisse eingestellt.", "En wurde unter anderem wegen enser Programmierkenntnisse eingestellt."))
+        test_sentences.append(("Trump ist der erste ehemalige US-Präsident, der sich wegen solcher Vergehen vor Gericht verantworten muss.", "Trump ist de erste ehemalige US-Präsidente, de sich wegen solcher Vergehen vor Gericht verantworten muss."))
+        test_sentences.append(("Das ist ihrer.", "Das ist ensey."))
+        test_sentences.append(("Das ist seines.", "Das ist enses."))
+        test_sentences.append(("Das ist Deine.", "Das ist Deiney."))
+        test_sentences.append(("Mit den Details des Gesetzes bin ich alles andere als zufrieden.", "Mit den Details des Gesetzes bin ich alles andere als zufrieden."))
+        test_sentences.append(("Mit allem anderen bin ich zufrieden.", "Mit allem anderen bin ich zufrieden."))
+        test_sentences.append(("Das ist das Auto vom Hausmeister.", "Das ist das Auto von derm Hausmeistere."))
+        test_sentences.append(("Das liegt nur am Lehrer.", "Das liegt nur an derm Lehrere."))
+        test_sentences.append(("So viel John Wayne steckt im Kanzler.", "So viel John Wayne steckt in derm Kanzlere."))
+        test_sentences.append(("Das passiert am häufigsten im Auto.", "Das passiert am häufigsten im Auto."))
+        test_sentences.append(("Mein Ururopa stammte aus Europa, aber mein Uropa ist schon in Brasilien geboren.", "Mein Ururota stammte aus Europa, aber mein Urota ist schon in Brasilien geboren."))
+        test_sentences.append(("Erst der britische König Edward VII. konnte 1902 den Grenzstreit schlichten.", "Erst de britische Könige Edward VII. konnte 1902 den Grenzstreit schlichten."))
+        test_sentences.append(("Als ehrlicher Kaufmann besteche ich keine Politiker.", "Als ehrliche Kaufperson besteche ich keine Politikerne."))
+        test_sentences.append(("Mit mir als ehrlichem Kaufmann kann man keine solchen Geschäfte machen.", "Mit mir als ehrlicher Kaufperson kann mensch keine solchen Geschäfte machen."))
+        test_sentences.append(("Ich gebe das einem ehrlichen Kaufmann.", "Ich gebe das einer ehrlichen Kaufperson."))
+        test_sentences.append(("Wir brauchen mehr Zusammenhalt.", "Wir brauchen mehr Zusammenhalt."))
+        test_sentences.append(("Ist hier jemand, der uns helfen kann?", "Ist hier jemand, de uns helfen kann?"))
+        test_sentences.append(("Ein jeder kommt zu seiner Zeit.", "Ein jede kommt zu enser Zeit."))
+        test_sentences.append(("Der hohe Angestellte verdient mehr als der niedrige.", "De hohe Angestellte verdient mehr als de niedrige."))
+        test_sentences.append(("Der rosa Kämpfer ist mein Held.", "De rosa Kämpfere ist mein Helde."))
+        test_sentences.append(("Das ist derselbe Lehrer wie gestern.", "Das ist deselbe Lehrere wie gestern."))
+        test_sentences.append(("Ich habe es derselben Lehrerin zurückgegeben.", "Ich habe es dermselben Lehrere zurückgegeben."))
+        test_sentences.append(("Diese Schülerin ist dieselbe, die gestern hier war.", "Diesey Schülere ist deselbe, de gestern hier war."))
+        test_sentences.append(("Ich rede mit derjenigen Schülerin, die gestern hier war.", "Ich rede mit dermjenigen Schülere, de gestern hier war."))
+        test_sentences.append(("Das ist unser Lehrer und nicht eurer.", "Das ist unse Lehrere und nicht eurey."))
+        test_sentences.append(("Das ist eure Lehrerin und nicht unsere.", "Das ist eue Lehrere und nicht unserey."))
+        test_sentences.append(("Ich spiele mit eurem Sohn Tennis.", "Ich spiele mit eurerm Spross Tennis."))
+        test_sentences.append(("Das ist das Auto unserer Nachbarin.", "Das ist das Auto unserers Nachbares."))
+        test_sentences.append(("Er war von 2009 bis 2017 der 44. Präsident der Vereinigten Staaten.", "En war von 2009 bis 2017 de 44. Präsidente der Vereinigten Staaten."))
+        test_sentences.append(("Unter den Menschen, die in den großen Städten das Glück suchten, waren viele landlose Arbeiter und verarmte Kleinbauern.", "Unter den Menschen, die in den großen Städten das Glück suchten, waren viele landlose Arbeiterne und verarmte Kleinbauerne."))
+        test_sentences.append(("Er ist Lehrer.", "En ist Lehrere."))
+        test_sentences.append(("Er war zunächst unter dem Militärregime Ramírez Minister für Arbeit.", "En war zunächst unter dem Militärregime Ramírez Ministere für Arbeit."))
+        test_sentences.append(("Die Veranstalter sprachen von rund 300.000 Teilnehmerinnen und Teilnehmern.", "Die Veranstalterne sprachen von rund 300.000 Teilnehmernen."))
+        test_sentences.append(("Die Wählerinnen und Wähler wünschen sich kompetentere Politiker und Politikerinnen.", "Die Wählerne wünschen sich kompetentere Politikerne."))
+        test_sentences.append(("Den Lehrerinnen und Lehrern ist die schulische Leistung der Schülerinnen und Schüler nicht egal.", "Den Lehrernen ist die schulische Leistung der Schülerne nicht egal."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
-            input_text_with_split_prepositions = split_prepositions(test[0])
+            input_text = hack_for_ordinal_numbers(test[0])
+            input_text_with_split_prepositions = split_prepositions(input_text)
             parse = get_parse(input_text_with_split_prepositions)
 
-            modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse,test[0])
+            modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse,input_text)
             if not change:
                 marking_tool = Marking_Tool(parse[0],{},[])
                 marked_nouns = mark_nouns(parse,[],[])
@@ -135,9 +175,10 @@ class Sentence_Test(unittest.TestCase):
                     for component_data in selection:
                         if component_data[0] == nounphrase[0]:
                             selected_components.append(component_data[1])
-                    marking_tool.neutralize_nounphrase(nounphrase[0] - 1, nounphrase[1], selected_components)
+                    marking_tool.neutralize_nounphrase(nounphrase[0] - 1, selected_components)
                     list_of_neutralized_nouns.append(nounphrase[0])
-            self.assertEqual(marking_tool.get_sentence(), test[1], f"Text {i+1} doesn't have correct output.") 
+            output_text = undo_hack_for_ordinal_numbers(marking_tool.get_sentence())
+            self.assertEqual(output_text, test[1], f"Text {i+1} doesn't have correct output.") 
 
 def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
     marking_form = ""
