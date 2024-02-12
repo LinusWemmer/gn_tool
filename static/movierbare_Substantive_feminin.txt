@@ -157,7 +157,6 @@ Weberin
 Bundespräsidentin
 Verbraucherin
 Bremerin
-Zählerin
 Schiedsrichterin
 Landwirtin
 Aufsteigerin
@@ -4124,3 +4123,5 @@ Christin
 Bloggerin
 Vloggerin
 Oberstin
+Topologin
+Zählerin

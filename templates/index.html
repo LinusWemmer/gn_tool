@@ -18,7 +18,11 @@
         </div>
 
             <div class="paragraph" id="extendedExplanatoryText">
-                <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als solche interpretiert. Zum Beispiel das Wort „er“, auch wenn es sich etwa auf einen Tisch und keine Person bezieht, oder Wörter wie „Rechner“, die manchmal Dinge und manchmal Personen bezeichnen. Dies betrifft auch die Possessivform „ihr“, egal ob diese sich auf eine Person bezieht (wie in „Sie hat ihre Tasche verlegt“) oder auf mehrere („Sie haben ihre Taschen verlegt“). In letzterem Fall sollte „ihr“ nicht markiert werden, da das pluralische „ihr“ im De&#8209;e-System unverändert bleibt.</p>
+                <p>Es sollte beachtet werden, dass der De&#8209;e-Automat manchmal Wörter, die keine Personenbezeichnungen sind, im ersten Schritt als solche interpretiert. Zum Beispiel das Wort „er“, auch wenn es sich etwa auf einen Tisch und keine Person bezieht, oder Wörter wie „Rechner“, die manchmal Dinge und manchmal Personen bezeichnen. Wenn sie sich nicht auf Personen beziehen, sollten diese Wörter nicht für die Neutralisierung markiert werden.</p>
+
+                <p>Im Deutschen wird das Geschlecht im Plural in weniger Wortarten angezeigt als im Singular, nämlich nur an Substantiven. Artikel, Pronomen und Adjektive sind im Plural bereits geschlechtsneutral und bleiben daher im De&#8209;e-System unverändert. Das betrifft auch substantivierte Adjektive (zum Beispiel „die Jugendlichen“). Bei der Possessivform „ihr“ und in bestimmten  Kontexten auch beim Pronomen „sie“ kann der De-e-Automat nicht erkennen, ob es um eine oder mehrere Personen geht (zum Beispiel bei „Ich habe sie mit ihren Hunden gesehen“). Diese Wörter solltest Du nur auswählen, wenn sie sich auf eine einzelne Person beziehen.</p>
+                    
+                <p>Der De&#8209;e-Automat kann derzeit nur feminine und maskuline Formen wie „Lehrerinnen“ und „jeder“ korrekt neutralisieren (und außerdem Doppelformen wie „Lehrerinnen und Lehrer“), nicht aber Formen mit Sonderzeichen wie „Lehrer*innen“ und „jede(r)“.</p>
 
                 <p>Beim Automaten handelt es sich noch um eine Beta-Version und es können auch Fehler bei der Übersetzung ins De-e-System auftreten. Falls Dir ein Problem auffällt, kannst Du dies gerne melden, indem Du auf „<a href="/report">Problem melden</a>“ klickst.</p>
             </div>
@@ -26,7 +30,7 @@
 
     <div class="text-area">
         <form action="/parse" method="POST">
-            <textarea id="textInput" name="inputText" maxlength="5000" oninput="updateCharacterCount()">{{ input_text }}</textarea>
+            <textarea id="textInput" name="inputText" oninput="updateCharacterCount()">{{ input_text }}</textarea>
             <br/>
             <button type="submit" class="green-button">Personenbezeichnungen ermitteln</button>
             <div class="character-count" id="charCountText"><span id="charCount"></span>&nbsp;/&nbsp;5000</div>
@@ -95,7 +99,7 @@ function updateCharacterCount() {
   
   document.getElementById('charCount').textContent = remaining;
 
-  if (remaining <= 0) {
+  if (remaining < 0) {
     charCountText.style.color = 'red';
   } else {
     charCountText.style.color = 'rgb(71, 71, 71)';

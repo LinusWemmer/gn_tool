@@ -7,7 +7,7 @@ import itertools
  # are called by calling Lexicon.function()
 class Lexicon:
     PRONOUNS = {"Nom": "en",
-                "Gen": "ens",
+                "Gen": "enser",
                 "Dat": "em",
                 "Acc": "en"}
     
@@ -47,9 +47,9 @@ class Lexicon:
     ROMAN_NOUN_STARTS = ["Alumn", "Ballerin", "Emerit", "Filipin", "Gueriller", "Latin", "Liber", "Mafios", "Torer"]
 
     # Apart from really irregular nouns, the following list also contains nouns that ParZu does not parse correctly, e.g. "Homöopathen", which ParZu does not recognize as a form of "Homöopath".
-    IRREGULAR_NOUNS = [r"Prinz(essin)?", r"Hexer?", r"Witwer?", r"Br(a|ä)ut(igam)?", r"Hebamme", r"Amme", r"Homöopathen"]
-    IRREGULAR_NOUNS_COMPOUND = [r"Prinz(en|essinnen)", r"Hexe(n|r)", r"Witwe(n|rn|r)", r"Br(a|ä)ut(igams)?", r"Hebammen", r"Ammen", r"Homöopathen"]
-    IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere", "Homöopathe"]
+    IRREGULAR_NOUNS = [r"Prinz(essin)?", r"Hexer?", r"Witwer?", r"Br(a|ä)ut(igam)?", r"Hebamme", r"Amme", r"Homöopathen", r"Sympathisanten"]
+    IRREGULAR_NOUNS_COMPOUND = [r"Prinz(en|essinnen)", r"Hexe(n|r)", r"Witwe(n|rn|r)", r"Br(a|ä)ut(igams)?", r"Hebammen", r"Ammen", r"Homöopathen", r"Sympathisanten"]
+    IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere", "Homöopathe", "Sympathisante"]
 
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 
@@ -141,7 +141,7 @@ class Lexicon:
     
     def neutralize_attributing_relative_pronoun(word_parse) -> str:
         article = "dersen"
-        return article.capitalize() if word_parse[0] == "1" else article
+        return article.capitalize() if word_parse[1][0].isupper() else article
     
     def neutralize_article(word_parse) -> str:
         feats = word_parse[5].split("|")
@@ -161,7 +161,7 @@ class Lexicon:
         # All other types of article
         else:
             word = word_parse[1].lower()
-            #incase no grammatical case is found, treat as nominative, even if wrong.
+            # in case no grammatical case is found, treat as nominative, even if wrong.
             if feats[1] == "_":
                 feats[1] = "Nom"
             # derselbe/dieselbe:
@@ -248,24 +248,23 @@ class Lexicon:
             # Differentiate case
             if feats[2] == "Acc" or feats[2] == "Nom":
                 adjective = adjective + "e"
-                return adjective.capitalize() if word_parse[0] == "1" else adjective
+                return adjective.capitalize() if word_parse[1][0].isupper() else adjective
             else:
                 adjective = adjective + "en"
-                return adjective.capitalize() if word_parse[0] == "1" else adjective
+                return adjective.capitalize() if word_parse[1][0].isupper() else adjective
         # Strong Flexion, on it's own
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
             feats[2] = "Nom"
         adjective =  adjective + Lexicon.ARTIKEL_JEDER.get(feats[2])
-        return adjective.capitalize() if word_parse[0] == "1" else adjective
+        return adjective.capitalize() if word_parse[1][0].isupper() else adjective
     
     # Neutralize possesive jemand, this often doesn't get parsed correctly
     def neutralize_pos_jemand(word_parse) -> str:
         word = "jemanders"
-        return word.capitalize() if word_parse[0] == "1" else word
+        return word.capitalize() if word_parse[1][0].isupper() else word
     
     def neutralize_pronoun(word_parse,has_article) -> str:
-        print("Pronoun case")
         feats = word_parse[5].split("|")
         is_capitalized = word_parse[1][0].isupper()
         if feats[0] == "Neut":
@@ -331,6 +330,8 @@ class Lexicon:
             return pronoun.capitalize() if is_capitalized else pronoun
 
     def neutralize_word(word_parse,has_article) -> str:
+        print("neutralize_word")
+        print("word_parse:", word_parse)
         # Plural cases don't have to be changed and can be ignored
         if "Pl" in word_parse[5]:
             return word_parse[1]
@@ -355,7 +356,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige"), "person" for "Mann", "Frau",
     # "Herr", "Dame", and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats):
+    def check_noun(word_parse,feats,has_article):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -367,7 +368,7 @@ class Lexicon:
             for j, line in enumerate(Lexicon.MALE_NOUNS):
                 if noun.lower().endswith(line.lower()):
                     prenoun = noun[:-len(line)]
-                    if len(prenoun) != 1 and not (prenoun.endswith("c") and line.lower().startswith("h")) and not (len(prenoun) != 0 and (line == "Rat" or line == "Ire" or line == "Ahn" or line == "Erbe" or line == "Same" or line == "Ober" or line == "Elfe")) and not (prenoun.endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
+                    if len(prenoun) != 1 and not (prenoun.endswith("c") and line.lower().startswith("h")) and not (len(prenoun) != 0 and (line == "Tor" or line == "Rat" or line == "Ire" or line == "Ahn" or line == "Erbe" or line == "Same" or line == "Ober" or line == "Elfe")) and not (prenoun.endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
                         prefix, list = Lexicon.check_composite_noun(prenoun,False)
                         original = word_parse[1][-len(line)-noun_suffix_length:]
                         capitalized = noun[-len(line)].isupper()
@@ -496,6 +497,10 @@ class Lexicon:
             else:
                 neutral_base = noun
             return True, "", [[0, noun, neutral_base, "", "substantivized adjective", False]]
+        
+        if word_parse[4] == "NE" and has_article:
+            capitalized = noun[0].isupper()
+            return True, "", [[0, noun, noun, "", "proper noun", capitalized]]
 
         prefix, list = Lexicon.check_composite_noun(word_parse[1],True)
         return False, prefix, list
@@ -694,6 +699,8 @@ class Lexicon:
                         # Strong Flexion, on it's own
                         else:
                             head = head_base[:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                    elif component[-3] == "proper noun":
+                        head = j
                     else:
                         if component[-3] == "standard":
                             head_base = Lexicon.NEUTRAL_NOUNS[j]

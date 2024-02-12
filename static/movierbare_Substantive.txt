@@ -157,7 +157,6 @@ Weber
 Bundespräsident
 Verbraucher
 Bremer
-Zähler
 Schiedsrichter
 Landwirt
 Aufsteiger
@@ -4124,3 +4123,5 @@ Christ
 Blogger
 Vlogger
 Oberst
+Topologe
+Zähler

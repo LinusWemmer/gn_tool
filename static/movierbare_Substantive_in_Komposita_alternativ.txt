@@ -157,7 +157,6 @@ Kaiser
 %Bundespräsident
 %Verbraucher
 %Bremer
-%Zähler
 %Schiedsrichter
 %Landwirt
 %Aufsteiger
@@ -4124,3 +4123,5 @@ Diebs
 %Blogger
 %Vlogger
 %Oberst
+%Topologe
+%Zähler

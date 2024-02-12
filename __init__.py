@@ -226,7 +226,14 @@ def parse():
         input_text = request.form["inputText"]
         session.clear()
         session["input_text"] = input_text
+
+        # If input text has more than 5000 characters, return an error message.
+        if len(input_text) > 5000:
+            return render_template("index.html", input_text=input_text, dataToRender= f"""Der eingegebene Text ist zu lang. Bitte gib einen Text mit weniger als 5000 Zeichen ein.""")
+
         stripped_input_text = input_text.lstrip()
+        # Remove soft hyphens from input text
+        stripped_input_text = stripped_input_text.replace("­","")
         stripped_input_text = hack_for_ordinal_numbers(stripped_input_text)
         input_text_with_split_prepositions = split_prepositions(stripped_input_text)
         print(input_text_with_split_prepositions)
