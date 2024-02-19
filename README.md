@@ -52,7 +52,7 @@ In order to run transfer the docker image to a server, you need to pack it into 
 ~$: sudo docker save -o docker_image.tar docker_image
 ~$: sudo scp -i ~/.ssh/id_rsa docker_image.tar root@<server-ip>:/root/ 
 ```
-On the server, you need to unpack the docker image and the run it:
+On the server, you need to unpack the docker image and then run it:
 ```console
 ~$: docker load -i docker_image.tar
 ~$: docker run -d -p 8080:80 -v /var/app/reports:/app/reports docker_image
@@ -61,6 +61,6 @@ On the server, you need to unpack the docker image and the run it:
 
 Possible Errors:
 ---------------
-Small errors can occur in the software due to errors in the parsing from ParZu, these issues cannot be fixed.
+Small errors can occur in the software due to errors in the parsing from ParZu.
 
 
