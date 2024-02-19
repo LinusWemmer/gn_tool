@@ -64,3 +64,13 @@ Possible Errors:
 Small errors can occur in the software due to errors in the parsing from ParZu.
 
 
+License
+-------
+
+gn_tool is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License (see LICENSE).
+
+The files in postprocesser/DepSVG are from Kaarel Kaljurand's DepSVG library and are licensed under the LGPL (https://github.com/Kaljurand/DepSVG)
+
+preprocesser/tokenizer.perl and preprocessing/nonbreaking_prefix.de are from the Moses toolkit and licensed under the LGPL (http://www.statmt.org/moses/)
+
+preprocesser/punkt_tokenizer.py is from the NLTK and licensed under the Apache License 2.0 (https://github.com/nltk/nltk)
