@@ -7,12 +7,12 @@
 
 
 {% block body %}
-<h1>De&#8209;e-Automat (Beta&#8209;Version)</h1>
+<h1>De&#8209;e&#8209;Automat (Beta&#8209;Version)</h1>
 <div class="container">
     <div class="description">
         <h2 onclick="toggleDescription()">Erläuterungen zum De&#8209;e-Automaten&nbsp;<span id="toggleIcon">&#9660;</span></h2>
         <div class="paragraph" id="explanatoryText">
-            <p>Der De&#8209;e-Automat ist ein Werkzeug, das dabei helfen soll, Texte nach dem <a href="https://geschlechtsneutral.net/gesamtsystem/">De&#8209;e-System</a> geschlechtsneutral zu formulieren. Im ersten Schritt ermittelt der De&#8209;e-Automat die im Text vorkommenden Personenbezeichnungen. Neben diesen erscheinen Kästchen, die dann markiert werden können, um sie im zweiten Schritt geschlechtsneutral zu machen.</p>
+            <p>Der De&#8209;e-Automat ist ein Werkzeug, das dabei helfen soll, Texte nach dem <a href="https://geschlechtsneutral.net/gesamtsystem/">De&#8209;e-System</a> geschlechtsneutral zu formulieren. Im ersten Schritt ermittelt der De&#8209;e-Automat die im Text vorkommenden Personenbezeichnungen (egal ob weibliche, männliche oder gegenderte). Neben diesen erscheinen Kästchen, die dann markiert werden können, um sie im zweiten Schritt geschlechtsneutral zu machen.</p>
 
             <h3 onclick="toggleExtendedDescription()" style="cursor: pointer;">Weitere Erläuterungen&nbsp;<span id="toggleIconExt">&#9660;</span></h3>
         </div>
@@ -22,8 +22,6 @@
 
                 <p>Im Deutschen wird das Geschlecht im Plural in weniger Wortarten angezeigt als im Singular, nämlich nur an Substantiven. Artikel, Pronomen und Adjektive sind im Plural bereits geschlechtsneutral und bleiben daher im De&#8209;e-System unverändert. Das betrifft auch substantivierte Adjektive (zum Beispiel „die Jugendlichen“). Bei der Possessivform „ihr“ und in bestimmten  Kontexten auch beim Pronomen „sie“ kann der De-e-Automat nicht erkennen, ob es um eine oder mehrere Personen geht (zum Beispiel bei „Ich habe sie mit ihren Hunden gesehen“). Diese Wörter solltest Du nur auswählen, wenn sie sich auf eine einzelne Person beziehen.</p>
                     
-                <p>Der De&#8209;e-Automat kann derzeit nur feminine und maskuline Formen wie „Lehrerinnen“ und „jeder“ korrekt neutralisieren (und außerdem Doppelformen wie „Lehrerinnen und Lehrer“), nicht aber Formen mit Sonderzeichen wie „Lehrer*innen“ und „jede(r)“.</p>
-
                 <p>Beim Automaten handelt es sich noch um eine Beta-Version und es können auch Fehler bei der Übersetzung ins De-e-System auftreten. Falls Dir ein Problem auffällt, kannst Du dies gerne melden, indem Du auf „<a href="/report">Problem melden</a>“ klickst.</p>
             </div>
     </div>
@@ -92,14 +90,14 @@ document.getElementById("selectAllButton").addEventListener("click", function() 
     }
 });
 function updateCharacterCount() {
-  var maxLength = 5000;
+  // var maxLength = 5000;
   var currentLength = document.getElementById('textInput').value.length;
-  var remaining = maxLength - currentLength;
+  // var remaining = maxLength - currentLength;
   var charCountText = document.getElementById('charCountText');
   
-  document.getElementById('charCount').textContent = remaining;
+  document.getElementById('charCount').textContent = currentLength;
 
-  if (remaining < 0) {
+  if (currentLength > 5000) {
     charCountText.style.color = 'red';
   } else {
     charCountText.style.color = 'rgb(71, 71, 71)';

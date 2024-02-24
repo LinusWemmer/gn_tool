@@ -4125,3 +4125,4 @@ Diebs
 %Oberst
 %Topologe
 %Zähler
+%Slawisten

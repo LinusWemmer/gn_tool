@@ -5,6 +5,7 @@ import unittest
 import re
 from __init__ import get_parse
 from __init__ import split_prepositions
+from __init__ import remove_special_character_gendering
 from __init__ import search_lonely_adjectives
 from __init__ import hack_for_ordinal_numbers
 from __init__ import undo_hack_for_ordinal_numbers
@@ -155,10 +156,66 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Wo ist die Kim?","Wo ist de Kim?"))
         test_sentences.append(("Wo ist der nette Kim?","Wo ist de nette Kim?"))
         test_sentences.append(("Der Feuerwehrmann, der dort steht, kommt gleich her.","Die Feuerwehrperson, die dort steht, kommt gleich her."))
+        test_sentences.append(("Jeglicher Politiker könnte diese Ministerien leiten.","Jeglichey Politikere könnte diese Ministerien leiten."))
+        test_sentences.append(("Als ehrlicher Bürger macht man das nicht.","Als ehrlichey Bürgere macht mensch das nicht."))
+        test_sentences.append(("Ich habe Sie gesehen.","Ich habe Sie gesehen."))
+        test_sentences.append(("Wir zeigen ihr das Haus.","Wir zeigen em das Haus."))
+        test_sentences.append(("sie","en"))
+        test_sentences.append(("ihr","em"))
+        test_sentences.append(("ihrem","enserm"))
+        test_sentences.append(("sein","ens"))
+        test_sentences.append(("die","de"))
+        test_sentences.append(("Der","De"))
+        test_sentences.append(("das","das"))
+        test_sentences.append(("meine","meiney"))
+        test_sentences.append(("einer","einey"))
+        test_sentences.append(("Lehrer","Lehrere"))
+        test_sentences.append(("Studenten","Studenterne"))
+        test_sentences.append(("Kunden","Kunderne"))
+        test_sentences.append(("Bauern","Bauerne"))
+        test_sentences.append(("Das Buch ist nicht seins.","Das Buch ist nicht enses."))
+        test_sentences.append(("Drei Tage darauf kündigte sie an, anstelle ihres Mannes in dessen Sinn den politischen Kampf fortsetzen zu wollen.","Drei Tage darauf kündigte en an, anstelle ensers Ehepartneres in dersen Sinn den politischen Kampf fortsetzen zu wollen."))
+        test_sentences.append(("Der Mann, dessen Frau gleich kommt, ist schon da.","Die Person, dersen Ehepartnere gleich kommt, ist schon da."))
+        test_sentences.append(("Eine Sprecherin des russischen Außenministeriums erklärte, dass die zahlreichen „westlichen Anschuldigungen“ „selbsterklärend“ seien, d. h. keines Kommentars von offizieller russischer Stelle bedürften.","Ein Sprechere des russischen Außenministeriums erklärte, dass die zahlreichen „westlichen Anschuldigungen“ „selbsterklärend“ seien, d. h. keines Kommentars von offizieller russischer Stelle bedürften."))
+        test_sentences.append(("Er*sie ist ein*e nette*r Lehrer*in.", "En ist ein nette Lehrere."))
+        test_sentences.append(("Er/sie ist ein/e nette/r Lehrer/-in.", "En ist ein nette Lehrere."))
+        test_sentences.append(("Das weiß doch jede(r).", "Das weiß doch jedey."))
+        test_sentences.append(("Das weiß doch jede_r.", "Das weiß doch jedey."))
+        test_sentences.append(("Ihr(e) Lehrer(in) kommt gleich.", "Ens Lehrere kommt gleich."))
+        test_sentences.append(("Kannst Du ihr*ihm sagen, dass ihre*seine Bücher schon auf dem Weg zu ihrem*r zukünftigen Besitzer*in sind.", "Kannst Du em sagen, dass ense Bücher schon auf dem Weg zu enserm zukünftigen Besitzere sind."))
+        test_sentences.append(("Das Buch ist nicht ihrs*seins.", "Das Buch ist nicht enses."))
+        test_sentences.append(("Der Schüler ist nicht ihrer*seiner.", "De Schülere ist nicht ensey."))
+        test_sentences.append(("Unsere Mitarbeiter*innen sind stets bereit, Ihnen zu helfen.", "Unsere Mitarbeiterne sind stets bereit, Ihnen zu helfen."))
+        test_sentences.append(("In unserem Team ist jede*r willkommen, der/die seine*ihre Ideen einbringen möchte.", "In unserem Team ist jedey willkommen, de ense Ideen einbringen möchte."))
+        test_sentences.append(("Die Schüler*innen haben ihre*seine Bücher schon.", "Die Schülerne haben ense Bücher schon."))
+        test_sentences.append(("Der/die Vorsitzende des Vereins wird bald eine Rede halten.", "De Vorsitzende des Vereins wird bald eine Rede halten."))
+        test_sentences.append(("Die Kandidat:innen für die Stelle müssen über mindestens fünf Jahre Berufserfahrung verfügen.", "Die Kandidaterne für die Stelle müssen über mindestens fünf Jahre Berufserfahrung verfügen."))
+        test_sentences.append(("Die Geschäftsleitung sucht nach einer/m engagierten Mitarbeiter*in für das neue Projekt.", "Die Geschäftsleitung sucht nach einerm engagierten Mitarbeitere für das neue Projekt."))
+        test_sentences.append(("Als Vorsitzende:r des Vereins hat sie/er viel zu tun.", "Als Vorsitzendey des Vereins hat en viel zu tun."))
+        test_sentences.append(("Gibt es eine/n Freiwillige/n, die/der uns helfen kann?", "Gibt es ein Freiwillige, de uns helfen kann?"))
+        test_sentences.append(("Haben Sie schon einmal eine/n Lehrer*in getroffen, die/der so jung ist?", "Haben Sie schon einmal ein Lehrere getroffen, de so jung ist?"))
+        test_sentences.append(("Bitte erkläre den SchülerInnen das Binnen-I.", "Bitte erkläre den Schülernen das Binnen-I."))
+        test_sentences.append(("Kim geht mit ihr*seinem Nachbarn spazieren.", "Kim geht mit enserm Nachbare spazieren."))
+        test_sentences.append(("Kim geht mit ihr*seiner Nachbarin spazieren.", "Kim geht mit enserm Nachbare spazieren."))
+        test_sentences.append(("Kim geht mit ihr*seiner*m Nachbar*in spazieren.", "Kim geht mit enserm Nachbare spazieren."))
+        test_sentences.append(("Der/die Schüler(in) ist nicht sein*ihre(r).", "De Schülere ist nicht ensey."))
+        test_sentences.append(("Der/die Schüler(in) ist nicht seine(r)*ihre(r).", "De Schülere ist nicht ensey."))
+        test_sentences.append(("Das ist seine*ihre Lehrerin.", "Das ist ens Lehrere."))
+        test_sentences.append(("Das ist ihr*e/sein*e Lehrer*in.", "Das ist ens Lehrere."))
+        test_sentences.append(("Pädagog(inn)en", "Pädagogerne"))
+        test_sentences.append(("Als Lehrer/Lehrerin macht man das nicht.", "Als Lehrere macht mensch das nicht."))
+        test_sentences.append(("Die*r Lehrer*in gibt der*m Vorsitzenden ein Buch.", "De Lehrere gibt derm Vorsitzenden ein Buch."))
+        test_sentences.append(("Ich kenne einen bekannten und reichen Sänger.", "Ich kenne ein bekannte und reiche Sängere."))
+        test_sentences.append(("Er ist der Sohn des Historikers und sächsischen Landespolitikers Dietmar Pellman.", "En ist de Spross ders Historikeres und sächsischen Landespolitikeres Dietmar Pellman."))
+        test_sentences.append(("Nur eine von hundert kennt die Antwort darauf.", "Nur einey von hundert kennt die Antwort darauf."))
+        test_sentences.append(("Er sagte das unter den gütigen Augen Mutter Teresas.", "En sagte das unter den gütigen Augen Elter Teresas."))
+        test_sentences.append(("Männer und Frauen sowie Lehrerinnen und Lehrer", "Leute sowie Lehrerne"))
+        test_sentences.append(("Rieman sollte zunächst wie sein Vater Theologe werden und hatte dazu Hebräisch gelernt.", "Rieman sollte zunächst wie ens Elter Theologere werden und hatte dazu Hebräisch gelernt."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])
             input_text_with_split_prepositions = split_prepositions(input_text)
+            input_text_with_split_prepositions = remove_special_character_gendering(input_text_with_split_prepositions)
             parse = get_parse(input_text_with_split_prepositions)
 
             modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse,input_text)
@@ -168,6 +225,7 @@ class Sentence_Test(unittest.TestCase):
             else:
                 print("Parsing again with capitalized adjectives.")
                 modified_text_with_split_prepositions = split_prepositions(modified_text)
+                modified_text_with_split_prepositions = remove_special_character_gendering(modified_text_with_split_prepositions)
                 parse = get_parse(modified_text_with_split_prepositions)
                 print(parse)            
                 marking_tool = Marking_Tool(parse[0],{},[])
@@ -222,11 +280,20 @@ def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
                     marking_tool.parse_list[capitalized_adj_address[1]][2] = "andere"
         for glauben_address in glauben:
             if i == glauben_address[0]:
+                # replace artificial "schreib" by original "glaub"
+                marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"eschrieben", "eglaubt", marking_tool.parse_list[glauben_address[1]][1])
                 marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][1])
                 marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"Schreib", "Glaub", marking_tool.parse_list[glauben_address[1]][1])
                 marking_tool.parse_list[glauben_address[1]][2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][2])
+                marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"eschrieben", "eglaubt", marking_tool.parse_list[glauben_address[1]][-2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][-2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"Schreib", "Glaub", marking_tool.parse_list[glauben_address[1]][-2])
+                # replace artificial "sag" by original "zeig"
+                marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"sag", "zeig", marking_tool.parse_list[glauben_address[1]][1])
+                marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"Sag", "Zeig", marking_tool.parse_list[glauben_address[1]][1])
+                marking_tool.parse_list[glauben_address[1]][2] = re.sub(r"sag", "zeig", marking_tool.parse_list[glauben_address[1]][2])
+                marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"sag", "zeig", marking_tool.parse_list[glauben_address[1]][-2])
+                marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"Sag", "Zeig", marking_tool.parse_list[glauben_address[1]][-2])
         #sentence_data.add_marking_tool(sentence_number, marking_tool)
         marking_form += marking_tool.get_marking_form(sentence_number)
         sentence_number += 1

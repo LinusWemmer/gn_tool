@@ -55,7 +55,7 @@ def replace_whitespace_outside_html_tags(text):
 # The following function capitalizes adjectives that do not modify a noun. It is a hack that ensures that
 # adjectives in conjunctions like "netten" in "einen netten und einen unfreundlichen Kollegen" can be
 # neutralized. The function also replaces "glauben" by "schreiben" internally, since ParZu does not
-# recognize the dative object of "glauben" as such.
+# recognize the dative object of "glauben" as such. Similarly it replaces "zeigen" bei "sagen".
 def search_lonely_adjectives(parse: list, input_text: str):
         change = False
         modified_text = ""
@@ -69,8 +69,9 @@ def search_lonely_adjectives(parse: list, input_text: str):
             an = False
             am = False
             for word_number, word in enumerate(marking_tool.parse_list):
-                # Wir setzen alle im Neutrum stehenden Adjektive, die nicht von einem Nomen abhängen, auf klein.
-                if ((word[3] == "ADJA" and not (am and (word[1] == "häufigsten" or word[1] == "sichtbarsten"))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and (int(word[6]) == 0 or parse_list[int(word[6])-1][3] != "N") and not "Neut" in word[5]:
+                # Wir setzen alle Adjektive, die nicht von einem Nomen abhängen und nicht im Neutrum stehen, auf groß.
+                # Ausnahmen sind "am ...sten", "unter anderem" und "alles andere".
+                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5]:
                     word[1] = word[1].capitalize()
                     capitalized_words.append([sentence_number,word_number])
                     change = True
@@ -93,12 +94,33 @@ def search_lonely_adjectives(parse: list, input_text: str):
             # Wir ersetzen "glauben" intern durch "schreiben", da ParZu Dativ-Objekte von "glauben" häufig nicht als solche erkennt.
             for word_number, word in enumerate(marking_tool.parse_list):
                 if word[2] == "glauben":
+                    word[1] = re.sub(r"eglaubt", "eschrieben", word[1])
                     word[1] = re.sub(r"glaub", "schreib", word[1])
                     word[1] = re.sub(r"Glaub", "Schreib", word[1])
                     glauben.append([sentence_number,word_number])
                     change = True
+                if word[2] == "zeigen":
+                    word[1] = re.sub(r"zeig", "sag", word[1])
+                    word[1] = re.sub(r"Zeig", "Sag", word[1])
+                    glauben.append([sentence_number,word_number])
+                    change = True
             modified_text += marking_tool.get_internal_sentence()
         return modified_text, capitalized_words, glauben, change
+
+# The following function checks whether an adjective is lonely, i.e. whether it does not modify a noun.
+def lonely_adjective(parse: list, sentence_number: int, word_number: int):
+    parse_list = parse[sentence_number]
+    word = parse_list[word_number]
+    print("determining status of adjective:", word)
+    if int(word[6]) == 0 or not parse_list[int(word[6])-1][3] in ["N", "KON"]:
+        print("adjective is lonely, case 1")
+        return True
+    elif parse_list[int(word[6])-1][3] == "KON" and (int(parse_list[int(word[6])-1][6]) == 0 or int(parse_list[int(parse_list[int(word[6])-1][6])-1][6]) == 0 or parse_list[int(parse_list[int(parse_list[int(word[6])-1][6])-1][6])-1][3] != "N"):
+        print("adjective is lonely, case 2")
+        return True
+    else:
+        print("adjective is not lonely")
+        return False
 
 # The following function creates the marking form for the user interface, i.e. the form that allows the user to select
 # the words that should be neutralized.
@@ -115,13 +137,22 @@ def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
                     marking_tool.parse_list[capitalized_adj_address[1]][2] = "andere"
         for glauben_address in glauben:
             if i == glauben_address[0]:
+                # replace artificial "schreib" by original "glaub"
+                marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"eschrieben", "eglaubt", marking_tool.parse_list[glauben_address[1]][1])
                 marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][1])
                 marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"Schreib", "Glaub", marking_tool.parse_list[glauben_address[1]][1])
                 marking_tool.parse_list[glauben_address[1]][2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][2])
+                marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"eschrieben", "eglaubt", marking_tool.parse_list[glauben_address[1]][-2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"schreib", "glaub", marking_tool.parse_list[glauben_address[1]][-2])
                 marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"Schreib", "Glaub", marking_tool.parse_list[glauben_address[1]][-2])
-        session[f"markingtool{sentence_number}"] = marking_tool.__dict__
+                # replace artificial "sag" by original "zeig"
+                marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"sag", "zeig", marking_tool.parse_list[glauben_address[1]][1])
+                marking_tool.parse_list[glauben_address[1]][1] = re.sub(r"Sag", "Zeig", marking_tool.parse_list[glauben_address[1]][1])
+                marking_tool.parse_list[glauben_address[1]][2] = re.sub(r"sag", "zeig", marking_tool.parse_list[glauben_address[1]][2])
+                marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"sag", "zeig", marking_tool.parse_list[glauben_address[1]][-2])
+                marking_tool.parse_list[glauben_address[1]][-2] = re.sub(r"Sag", "Zeig", marking_tool.parse_list[glauben_address[1]][-2])
         marking_form += marking_tool.get_marking_form(sentence_number)
+        session[f"markingtool{sentence_number}"] = marking_tool.__dict__
         sentence_number += 1
     session["sentence_number"] = sentence_number
     return marking_form
@@ -142,10 +173,12 @@ def undo_hack_for_ordinal_numbers(input_text: str) -> str:
 # The following function splits prepositions that are conjoined with articles. This is necessary because ParZu
 # does not recognize the preposition and the article as separate words, but we need to consider them separately
 # for the neutralization.
+# Additionally we here replace "seins" and "ihrs" by "seines" and "ihres", because ParZu does not recognize
+# "seins" and "ihrs" as possible neuter forms of "seiner" and "ihrer".
 def split_prepositions(input_text: str) ->str:
     quotation_mark_pattern = r'„|“|”'
     input_text = re.sub(quotation_mark_pattern, '"', input_text)
-    words = re.split('(\s)', input_text)     
+    words = re.split(r"(\s|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_])", input_text)
     output = ""
     for word in words:
         if word =="beim":
@@ -192,9 +225,72 @@ def split_prepositions(input_text: str) ->str:
             output += "für das"
         elif word == "Fürs":
             output += "Für das"
+        elif word == "seins":
+            output += "seines"
+        elif word == "ihrs":
+            output += "ihres"
+        elif word == "Ihrs":
+            output += "Ihres"
         else:
             output += word
     return output
+
+# The following function removes forms of gendering involving special characters, such as "Lehrer*innen" and "er/sie".
+# They are replaced by the corresponding female form, e.g. "Lehrerinnen" and "sie".
+def remove_special_character_gendering(input_text: str) ->str:
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})[*_:/]in", r"\1in", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})/-in", r"\1in", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(in\)", r"\1in", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(inn\)(?=en($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"\1inn", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(innen\)", r"\1innen", input_text)
+    input_text = re.sub(r"er[/*_:]sie", "sie", input_text)
+    input_text = re.sub(r"sie[/*_:]er", "sie", input_text)
+    input_text = re.sub(r"Er[/*_:][sS]ie", "Sie", input_text)
+    input_text = re.sub(r"Sie[/*_:][eE]r", "Sie", input_text)
+    input_text = re.sub(r"ihm[/*_:]ihr", "ihr", input_text)
+    input_text = re.sub(r"ihr[/*_:]ihm", "ihr", input_text)
+    input_text = re.sub(r"Ihm[/*_:][iI]hr", "Ihr", input_text)
+    input_text = re.sub(r"Ihr[/*_:][iI]hm", "Ihr", input_text)
+    input_text = re.sub(r"ihn[/*_:]sie", "sie", input_text)
+    input_text = re.sub(r"sie[/*_:]ihn", "sie", input_text)
+    input_text = re.sub(r"Ihn[/*_:][sS]ie", "Sie", input_text)
+    input_text = re.sub(r"Sie[/*_:][iI]hn", "Sie", input_text)
+    input_text = re.sub(r"der[/*_:]die", "die", input_text)
+    input_text = re.sub(r"die[/*_:]der", "die", input_text)
+    input_text = re.sub(r"Der[/*_:][dD]ie", "Die", input_text)
+    input_text = re.sub(r"Die[/*_:][dD]er", "Die", input_text)
+    input_text = re.sub(r"des[/*_:]der", "der", input_text)
+    input_text = re.sub(r"der[/*_:]des", "der", input_text)
+    input_text = re.sub(r"Des[/*_:][dD]er", "Der", input_text)
+    input_text = re.sub(r"Der[/*_:][dD]es", "Der", input_text)
+    input_text = re.sub(r"dem[/*_:]der", "der", input_text)
+    input_text = re.sub(r"der[/*_:]dem", "der", input_text)
+    input_text = re.sub(r"Dem[/*_:][dD]er", "Der", input_text)
+    input_text = re.sub(r"Der[/*_:][dD]em", "Der", input_text)
+    input_text = re.sub(r"den[/*_:]die", "die", input_text)
+    input_text = re.sub(r"die[/*_:]den", "die", input_text)
+    input_text = re.sub(r"Den[/*_:][dD]ie", "Die", input_text)
+    input_text = re.sub(r"Die[/*_:][dD]en", "Die", input_text)
+    # eine/ein(er):
+    input_text = re.sub(re.compile(r"([mdks])?([eE])in(er|en)?[/*_:]\1[eE]ine", re.IGNORECASE), r"\1\2ine", input_text)
+    input_text = re.sub(re.compile(r"([mdks])?([eE])ine[/*_:]\1[eE]in(er|en)?", re.IGNORECASE), r"\1\2ine", input_text)
+    input_text = re.sub(re.compile(r"([mdks])?([eE])ine[sm]][/*_:]\1[eE]iner", re.IGNORECASE), r"\1\2iner", input_text)
+    input_text = re.sub(re.compile(r"([mdks])?([eE])iner[/*_:]\1[eE]ine[sm]]", re.IGNORECASE), r"\1\2iner", input_text)
+    input_text = re.sub(r"[*_:/]e(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"e[*_:/][rn](?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"er[*_:/]s(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"es[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"er[*_:/]m(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"em[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"\(e\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"e\(r\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"e\(n\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"[sS]eine?[rsmn]?[/*_:]([iI]hre?[rsmn]?)", r"\1", input_text)
+    input_text = re.sub(r"([iI]hr)e?[rsmn]?[/*_:][sS]ein(e?[rsmn]?)", r"\1\2", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ])In", r"\1in", input_text)
+
+    return input_text
+
 
 # The following function ensures that the user does not see the internal error message of the program,
 # but a more user-friendly error message combined with a form that allows the user to report the error.
@@ -236,6 +332,7 @@ def parse():
         stripped_input_text = stripped_input_text.replace("­","")
         stripped_input_text = hack_for_ordinal_numbers(stripped_input_text)
         input_text_with_split_prepositions = split_prepositions(stripped_input_text)
+        input_text_with_split_prepositions = remove_special_character_gendering(input_text_with_split_prepositions)
         print(input_text_with_split_prepositions)
         parse = get_parse(input_text_with_split_prepositions)
 
@@ -246,8 +343,10 @@ def parse():
         else:
             print("Parsing again with capitalized adjectives.")
             modified_text_with_split_prepositions = split_prepositions(modified_text)
+            modified_text_with_split_prepositions = remove_special_character_gendering(modified_text_with_split_prepositions)
             print(modified_text_with_split_prepositions)
             parse = get_parse(modified_text_with_split_prepositions)
+            print(parse)
             for parse_list in parse:
                 marking_tool = Marking_Tool(parse_list,{},[])
                 modified_text = Marking_Tool.find_realizations(marking_tool,modified_text)
@@ -255,6 +354,75 @@ def parse():
 
         marked_nouns = undo_hack_for_ordinal_numbers(marked_nouns)
         marked_nouns = replace_whitespace_outside_html_tags(marked_nouns)
+        # Add warning for single word input (only when the word as a whole is marked, i.e. when marked_nouns contains "checkbox" and has no letter after "</u></label></div>"):
+        warning = False
+        if len(parse) == 1 and (len(parse[0]) == 1 or (len(parse[0]) == 2 and parse[0][1][3] == "$.")) and marked_nouns.find("checkbox") != -1 and not re.search(r"</u></label></div>[a-zA-ZäöüßÄÖÜẞ]", marked_nouns):
+            # sie
+            if parse[0][0][1] == "sie":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „sie“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+            # Sie
+            elif parse[0][0][1] == "Sie":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „Sie“ als höfliche Alternative zu „du“ verwendet wird, sich auf eine Gruppe von Personen bezieht oder auf eine einzelne Person. In den ersten beiden Fällen ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+            # ihr
+            elif parse[0][0][1] == "ihr":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. Mit Bezug auf eine einzelne Person kann das Wort „ihr“ entweder eine besitzanzeigende Funktion haben oder die Dativ-Form von „sie“ sein. Im ersten Fall lautet die geschlechtsneutrale Form „ens“, im zweiten Fall „em“. "
+            # Ihr
+            elif parse[0][0][1] == "ihr" or parse[0][0][1] == "Ihr" or parse[0][0][1] == "ihrem" or parse[0][0][1] == "Ihrem" or parse[0][0][1] == "ihres" or parse[0][0][1] == "Ihres" or parse[0][0][1] == "ihrs" or parse[0][0][1] == "Ihrs":
+                warning = True
+                ending = parse[0][0][1][3:]
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ als höfliche Alternative zu „dein" + ending + "“ verwendet wird, Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es als höfliche Alternative zu „dein" + ending + "“ verwendet wird oder Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+            # ihre, ihrem, ihr(e)s (since this has two ambiguities, we only give a generic warning for single-word inputs)
+            elif parse[0][0][1] == "ihre" or parse[0][0][1] == "Ihre" or parse[0][0][1] == "ihrem" or parse[0][0][1] == "ihres" or parse[0][0][1] == "ihrs":
+                warning = True
+                special_warning = ""
+            # sein
+            elif parse[0][0][1] == "sein":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „sein“ mit besitzanzeigender Funktion oder als Verb verwendet wird. Als Verb sollte es im De-e-System natürlich nicht geändert werden. "
+            # die
+            elif parse[0][0][1] == "die" or parse[0][0][1] == "Die":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+            # der
+            elif parse[0][0][1] == "der" or parse[0][0][1] == "Der":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die maskuline Nominativ-Form oder die feminine Genitiv-Form des bestimmten Artikels ist, sodass nicht klar ist, ob im Inklusivum die Nominativ-Form „de“ oder die Genitiv-Form „ders“ verwendet werden sollte. "
+            # den
+            elif parse[0][0][1] == "den" or parse[0][0][1] == "Den":
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die maskuline Akkusativ-Form oder die Dativ-Plural-Form des bestimmten Artikels ist. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+            # meine/keine usw.
+            elif (parse[0][0][4] == "PIS" or parse[0][0][4] == "PPOSAT") and parse[0][0][1].endswith("e") and parse[0][0][5].endswith("_") and marked_nouns.find("checkbox-container") == marked_nouns.rfind("checkbox-container"): # The last condition ensures that "seine" and "ihre" are not covered by this warning, as they contain two ambiguities.
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+            # Substantiv auf "-er", dass kein Kompositum aus mehreren movierbaren Susbtantiven ist (marked_nouns contains at most one "checkbox-container")
+            elif marked_nouns.find("checkbox-container") == marked_nouns.rfind("checkbox-container") and parse[0][0][4] == "NN" and parse[0][0][1].endswith("er") and parse[0][0][5].endswith("_"):
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im ersten Fall lautet die geschlechtsneutrale Form „" + parse[0][0][1] + "e“, im zweiten Fall „" + parse[0][0][1] + "ne“. "
+            # Substantiv auf "-er", dass ein Kompositum aus mehreren movierbaren Susbtantiven ist
+            elif parse[0][0][4] == "NN" and parse[0][0][1].endswith("er") and parse[0][0][5].endswith("_"):
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im ersten Fall endet die geschlechtsneutrale Form auf „‑ere“, im zweiten Fall auf „‑erne“. "
+            # Substantiv wie "Studenten" (declined form is base form with additional "en")
+            elif parse[0][0][4] == "NN" and (parse[0][0][1] == parse[0][0][2] + "en" or parse[0][0][1] == "Bauern") and parse[0][0][5].endswith("_"):
+                warning = True
+                if parse[0][0][1] == "Bauern":
+                    plural_form = "Bauerne"
+                else:
+                    plural_form = parse[0][0][2] + "erne"
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die Pluralform oder eine nicht-nominative Singularform von „" + parse[0][0][2] + "“ ist. Im ersten Fall lautet die geschlechtsneutrale Form „" + plural_form + "“ (bzw. im Dativ „" + plural_form + "n“), im zweiten Fall „" + parse[0][0][2] + "e“ (bzw. im Genitiv „" + parse[0][0][2] + "es“). "
+            # Substantive wie "Kunden" (base form ends in "e" and declined form is base form with additional "n")
+            elif parse[0][0][4] == "NN" and parse[0][0][2].endswith("e") and parse[0][0][1] == parse[0][0][2] + "n" and parse[0][0][5].endswith("_"):
+                warning = True
+                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die Pluralform oder eine nicht-nominative Singularform von „" + parse[0][0][2] + "“ ist. Im ersten Fall lautet die geschlechtsneutrale Form „" + parse[0][0][2] + "rne“ (bzw. im Dativ „" + parse[0][0][2] + "rnen“), im zweiten Fall „" + parse[0][0][2] + "re“. (bzw. im Genitiv „" + parse[0][0][2] + "res“). "
+            else:
+                special_warning = ""
+            if warning:
+                marked_nouns = marked_nouns + f"""<br/><br/><div class="warning">Hinweis: """ + special_warning + """Allgemein ist es empfehlenswert, mehr als ein Wort einzugeben, damit der De-e-Automat auf Grundlage des grammatischen Kontexts mehrdeutige Wörter korrekt interpretieren kann.</div>"""
+
         session["marked_nouns"] = marked_nouns
         if "checkbox" in marked_nouns:
             return render_template("index.html", input_text=input_text, dataToRender= f"""<form action="/mark" method="POST">

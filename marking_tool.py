@@ -39,7 +39,7 @@ class Marking_Tool:
         sentence = ""
         for word_parse in self.parse_list:
             print(word_parse)
-            if (len(word_parse[-2]) != len(word_parse[1]) and not word_parse[2] == "glauben") or word_parse[1] == '"':
+            if (len(word_parse[-2]) != len(word_parse[1]) and not word_parse[2] == "glauben" and not word_parse[2] == "zeigen") or word_parse[1] == '"':
                 sentence = sentence + word_parse[-2]
             else:
                 sentence += word_parse[1]
@@ -106,10 +106,16 @@ class Marking_Tool:
                 self.parse_list[pos-1][-1] = " "
                 if self.parse_list[pos-1][-2] == "i":
                     self.parse_list[pos-1][-2] = "in"
+                elif self.parse_list[pos-1][-2] == "I":
+                    self.parse_list[pos-1][-2] = "In"
                 elif self.parse_list[pos-1][-2] == "vo":
                     self.parse_list[pos-1][-2] = "von"
+                elif self.parse_list[pos-1][-2] == "Vo":
+                    self.parse_list[pos-1][-2] = "Von"
                 elif self.parse_list[pos-1][-2] == "a":
                     self.parse_list[pos-1][-2] = "an"
+                elif self.parse_list[pos-1][-2] == "A":
+                    self.parse_list[pos-1][-2] = "An"
                 self.parse_list[pos][-2] = "derm"
             else:
                 self.parse_list[pos][-2] = neutralized_word
@@ -151,7 +157,7 @@ class Marking_Tool:
             feats[1] = "Dat"
             feats[2] = "Pl"
         # Wenn das Substantiv ein Prädikativ eines singularischen Verbes ist, dann ist es im Singular:
-        elif self.parse_list[pos][7] == "pred" and self.parse_list[int(self.parse_list[pos][6])-1][3] == "V" and self.parse_list[int(self.parse_list[pos][6])-1][5].split("|")[1] == "Sg":
+        elif self.parse_list[pos][7] == "pred" and self.parse_list[int(self.parse_list[pos][6])-1][3] == "V" and self.singular_verb(int(self.parse_list[pos][6])-1):
             feats[2] = "Sg"
         # Wenn bei "Ahnen"/"Vorfahren"/"Nachfahren" erkannt wird, dass es Nominativ ist, aber kein Numerus erkannt wird, dann ist es ein Plural.
         elif (self.parse_list[pos][1] == "Ahnen" or self.parse_list[pos][1] == "Vorfahren" or self.parse_list[pos][1] == "Nachfahren") and feats[1] == "Nom":
@@ -176,6 +182,9 @@ class Marking_Tool:
                 # Ansonsten ist ein Substantiv mit Artikel und einem nicht erkannten Numerus im Singular.
                 else:
                     feats[2] = "Sg"
+            # Wenn der Satz nur das Substantiv enthält und das Substantiv nicht auf "-en" endet und nicht "Bauern" lautet, setze es in den Singular:
+            elif (len(self.parse_list) == 1 or (len(self.parse_list) == 2 and self.parse_list[1][3] == "$.")) and not self.parse_list[pos][1].endswith("en") and not self.parse_list[pos][1] == "Bauern":
+                feats[2] = "Sg"
             # Wenn das Substantiv nicht von "als" abhängig ist (lässt sich im ParZu-Parsebaum überprüfen),
             # setze den Numerus des Substantivs auf "Pl":
             elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):
@@ -186,7 +195,9 @@ class Marking_Tool:
                 index_of_last_np_before_als = self.find_last_np_before_index(int(self.parse_list[pos][6]))
                 if index_of_last_np_before_als > 0:
                     otherfeats = self.parse_list[index_of_last_np_before_als-1][5].split("|")
-                    if self.parse_list[index_of_last_np_before_als-1][3] == "N":
+                    if self.parse_list[index_of_last_np_before_als-1][2] == "man":
+                        feats[2] = "Sg"
+                    elif self.parse_list[index_of_last_np_before_als-1][3] == "N":
                         feats[1] = otherfeats[1]
                         feats[2] = otherfeats[2]
                     elif self.parse_list[index_of_last_np_before_als-1][3] == "PRO":
@@ -200,28 +211,40 @@ class Marking_Tool:
                     print("index_of_first_np_after_als_construct:", index_of_first_np_after_als_construct)
                     if index_of_first_np_after_als_construct > 0:
                         otherfeats = self.parse_list[index_of_first_np_after_als_construct-1][5].split("|")
-                        if self.parse_list[index_of_first_np_after_als_construct-1][3] == "N":
+                        if self.parse_list[index_of_first_np_after_als_construct-1][2] == "man":
+                            feats[2] = "Sg"
+                        elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "N":
                             feats[2] = otherfeats[2]
                         elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "PRO":
                             feats[2] = otherfeats[1]
                     else:
                         feats[2] = "Sg"
+
+    def singular_verb(self, pos:int):
+        if "Sg" in self.parse_list[pos][5]:
+            return True
+        elif self.parse_list[pos][7] == "aux" and int(self.parse_list[pos][6]) != 0:
+            return self.singular_verb(int(self.parse_list[pos][6])-1)
+        else:
+            return False
     
     def find_last_np_before_index(self, als_index:int):
         for i in range(als_index-1,0,-1):
-            if i in self.nounphrases:
+            if i in self.nounphrases and self.parse_list[i-1][1] != "sich":
                 return i
         return 0
     
     def find_first_np_after_index(self, als_index:int):
         for i in range(als_index+1,len(self.parse_list)+1):
-            if i in self.nounphrases:
+            if i in self.nounphrases and self.parse_list[i-1][1] != "sich":
                 return i
         return 0
 
 
     # This function neutralizes the word that has been selected. Then, all dependent words in the sentence are neutralized.
     def neutralize_nounphrase(self, pos:int, selected_components):
+        print("about to neutralize nounphrase")
+        print(self.parse_list[pos])
         feats = self.parse_list[pos][5].split("|")
         if len(feats) == 1:
             feats.append("_")
@@ -230,16 +253,40 @@ class Marking_Tool:
 
         # Determine whether the noun phrase has an article:
         has_article = False
-        for child in self.nounphrases.get(pos+1):
-            if self.parse_list[child-1][3] == "ART":
-                has_article = True
-                break
+        if pos+1 in self.nounphrases:
+            for child in self.nounphrases.get(pos+1):
+                if self.parse_list[child-1][3] == "ART":
+                    has_article = True
+                    break
+        # Check whether the noun phrase is conjuncted with a noun phrase that has an article:
+        # if int(self.parse_list[pos][6]) != 0: 
+        #     print("step 1:", pos)
+        #     if self.parse_list[int(self.parse_list[pos][6])-1][3] == "KON": 
+        #         print("step 2:", int(self.parse_list[pos][6])-1)
+        #         if int(self.parse_list[int(self.parse_list[pos][6])-1][6]) != 0: 
+        #             print("step 3:", int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1)
+        #             if self.parse_list(int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1)[3] == "N":
+        #                 print("step 4:", int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1)
+        #                 for child in self.nounphrases.get(int(self.parse_list[int(self.parse_list[pos][6])-1][6])):
+        #                     if self.parse_list[child-1][3] == "ART":
+        #                         has_article = True
+        #                         break
+        if int(self.parse_list[pos][6]) != 0 and self.parse_list[int(self.parse_list[pos][6])-1][3] == "KON" and int(self.parse_list[int(self.parse_list[pos][6])-1][6]) != 0 and self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][3] == "N":
+            for child in self.nounphrases.get(int(self.parse_list[int(self.parse_list[pos][6])-1][6])):
+                if self.parse_list[child-1][3] == "ART":
+                    has_article = True
+                    break
 
         # Neutralize a possessive pronoun
         if self.parse_list[pos][4] == "PPOSAT" and self.parse_list[pos][6] == "0":
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
-            self.parse_list[pos][-2] = Lexicon.neutralize_possesive_pronoun(pos,selected_components,self.nounlist,feats)
+            match = re.search(r"[/*_:]([Ii]hr|[Ss]ein)", self.parse_list[pos][-2])
+            if match:
+                print("sonderzeichen:",match.group(0))
+                self.parse_list[pos][-2] = Lexicon.neutralize_possesive_pronoun_with_sonderzeichen(pos,selected_components,self.nounlist,feats,match.group(0))
+            else:
+                self.parse_list[pos][-2] = Lexicon.neutralize_possesive_pronoun(pos,selected_components,self.nounlist,feats)
         # Neutralize a possessive article
         elif self.parse_list[pos][4] == "PPOSAT":
             self.parse_list[pos][-2] = Lexicon.neutralize_possesive_article(self.parse_list[pos])
@@ -264,14 +311,14 @@ class Marking_Tool:
                 self.determine_number(pos,feats)
             if feats[1] == "_" and self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
                 feats[1] = "Dat"
-            # Nach "zwischen", "unter", "vor", "hinter", "neben" nicht erkanntes Kasus zu Dativ machen.
+            # Nach "zwischen", "unter", "vor", "hinter", "neben", "von", "bei" nicht erkanntes Kasus zu Dativ machen.
             if feats[1] == "_":
                 if int(self.parse_list[pos][6]) != 0:
-                    if self.parse_list[int(self.parse_list[pos][6])-1][2] in ["zwischen","unter","vor","hinter","neben"]:
+                    if self.parse_list[int(self.parse_list[pos][6])-1][2] in ["zwischen","unter","vor","hinter","neben","von","bei"]:
                         feats[1] = "Dat"
                     elif int(self.parse_list[int(self.parse_list[pos][6])-1][6]) != 0:
                         if int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6]) != 0:
-                            if self.parse_list[int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6])-1][2] in ["zwischen","unter","vor","hinter","neben"]:
+                            if self.parse_list[int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6])-1][2] in ["zwischen","unter","vor","hinter","neben","von","bei"]:
                                 feats[1] = "Dat"
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
@@ -295,9 +342,9 @@ class Marking_Tool:
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
                         self.feminize_word(child-1, has_article, article_pos)
-        # Neutralized attributing relative pronoun
-        elif self.parse_list[pos][4] == "PRELAT":
-            self.parse_list[pos][-2] = Lexicon.neutralize_attributing_relative_pronoun(self.parse_list[pos])
+        # Neutralized attributive pronoun
+        elif self.parse_list[pos][1].lower() in ["dessen","deren"]:
+            self.parse_list[pos][-2] = Lexicon.neutralize_attributive_pronoun(self.parse_list[pos])
         elif re.match(r"(J|j)emand(e?)s" , self.parse_list[pos][1]):
                 self.parse_list[pos][-2] = Lexicon.neutralize_pos_jemand(self.parse_list[pos])
         #Neutralize everything else
@@ -410,7 +457,7 @@ class Marking_Tool:
         noun_pair_types = {}
         noun_pair_prefixes = {}
         for pos, word_parse in enumerate(self.parse_list):
-            if word_parse[1] == "und" or word_parse[1] == "oder":
+            if word_parse[1] == "und" or word_parse[1] == "oder" or word_parse[1] == "/" or word_parse[1] == "bzw." or word_parse[1] == "bzw" or word_parse[1] == "+":
                 # Schaue, ob das Wort davor ein feminines Personensubstantiv ist:
                 for j, line in enumerate(Lexicon.FEMALE_NOUNS):
                     if self.parse_list[pos-1][2] == line:
@@ -467,7 +514,6 @@ class Marking_Tool:
                         noun_pair_indices[pos-1] = 0
                         noun_pair_types[pos-1] = "person"
                         noun_pair_prefixes[pos-1] = match.group(1).capitalize()
-                        break
                 # Schaue, ob das Wort davor auf "beamt..." endet:
                 beamt_pattern = r"(.*)(beamt(in(nen)?|e(r|n|m)?))$"
                 match = re.match(beamt_pattern, self.parse_list[pos-1][2].lower())
@@ -480,7 +526,6 @@ class Marking_Tool:
                         noun_pair_indices[pos-1] = 0
                         noun_pair_types[pos-1] = "beamtey"
                         noun_pair_prefixes[pos-1] = match.group(1).capitalize()
-                        break
                 # Schaue, ob das Wort davor ein Romanismus ist:
                 for j, romanism in enumerate(Lexicon.ROMAN_NOUNS):
                     romanism = "(" + romanism + ")$"
@@ -531,7 +576,6 @@ class Marking_Tool:
                         noun_pair_indices[pos-1] = match.group(1).capitalize()
                         noun_pair_types[pos-1] = "substantivized adjective"
                         noun_pair_prefixes[pos-1] = ""
-                        break
 
         nouns = ""
         for pos, word_parse in enumerate(self.parse_list):
@@ -565,8 +609,21 @@ class Marking_Tool:
                 match = re.match(r"((S|s)ein)|((I|i)hr)", word_parse[1])
                 if word_parse[4] == "PPOSAT" and word_parse[6] == "0" and match:
                     self.find_nounphrase(word_parse)
-                    base = match.group(0)
-                    ending = word_parse[1][len(base):]
+                    sonderzeichen_match = re.match(r"((S|s)ein|(I|i)hr)(([/*_:]?e|\(e\)|s|es|em|en|er)?([/*_:][smnr]|\([rn]\))?)([/*_:])((S|s)ein|(I|i)hr)(([/*_:]?e|\(e\)|s|es|em|en|er)?([/*_:][smnr]|\([rn]\))?)$", word_parse[-2])
+                    # The following case distinction is needed to ensure that when only the base is markes,
+                    # "ihrer*seiner" becomes "enser" and not "enser*enser", while "ihre(r)" becomes "ense(r)" and not "ense".
+                    if sonderzeichen_match:
+                        base = sonderzeichen_match.group(1)
+                        marking_form_base = sonderzeichen_match.group(1) + sonderzeichen_match.group(4) + sonderzeichen_match.group(7) + sonderzeichen_match.group(8)
+                        ending = sonderzeichen_match.group(11)
+                        #grammatical_ending = word_parse[1][len(base):]
+                        print("base:",base)
+                        print("marking_form_base:",marking_form_base)
+                        print("ending:",ending)
+                    else:
+                        base = match.group(0)
+                        marking_form_base = match.group(0)
+                        ending = word_parse[-2][len(base):]
                     capitalized = word_parse[1][0].isupper()
                     # Since ParZu does not identify the neuter form of possessive pronouns as such, we identify them by the ending "es":
                     if word_parse[1].endswith("es"):
@@ -574,7 +631,7 @@ class Marking_Tool:
                         nouns += input_form
                         self.nounlist.extend([[int(word_parse[0]), 0, base, "ens", "", "possessive_pronoun_base", capitalized, False], [int(word_parse[0]), len(base), ending, ending, "", "possessive_pronoun_ending", False, False]])
                     else:
-                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{"<u>" + base + "</u>"}</label></div>"""
+                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{"<u>" + marking_form_base + "</u>"}</label></div>"""
                         nouns += input_form
                         if len(ending) > 0:
                             input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-4}" name="{sentence_number}|{word_parse[0]}|{-4}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-4}">{"<u>" + ending + "</u>"}</label></div>"""
@@ -598,6 +655,14 @@ class Marking_Tool:
                         input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-5}" name="{sentence_number}|{word_parse[0]}|{-5}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-5}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                         nouns += input_form
                         self.nounlist.extend([[int(word_parse[0]), 0, base, base, "", "possessive_pronoun_base", False, False], [int(word_parse[0]), len(base), ending, "", "", "possessive_pronoun_ending", False, False]])
+                # Case: "sein" as a single word in the input
+                elif word_parse[1] == "sein" and len(self.parse_list) == 1:
+                    self.find_nounphrase(word_parse)
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
+                    nouns += input_form
+                    self.parse_list[pos] = ['1', 'sein', 'seine', 'ART', 'PPOSAT', 'Neut|Nom|Sg', '0', 'det', '_', '_', 'sein', '']
+                    print("modified word_parse for sein")
+                    self.nounlist.extend([[int(word_parse[0]), 0, "sein", "sein", "", "possessive_pronoun_base", False, False], [int(word_parse[0]), 4, "", "", "", "possessive_pronoun_ending", False, False]])
 
                 # Case: Possessive article
                 elif word_parse[4] == "PPOSAT" and not re.match(r"(M|m|D|d)ein|(U|u)nse?r|(E|e)ue?r", word_parse[1]):
@@ -633,8 +698,14 @@ class Marking_Tool:
                             article_feats = other_word_parse[5].split("|")
                             if article_feats[-1] != "Pl" and (article_feats[-3] == "Masc" or article_feats[-3] == "Fem"):
                                 has_article = True
+                    # The following checks whether some possessive form ("sein", "ihr", "mein", "dein", "unser", "euer", "dessen", "deren") is dependent on the noun:
+                    has_possessive = False
+                    for other_word_parse in self.parse_list:
+                        if other_word_parse[6] == word_parse[0] and (other_word_parse[4] == "PPOSAT" or other_word_parse[1] in ["dessen","deren"]):
+                            has_possessive = True
                     print("about to check noun:", word_parse)
-                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article)
+                    print("has_article:",has_article)
+                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive)
                     print(list)
                     if list == []:
                         nouns += word_parse[-2]
@@ -653,12 +724,13 @@ class Marking_Tool:
                     list.insert(0, [int(word_parse[0]), 0, "", "", prefix, "prefix", False, False])
                     self.nounlist.extend(list)
                 # Case: Pronoun
-                elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "mehr" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle"): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
+                elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle"): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
+                    print("found pronoun:",word_parse)
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                     nouns += input_form
                 # Case: Relative pronoun dependent on a proper noun
-                elif word_parse[4] == "PRELS" and ((self.parse_list[pos-1][1] == "," and self.parse_list[pos-2][4] == "NE") or (self.parse_list[pos-2][1] == "," and self.parse_list[pos-3][4] == "NE")) and not word_parse[5].startswith("Neut") and not word_parse[5].endswith("Pl"):
+                elif word_parse[4] == "PRELS" and pos > 1 and ((self.parse_list[pos-1][1] == "," and self.parse_list[pos-2][4] == "NE") or (pos != 2 and self.parse_list[pos-2][1] == "," and self.parse_list[pos-3][4] == "NE")) and not word_parse[5].startswith("Neut") and not word_parse[5].endswith("Pl"):
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                     nouns += input_form
@@ -676,7 +748,7 @@ class Marking_Tool:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                     nouns += input_form
-                elif word_parse[4] == "PRELAT":
+                elif word_parse[4] == "PRELAT" or word_parse[1].lower() in ["dessen","deren"]:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                     nouns += input_form
@@ -684,7 +756,7 @@ class Marking_Tool:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                     nouns += input_form
-                elif word_parse[3] == "ART" and word_parse[6] == "0":
+                elif word_parse[3] == "ART" and word_parse[6] == "0" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[1].startswith("das") and not word_parse[2] == "wenige":
                     # Search if the article is part of a noun phrase:
                     article_dependent = False
                     for key in self.nounphrases:
@@ -692,9 +764,17 @@ class Marking_Tool:
                             article_dependent = True
                             break
                     if not article_dependent:
+                        print("found article:",word_parse)
                         self.find_nounphrase(word_parse)
                         input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + word_parse[-2] + "</u>"}</label></div>{word_parse[-1]}"""
                         nouns += input_form
+                        # The following is needed so that the "article" is treated as a pronoun during the neutralization process:
+                        self.parse_list[pos][3] = "PRO"
+                        self.parse_list[pos][4] = "PIS"
+                        if word_parse[5].startswith("Indef|"):
+                            self.parse_list[pos][5] = word_parse[5][6:]
+                        if word_parse[5].startswith("Def|"):
+                            self.parse_list[pos][5] = word_parse[5][4:]
                     else:
                         nouns += word_parse[-2]
                         nouns += word_parse[-1]
@@ -719,6 +799,7 @@ class Marking_Tool:
     def find_realizations(self, input_text: str):
         position_after_preposition = False
         for word in self.parse_list:
+            print("word:",word)
             if position_after_preposition == True and word[1].startswith("d") and len(word[1]) == 3:
                 pattern = "(" + re.escape(word[1]) + "|" + re.escape(word[1][2]) + ")"
             elif word[1].lower() == "in":
@@ -729,6 +810,36 @@ class Marking_Tool:
                 pattern = "(von|vo(?!n))"
             elif word[1] == '"':
                 pattern = '("|„|“|”)'
+            elif word[1] == "seines" or word[1] == "ihres" or word[1] == "Ihres":
+                pattern = "(sein|ihr|Ihr)e?s([*_:/](sein|ihr|Ihr)e?s)?"
+            elif re.match(r"^.*[a-zA-ZäöüßÄÖÜẞ]{3}in(nen)?.*$",word[1]):
+                match = re.match(r"^(.*[a-zA-ZäöüßÄÖÜẞ]{3})in((nen)?)(.*)$",word[1])
+                pattern = match.group(1) + "(\(in" + match.group(2) + "\)|([*_:/]|/-)?in"  + match.group(2) + "|\(inn\)en)" + match.group(4)
+            elif word[1] in ["sie","Sie"]:
+                pattern = "[Ss]ie([*_:/][Ee]r|[*_:/][Ih]hn)?|[Ee]r[*_:/][Ss]ie|[Ii]hn[*_:/][Ss]ie"
+            elif word[1] in ["ihr","Ihr"]:
+                pattern = "[Ii]hr([*_:/][Ii]hm|[*_:/][Ss]ein)?|[Ii]hm[*_:/][Ii]hr|[Ss]ein[*_:/][Ii]hr"
+            elif word[1] in ["ihre","Ihre"]:
+                pattern = "[Ss]ein([*_:/]e|\(e\)|e[*_:/][rn]|e\([rn]\)|e)?[*_:/][Ii]hr([*_:/]e|\(e\)|e[*_:/][rn]|e\([rn]\)|e)|[Ii]hr([*_:/]e|\(e\)|e[*_:/][rn]|e\([rn]\)|e)?([*_:/][Ss]ein([*_:/]e|\(e\)|e[*_:/][rn]|e\([rn]\)|e))?"
+            elif word[1] in ["ihrer","Ihrer"]:
+                pattern = "[Ss]ein(e([*_:/]r|\(r\)|[ms][*_:/]r|r([*_:/][ms])?))?[*_:/][Ii]hre([*_:/]r|\(r\)|[ms][*_:/]r|r([*_:/][ms])?)|[Ii]hrer[*_:/][Ss]eine([*_:/]r|\(r\)|[ms][*_:/]r|r([*_:/][ms])?)|[Ii]hr(e([*_:/]r|\(r\)|[ms][*_:/]r|r([*_:/][ms])?))?([*_:/][Ss]eine([*_:/]r|\(r\)|[ms][*_:/]r|r([*_:/][ms])?))?"
+            elif word[1].lower().startswith("ihr"):
+                pattern = re.escape(word[1])[:3] + "(" + re.escape(word[1][3:]) + ")?([*_:/][Ss]ein(" + re.escape(word[1][3:]) + ")?)?|[Ss]ein" + re.escape(word[1][3:]) + "[*_:/][Ii]hr" + re.escape(word[1][3:])
+            elif word[1] in ["die","Die"]:
+                pattern = "[Dd]ie([*_:/][Dd]e[rn]|[*_:/][rn])?|[Dd]e[rn][*_:/][Dd]ie"
+            elif word[1] in ["der","Der"]:
+                pattern = "([Dd]er([*_:/][Dd]e[ms]|[*_:/][ms])?|[Dd]e[ms][*_:/][Dd]er)"
+            elif re.match(re.compile(r"[mdks]?eine$", re.IGNORECASE),word[1]):
+                pattern = r"([mdks])?eine([*_:/][rn]|[*_:/]\1ein(er|en)?)?|([mdks])?ein(er|en)?[*_:/]\4eine|ein[*_:/]e"
+            elif re.match(re.compile(r"[mdks]?einer$", re.IGNORECASE),word[1]):
+                pattern = r"([mdks])?eine(r[*_:/][ms]|[ms][*_:/]r|r[*_:/]\1eine[ms]|r)|([mdks])?eine[ms][*_:/]\3einer"
+            elif word[1].endswith("e"):
+                pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))"
+            elif word[1].endswith("er"):
+                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))"
+            # elif re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1]):
+            #     match = re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1])
+            #     pattern = re.escape(word[1]) + "|" + match.group(1) + "In" + match.group(2)
             else:
                 pattern = re.escape(word[1])
             match = re.search("^" + pattern, input_text, re.IGNORECASE)

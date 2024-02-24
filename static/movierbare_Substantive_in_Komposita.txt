@@ -794,7 +794,7 @@ Entertainer
 %Same
 Staatsminister
 Zaren
-Inder
+%Inder
 Schirmherren
 Freiburger
 Hoffnungsträger
@@ -2411,7 +2411,7 @@ Sozialexperten
 Librettisten
 Prorektoren
 Industrieminister
-Recken
+%Recken
 Laienschauspieler
 Sticker
 Theaterdirektoren
@@ -4125,3 +4125,4 @@ Vlogger
 %Oberst
 Topologen
 Zähler
+Slawisten
