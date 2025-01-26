@@ -55,7 +55,7 @@ In order to run transfer the docker image to a server, you need to pack it into 
 On the server, you need to unpack the docker image and then run it:
 ```console
 ~$: docker load -i docker_image.tar
-~$: docker run -d -p 8080:80 -v /var/app/reports:/app/reports docker_image
+~$: docker run --restart always -d -p 8080:80 -v /var/app/reports:/app/reports docker_image
 ```
 
 
