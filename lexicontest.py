@@ -231,6 +231,12 @@ class Sentence_Test(unittest.TestCase):
         # "Ehemann"/"Ehefrau" werden zu "Ehepartnere" und nicht zu "Eheperson":
         test_sentences.append(("Ihr Ehemann kommt.", "Ens Ehepartnere kommt."))
         test_sentences.append(("Die Ehefrauen kommen.", "Die Ehepartnerne kommen."))
+        # Umlaut im Plural, aus maskuliner wie femininer Eingabeform:
+        test_sentences.append(("Die Ärzte sind da.", "Die Ärzterne sind da."))
+        test_sentences.append(("Die Ärztinnen sind da.", "Die Ärzterne sind da."))
+        test_sentences.append(("Ich gehe zu den Zahnärzten.", "Ich gehe zu den Zahnärzternen."))
+        # ... aber nicht bei Substantiven, deren maskuliner Plural keinen Umlaut hat:
+        test_sentences.append(("Die Bäuerinnen kommen.", "Die Bauerne kommen."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

@@ -92,6 +92,67 @@ class Lexicon:
         for line in f_sub_adj:
             SUBST_ADJ.append(line.rstrip())
 
+    UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
+
+    # Substantive, die im Inklusivum-Plural keinen Umlaut bekommen, obwohl eine der beiden
+    # traditionellen Pluralformen einen hat. Die Regel lautet: Umlaut nur dann, wenn der
+    # maskuline UND der feminine Plural umlauten. Der Abgleich erfolgt über das Ende der
+    # maskulinen Grundform, damit Komposita automatisch mit abgedeckt sind.
+    NO_PLURAL_UMLAUT = [
+        # Nur der feminine Plural lautet um; der maskuline ist schwach:
+        "bauer",     # die Bauern    / die Bäuerinnen
+        "graf",      # die Grafen    / die Gräfinnen
+        "sachse",    # die Sachsen   / die Sächsinnen
+        "schwabe",   # die Schwaben  / die Schwäbinnen
+        "westfale",  # die Westfalen / die Westfälinnen
+        "franke",    # die Franken   / die Fränkinnen
+        "franzose",  # die Franzosen / die Französinnen
+        "narr",      # die Narren    / die Närrinnen
+        # Nur der maskuline Plural lautet um:
+        "herzog",    # die Herzöge   / die Herzoginnen
+        "general",   # die Generäle  / die Generalinnen
+        "bass",      # die Bässe     / die Bassinnen
+        "fuchs",     # die Füchse    / die Fuchsinnen
+    ]
+
+    # Überträgt den Umlaut der Plural-Eingabeform auf die Inklusivum-Form, damit aus "Ärzte"
+    # oder "Ärztinnen" nicht "Arzterne", sondern "Ärzterne" wird. Der Umlaut wird aus der
+    # Eingabe abgelesen und nicht aus den Wortlisten, weil deren feminine Spalte stellenweise
+    # fehlerhaft ist ("Zahnarztin" statt "Zahnärztin"); Wörter, bei denen der Umlaut nichts
+    # über den Plural aussagt, stehen in NO_PLURAL_UMLAUT.
+    def apply_plural_umlaut(head_base, original, male_noun) -> str:
+        for exception in Lexicon.NO_PLURAL_UMLAUT:
+            if male_noun.lower().endswith(exception):
+                return head_base
+        plain = original.lower()
+        for vowel, umlaut in Lexicon.UMLAUTS.items():
+            plain = plain.replace(umlaut, vowel)
+        if plain == original.lower():
+            return head_base
+        # Nur umlauten, wenn Eingabe- und Inklusivum-Form denselben Stamm haben. Sonst würde
+        # aus "Ehemänner" über "Ehepartnere" ein "Ehepärtnerne". Die Prüfung schließt zugleich
+        # Stämme aus, die den Umlaut ohnehin schon tragen ("Schüler", "Händler").
+        stem = head_base.lower()
+        if stem.endswith("e"):
+            stem = stem[:-1]
+        if stem not in plain:
+            return head_base
+        # Der Umlaut steht auf dem letzten umlautfähigen Stammvokal ("Anwalte" -> "Anwälte",
+        # "Notarzte" -> "Notärzte"). "au" wird dabei zu "äu", "eu" hat keine Umlautform.
+        for i in range(len(head_base) - 1, -1, -1):
+            if head_base[i].lower() not in Lexicon.UMLAUTS:
+                continue
+            if head_base[i].lower() == "u" and i > 0:
+                if head_base[i-1].lower() == "a":
+                    i -= 1
+                elif head_base[i-1].lower() == "e":
+                    continue
+            umlaut = Lexicon.UMLAUTS[head_base[i].lower()]
+            if head_base[i].isupper():
+                umlaut = umlaut.upper()
+            return head_base[:i] + umlaut + head_base[i+1:]
+        return head_base
+
     # Neutralizes words where a neologism is the neutral form 
     def neutralize_neologism(feats, index) -> str:
         if feats[2] == "Pl":
@@ -834,6 +895,9 @@ class Lexicon:
 
                         
                         if feats[2] == "Pl":
+                            # Nur der Typ "standard" hat einen Eintrag in MALE_NOUNS.
+                            if component[-3] == "standard":
+                                head_base = Lexicon.apply_plural_umlaut(head_base, component[2], Lexicon.MALE_NOUNS[j])
                             if feats[1] ==  "Dat":
                                 if head_base.endswith("re"):
                                     head = head_base[:-1] + "nen"
