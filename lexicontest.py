@@ -224,6 +224,10 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Siehst Du diesen Herrn?", "Siehst Du diese Person?"))
         test_sentences.append(("Sie nennt sich »Lehrer«.", "En nennt sich »Lehrere«."))
         test_sentences.append(("Nimue hatte vor, bei einem renommierten Barden in die Lehre zu gehen.","Nimue hatte vor, bei einerm renommierten Bardere in die Lehre zu gehen."))
+        # "Junge"/"Mädchen" werden zu "junge Person" mit femininer Kongruenz:
+        test_sentences.append(("Der Junge spielt.", "Die junge Person spielt."))
+        test_sentences.append(("Ich sehe ein junges Mädchen.", "Ich sehe eine sehr junge Person."))
+        test_sentences.append(("Die Jungs spielen.", "Die jungen Leute spielen."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

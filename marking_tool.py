@@ -391,7 +391,7 @@ class Marking_Tool:
             print(feats)
             print(selected_components)
             print(self.nounlist)
-            self.parse_list[pos][-2], head_selected, person, kind = Lexicon.make_neutralized_noun(pos,selected_components,self.nounlist,feats,has_article)
+            self.parse_list[pos][-2], head_selected, person, kind, junge_person = Lexicon.make_neutralized_noun(pos,selected_components,self.nounlist,feats,has_article)
             print(self.parse_list[pos][-2])
             # The following line prevents articles of composite nouns with a person noun in non-final position from being neutralized.
             if not head_selected:
@@ -401,11 +401,17 @@ class Marking_Tool:
                 # In order not to neutralize the dependent words later, we set "plural" to True.
                 plural = True
                 feats = self.parse_list[pos][5].split("|")
-                if (feats[0] == "Masc" or feats[0] == "_") and feats[2] != "Pl":
+                # "Mädchen" ist neutrum, muss aber wie "Junge" feminine Kongruenz bekommen.
+                if (feats[0] == "Masc" or feats[0] == "_" or junge_person) and feats[2] != "Pl":
                     print("about to feminize dependent words", self.parse_list[pos][1], self.nounphrases.get(pos+1))
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
-                        self.feminize_word(child-1, has_article, article_pos)
+                        # Aus "junges Mädchen" wird "sehr junge Person", damit das Adjektiv
+                        # nicht doppelt erscheint ("junge junge Person").
+                        if junge_person and self.parse_list[child-1][3] == "ADJA" and self.parse_list[child-1][2] == "jung":
+                            self.parse_list[child-1][-2] = "sehr"
+                        else:
+                            self.feminize_word(child-1, has_article, article_pos)
             # If word ends in -sohn or -tochter, make dependent words neuter.
             if kind:
                 # In order not to neutralize the dependent words later, we set "plural" to True.

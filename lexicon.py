@@ -420,6 +420,20 @@ class Lexicon:
                     return True, prefix, list
 
 
+        # "Junge" und "Mädchen" werden zu "junge Person" (im Plural "junge Leute").
+        # Diese Prüfung steht vor den NEOLOGISMS, die dieselben Wörter sonst zu "Kid" machen würden.
+        junge_person_pattern = r"(mädchen|jung(e|en|s))$"
+        match = re.search(junge_person_pattern, noun.lower())
+        if match:
+            match_position = match.start()
+            prenoun = noun[:match_position]
+            if len(prenoun) != 1:
+                prefix, list = Lexicon.check_composite_noun(prenoun,False)
+                original = word_parse[1][match_position:]
+                capitalized = noun[match_position].isupper()
+                list.append([match_position, original, 0, "", "junge_person", capitalized])
+                return True, prefix, list
+
         for j, neologism in enumerate(Lexicon.NEOLOGISMS):
             neologism = "(" + neologism + ")$"
             match = re.search(neologism.lower(), noun.lower())
@@ -706,6 +720,7 @@ class Lexicon:
         head_selected = False
         person = False
         kind = False
+        junge_person = False
         noun = ""
         all_components = []
         for nouninfo in nounlist:
@@ -732,6 +747,22 @@ class Lexicon:
                             head = "Person"
                             head_selected = False
                             person = True
+                    elif component[-3] == "junge_person":
+                        # Im Plural "junge Leute", im Singular "junge Person" (mit femininer Kongruenz).
+                        if feats[2] == "Pl":
+                            adjective = "jungen" if has_article else "junge"
+                            head = adjective + (" Leuten" if feats[1] == "Dat" else " Leute")
+                        else:
+                            if feats[1] == "_":
+                                feats[1] = "Nom"
+                            if feats[1] == "Nom" or feats[1] == "Acc":
+                                adjective = "junge"
+                            else:
+                                adjective = "jungen" if has_article else "junger"
+                            head = adjective + " Person"
+                            head_selected = False
+                            person = True
+                            junge_person = True
                     elif component[-3] == "kind":
                         # if plural, head is "Kinder", otherwise "Kind"
                         if feats[2] == "Pl" and feats[1] != "Dat":
@@ -811,7 +842,7 @@ class Lexicon:
                     noun += component[3] + component[4]
             else:
                 noun += component[2] + component[4]
-        return noun, head_selected, person, kind
+        return noun, head_selected, person, kind, junge_person
     
     def __init__(self):
         pass
