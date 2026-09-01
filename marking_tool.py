@@ -1,5 +1,6 @@
 from lexicon import Lexicon
 from lexicon_fem import Lexicon_Fem
+from lexicon_neuter import Lexicon_Neuter
 import re
 
 # The Marking_tool class is a class that stores the parsing data for a sentence.
@@ -125,7 +126,7 @@ class Marking_Tool:
         word_parse = self.parse_list[pos]
         if word_parse[3] == "ADJA":
             # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
-            # flexion, the parent has to included when neutralizing the word.
+            # flexion, the parent has to be included when neutralizing the word.
             self.parse_list[pos][-2] = Lexicon_Fem.feminize_adjectives(word_parse, has_article)
         elif word_parse[4] == "PIDAT" and pos != article_pos-1:
             # This case covers morphologically adjectival determiners like the word "jeden" in "einem jeden Mann".
@@ -147,14 +148,45 @@ class Marking_Tool:
             else:
                 self.parse_list[pos][-2] = feminized_word
 
+    # This function makes the word that has been selected neuter.
+    def neuterize_word(self, pos:int, has_article:bool, article_pos:int):
+        word_parse = self.parse_list[pos]
+        if word_parse[3] == "ADJA":
+            # For adjectives, as the inklusivum differs from standard grammar regarding weak/strong
+            # flexion, the parent has to be included when neutralizing the word.
+            self.parse_list[pos][-2] = Lexicon_Neuter.neuterize_adjectives(word_parse, has_article)
+        elif word_parse[4] == "PIDAT" and pos != article_pos-1:
+            # This case covers morphologically adjectival determiners like the word "jeden" in "einem jeden Mann".
+            # Since the feature list of a PIDAT determiner has a differnt structure than that of an
+            # adjective, we need to first adapt its structure:
+            word_parse[5] = "POS|" + word_parse[5] + "|_|"
+            if word_parse[2] != "alle":
+                if word_parse[2].endswith("e"):
+                    word_parse[2] = word_parse[2][:-1]
+                self.parse_list[pos][-2] = Lexicon_Neuter.neuterize_adjectives(word_parse, has_article)
+        else:
+            neuter_word = Lexicon_Neuter.neuterize_word(self.parse_list[pos],has_article)
+            print("neuter_word:",neuter_word)
+            if neuter_word == "dem" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
+                self.parse_list[pos-1][-1] = ""
+                self.parse_list[pos][-2] = "m"
+            elif neuter_word == "dem" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
+                self.parse_list[pos-1][-1] = " "
+                self.parse_list[pos][-2] = "dem"
+            else:
+                self.parse_list[pos][-2] = neuter_word
+
     # This function determines the number of a noun for which no number has been recognized by ParZu.
     def determine_number(self, pos:int, feats:list):
         # Wenn das Substantiv auf "mann", "frau", "herr" oder "dame" endet, dann ist es im Singular.
-        if self.parse_list[pos][1].endswith("mann") or self.parse_list[pos][1].endswith("frau") or self.parse_list[pos][1].endswith("herr") or self.parse_list[pos][1].endswith("dame"):
+        if self.parse_list[pos][1].lower().endswith("mann") or self.parse_list[pos][1].lower().endswith("frau") or self.parse_list[pos][1].lower().endswith("herr") or self.parse_list[pos][1].lower().endswith("dame"):
            feats[2] = "Sg"
         # Wenn das Substantiv auf "ern" endet und nicht auf "bauern", dann ist es im Plural.
         elif self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1].lower().endswith("bauern"):
             feats[1] = "Dat"
+            feats[2] = "Pl"
+        # Wenn das substantiv auf "innen" endet, dann ist es im Plural.
+        elif self.parse_list[pos][1].endswith("innen"):
             feats[2] = "Pl"
         # Wenn das Substantiv ein Prädikativ eines singularischen Verbes ist, dann ist es im Singular:
         elif self.parse_list[pos][7] == "pred" and self.parse_list[int(self.parse_list[pos][6])-1][3] == "V" and self.singular_verb(int(self.parse_list[pos][6])-1):
@@ -162,7 +194,12 @@ class Marking_Tool:
         # Wenn bei "Ahnen"/"Vorfahren"/"Nachfahren" erkannt wird, dass es Nominativ ist, aber kein Numerus erkannt wird, dann ist es ein Plural.
         elif (self.parse_list[pos][1] == "Ahnen" or self.parse_list[pos][1] == "Vorfahren" or self.parse_list[pos][1] == "Nachfahren") and feats[1] == "Nom":
                 feats[2] = "Pl"
+        # Wenn das Substantiv das erste Wort in einer Doppelnennung mit einem anderen Substantiv steht, dann übernehme den Numerus des anderen Substantivs:
+        # (Überprüfe dabei auch, ob das Substantiv vorher als Teil einer Doppelnennung erkannt wurde, also der Output der Konjunktion auf "" gesetzt wurde.)
+        elif pos + 1 < len(self.parse_list) and (self.parse_list[pos+1][1] == "und" or self.parse_list[pos+1][1] == "oder" or self.parse_list[pos+1][1] == "/" or self.parse_list[pos+1][1] == "bzw." or self.parse_list[pos+1][1] == "bzw" or self.parse_list[pos+1][1] == "+") and self.parse_list[pos+1][-2] == "" and self.parse_list[pos+1][-1] == "" and self.parse_list[pos+2][3] == "N" and len(self.parse_list[pos+2][5].split("|")) >2 and self.parse_list[pos+2][5].split("|")[2] in ["Sg","Pl"]:
+            feats[2] = self.parse_list[pos+2][5].split("|")[2]
         else:
+            print("Else case of determining number for noun without number")
             article = False
             for child in self.nounphrases.get(pos+1):
                 if self.parse_list[child-1][3] == "ART":
@@ -192,6 +229,7 @@ class Marking_Tool:
             else:
                 # Wenn eine davorstehende Nominalphrase (oder eine Propositionalphrase mit einer Nominalphrase) im Syntaxbaum an "als" angebunden ist (manchmal erzeugt Parzu komische Anbindungen an danachstehende Nominalphrasen, sodass die Bedingung "davorstehende" wichtig ist),
                 # kopiere den Numerus und Kasus von dieser Nominalphrase auf das Substantiv ohne Numerus:
+                print("Else-else case of determining number for noun without number")
                 index_of_last_np_before_als = self.find_last_np_before_index(int(self.parse_list[pos][6]))
                 if index_of_last_np_before_als > 0:
                     otherfeats = self.parse_list[index_of_last_np_before_als-1][5].split("|")
@@ -207,16 +245,33 @@ class Marking_Tool:
                 else:
                     # Suche die erste Nominalphrase nach dem Substantiv ohne Numerus (da sich die als-Konstruktion jetzt höchstwahrscheinlich darauf bezieht) und
                     # kopiere den Numerus (aber nicht den Kasus) von dieser Nominalphrase auf das Substantiv ohne Numerus:
-                    index_of_first_np_after_als_construct = self.find_first_np_after_index(pos+1)
+                    # Zuerst muss der letzte Index der als-Konstruktion gefunden werden:
+                    indices_within_als_construction = [int(self.parse_list[pos][6])]
+                    print("indices_within_als_construction start:", indices_within_als_construction)
+                    previous_indices_within_als_construction = []
+                    while previous_indices_within_als_construction != indices_within_als_construction:
+                        previous_indices_within_als_construction = indices_within_als_construction.copy()
+                        for i in range(int(self.parse_list[pos][6])+1, len(self.parse_list)+1):
+                            if int(self.parse_list[i-1][6]) in indices_within_als_construction and i not in indices_within_als_construction:
+                                indices_within_als_construction.append(i)
+                                print("indices_within_als_construction append:", indices_within_als_construction)
+                    last_index_of_als_construction = max(indices_within_als_construction)
+                    index_of_first_np_after_als_construct = self.find_first_np_after_index(last_index_of_als_construction)
                     print("index_of_first_np_after_als_construct:", index_of_first_np_after_als_construct)
                     if index_of_first_np_after_als_construct > 0:
                         otherfeats = self.parse_list[index_of_first_np_after_als_construct-1][5].split("|")
                         if self.parse_list[index_of_first_np_after_als_construct-1][2] == "man":
                             feats[2] = "Sg"
                         elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "N":
-                            feats[2] = otherfeats[2]
+                            if otherfeats[2] in ["Sg","Pl"]:
+                                feats[2] = otherfeats[2]
+                            else:
+                                feats[2] = "Sg"
                         elif self.parse_list[index_of_first_np_after_als_construct-1][3] == "PRO":
-                            feats[2] = otherfeats[1]
+                            if otherfeats[1] in ["Sg","Pl"]:
+                                feats[2] = otherfeats[1]
+                            else:
+                                feats[2] = "Sg"
                     else:
                         feats[2] = "Sg"
 
@@ -276,6 +331,13 @@ class Marking_Tool:
                 if self.parse_list[child-1][3] == "ART":
                     has_article = True
                     break
+        # Determine whether the noun phrase has an article that is not from the ein-Paradigma:
+        has_non_ein_article = False
+        if pos+1 in self.nounphrases:
+            for child in self.nounphrases.get(pos+1):
+                if self.parse_list[child-1][3] == "ART" and self.parse_list[child-1][2] not in ["ein","eine","einer","einem","eines"]:
+                    has_non_ein_article = True
+                    break
 
         # Neutralize a possessive pronoun
         if self.parse_list[pos][4] == "PPOSAT" and self.parse_list[pos][6] == "0":
@@ -309,6 +371,7 @@ class Marking_Tool:
                 print(pos)
                 print(feats)
                 self.determine_number(pos,feats)
+                print("Determined number:", feats)
             if feats[1] == "_" and self.parse_list[pos][1].endswith("ern") and not self.parse_list[pos][1] == "Bauern":
                 feats[1] = "Dat"
             # Nach "zwischen", "unter", "vor", "hinter", "neben", "von", "bei" nicht erkanntes Kasus zu Dativ machen.
@@ -325,9 +388,10 @@ class Marking_Tool:
             print("about to neutralize noun")
             print(self.parse_list[pos])
             print(pos)
+            print(feats)
             print(selected_components)
             print(self.nounlist)
-            self.parse_list[pos][-2], head_selected, person = Lexicon.make_neutralized_noun(pos,selected_components,self.nounlist,feats,has_article)
+            self.parse_list[pos][-2], head_selected, person, kind = Lexicon.make_neutralized_noun(pos,selected_components,self.nounlist,feats,has_article)
             print(self.parse_list[pos][-2])
             # The following line prevents articles of composite nouns with a person noun in non-final position from being neutralized.
             if not head_selected:
@@ -342,6 +406,15 @@ class Marking_Tool:
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
                         self.feminize_word(child-1, has_article, article_pos)
+            # If word ends in -sohn or -tochter, make dependent words neuter.
+            if kind:
+                # In order not to neutralize the dependent words later, we set "plural" to True.
+                plural = True
+                if feats[2] != "Pl":
+                    print("about to make dependent words neuter", self.parse_list[pos][1], self.nounphrases.get(pos+1))
+                    for child in self.nounphrases.get(pos+1):
+                        article_pos = min(self.nounphrases.get(pos+1))
+                        self.neuterize_word(child-1, has_non_ein_article, article_pos)
         # Neutralized attributive pronoun
         elif self.parse_list[pos][1].lower() in ["dessen","deren"]:
             self.parse_list[pos][-2] = Lexicon.neutralize_attributive_pronoun(self.parse_list[pos])
@@ -513,6 +586,18 @@ class Marking_Tool:
                         noun_pair_positions.append(pos-1)
                         noun_pair_indices[pos-1] = 0
                         noun_pair_types[pos-1] = "person"
+                        noun_pair_prefixes[pos-1] = match.group(1).capitalize()
+                # Schaue, ob das Wort davor auf "sohn" oder "tochter" endet:
+                kind_pattern = r"(.*)(s(o|ö)hne?|t(o|ö)chter)$"
+                match = re.match(kind_pattern, self.parse_list[pos-1][2].lower())
+                if match:
+                    # Schaue, ob das Wort danach das entsprechende Wort ist:
+                    same_kind_pattern = match.group(1) + r"(s(o|ö)hne?|t(o|ö)chter)$"
+                    if re.match(same_kind_pattern, self.parse_list[pos+1][2].lower()):
+                        # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
+                        noun_pair_positions.append(pos-1)
+                        noun_pair_indices[pos-1] = 0
+                        noun_pair_types[pos-1] = "kind"
                         noun_pair_prefixes[pos-1] = match.group(1).capitalize()
                 # Schaue, ob das Wort davor auf "beamt..." endet:
                 beamt_pattern = r"(.*)(beamt(in(nen)?|e(r|n|m)?))$"
@@ -836,7 +921,7 @@ class Marking_Tool:
             elif word[1].endswith("e"):
                 pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))"
             elif word[1].endswith("er"):
-                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))"
+                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|[ .,!?;: ‑\n\r\t„“»«›‹'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“»«›‹'’\"(){}<>|\[\]+/*_]))"
             # elif re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1]):
             #     match = re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1])
             #     pattern = re.escape(word[1]) + "|" + match.group(1) + "In" + match.group(2)

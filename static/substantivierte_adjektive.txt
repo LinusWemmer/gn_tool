@@ -24,6 +24,10 @@ Neunte
 Zehnte
 Elfte
 Zwölfte
+Erstere
+Zweitere
+Letztere
+Letzte
 Studierende
 Mitarbeitende
 Demonstrierende

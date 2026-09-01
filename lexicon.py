@@ -54,10 +54,10 @@ class Lexicon:
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 
     # NEOLOGISMS lists singular forms as well as forms that occur in compounds
-    NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Tochter|Sohn(es)?", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?"]  
-    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Ota", "Urota", "Ururota", "Tonke", "Couse", "Spross", "Jungfere", "Kid", "Nefte"]
-    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Otas", "Urotas", "Ururotas", "Tonken", "Couserne", "Sprosse", "Jungferne", "Kids", "Neften"]
-    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Ota", "Urota", "Ururota", "Tonken", "Couserne", "Spross", "Jungferne", "Kid", "Neften"]
+    NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?", r"O(p|m)i", r"Uro(p|m)i", r"Ururo(p|m)i", r"(Mam|Pap)a", r"(Mam|Pap)i"]  
+    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonke", "Couse", "Jungfere", "Kid", "Nifte", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi"]
+    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Owas", "Urowas", "Ururowas", "Tonken", "Cousen", "Jungferne", "Kids", "Niften", "Owis", "Urowis", "Ururowis", "Sasas", "Sasis"]
+    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi"]
 
     # The next section generates List of Male/Female role nouns an their corresponding neutral forms
     # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
@@ -96,15 +96,13 @@ class Lexicon:
     def neutralize_neologism(feats, index) -> str:
         if feats[2] == "Pl":
             noun = Lexicon.NEOLOGISMS_PLURAL[index]
-            if index in [0,5,6] and feats[1] == "Dat":
+            if index in [0,7] and feats[1] == "Dat":
                 return noun + "n"
             else:
                 return noun
         else:
             noun = Lexicon.NEOLOGISMS_NEUTRAL[index]
-            if feats[1] == ("Gen") and index == 7:
-                return noun + "es"
-            elif feats[1] == ("Gen"):
+            if feats[1] == ("Gen"):
                 return noun + "s"
             else:
                 return noun
@@ -386,8 +384,8 @@ class Lexicon:
     # of noun ("standard" for nouns from Lexicon.MALE_NOUNS or Lexicon.FEMALE_NOUNS, "romanism" for nouns from
     # Lexicon.ROMAN_NOUNS, "irregular" for nouns from Lexicon.IRREGULAR_NOUNS, "neologism" for nouns from
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
-    # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige"), "person" for "Mann", "Frau",
-    # "Herr", "Dame", and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
+    # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
+    # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
     def check_noun(word_parse,feats,has_article,has_possessive):
         print("check_noun")
         print("word_parse:", word_parse)
@@ -441,7 +439,7 @@ class Lexicon:
             # Line 967 is the line number of "Ehepartnere" in Lexicon.NEUTRAL_NOUNS
             return True, "", [[0, noun, 967, "", "standard", True]]
 
-        person_pattern = r"((m(a|ä)nn(er)?)|(frau(en)?)|herr|dame)$"
+        person_pattern = r"((m(a|ä)nn(er)?)|(frau(en)?)|herr(e?n)?|damen?)$"
         match = re.search(person_pattern, noun.lower())
         if match:
             match_position = match.start()
@@ -451,6 +449,18 @@ class Lexicon:
                 original = word_parse[1][match_position:]
                 capitalized = noun[match_position].isupper()
                 list.append([match_position, original, 0, "", "person", capitalized])
+                return True, prefix, list
+            
+        kind_pattern = r"(s(o|ö)hn(e|en)?|t(o|ö)chtern?)$"
+        match = re.search(kind_pattern, noun.lower())
+        if match:
+            match_position = match.start()
+            prenoun = noun[:match_position]
+            if len(prenoun) != 1:
+                prefix, list = Lexicon.check_composite_noun(prenoun,False)
+                original = word_parse[1][match_position:]
+                capitalized = noun[match_position].isupper()
+                list.append([match_position, original, 0, "", "kind", capitalized])
                 return True, prefix, list
             
         beamt_pattern = r"(beamt(in(nen)?|e(r|n|m)?))$"
@@ -557,7 +567,7 @@ class Lexicon:
         for j in range(len(noun), -1, -1):
             if (is_head and j <= len(noun)-2) or (not is_head and (j == len(noun) or j <= len(noun)-3)):
                 for i, line in enumerate(Lexicon.COMPOSITE_NOUNS):
-                    if j-len(line) != 1 and noun[:j].lower().endswith(line.lower()) and noun[j:] != "in" and not (noun[j:].lower().startswith("ch") and line.endswith("s")) and not (noun[:j-len(line)].endswith("c") and line.lower().startswith("h")) and not noun[j:j+8] == "lichkeit" and not noun[j:j+3] == "iat" and not noun[j:j+3] == "ium" and not noun[j:j+3] == "ien" and not (noun[j:j+3] == "ung" and (line.lower().endswith("arzt") or line.lower().endswith("bürger") or line.lower().endswith("partner") or line.lower().endswith("inder") or line.lower().endswith("könig"))) and not (noun[:j-len(line)].endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
+                    if j-len(line) != 1 and noun[:j].lower().endswith(line.lower()) and noun[j:] != "in" and not (noun[j:].lower().startswith("ch") and line.endswith("s")) and not (noun[:j-len(line)].endswith("c") and line.lower().startswith("h")) and not noun[j:j+8] == "lichkeit" and not noun[j:j+3] == "iat" and not noun[j:j+3] == "ium" and not noun[j:j+3] == "ien" and not noun[j:j+7] == "laubnis" and not (noun[j:j+3] == "ung" and (line.lower().endswith("arzt") or line.lower().endswith("bürger") or line.lower().endswith("partner") or line.lower().endswith("inder") or line.lower().endswith("könig"))) and not (noun[:j-len(line)].endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
                         if Lexicon.NEUTRAL_NOUNS[i].endswith("re"):
                             neutral_core = Lexicon.NEUTRAL_NOUNS[i][:-1] + "ne"
                         else:
@@ -628,6 +638,19 @@ class Lexicon:
                         list.append([match_position, noun[match_position:j], neutral_core, later_part, "person", False])
                         return prefix, list
                 
+                kind_pattern = r"(töchter|söhne)$"
+                match = re.search(kind_pattern, noun[:j].lower())
+                if match:
+                    match_position = match.start()
+                    if match_position != 1:
+                        later_part = noun[j:]
+                        neutral_core = "Kinder"
+                        if not noun[match_position].isupper():
+                            neutral_core = neutral_core.lower()
+                        prefix, list = Lexicon.check_composite_noun(noun[:match_position],False)
+                        list.append([match_position, noun[match_position:j], neutral_core, later_part, "kind", False])
+                        return prefix, list
+                
                 beamt_pattern = r"beamt(en|innen)$"
                 match = re.search(beamt_pattern, noun[:j].lower())
                 if match:
@@ -678,9 +701,11 @@ class Lexicon:
     # This creates a neutralized noun based on which components were selected. Apart from the noun it returns two Booleans:
     # - head_selected indicates whether the head of the noun phrase was selected and changed into inklusivum.
     # - person indicates whether the head was changed into "Person", so that dependent modifiers need to be made feminine.
+    # - kind indicates whether the head was changed into "Kind", so that dependent modifiers need to be made neuter.
     def make_neutralized_noun(pos,selected_components,nounlist,feats,has_article):
         head_selected = False
         person = False
+        kind = False
         noun = ""
         all_components = []
         for nouninfo in nounlist:
@@ -707,6 +732,20 @@ class Lexicon:
                             head = "Person"
                             head_selected = False
                             person = True
+                    elif component[-3] == "kind":
+                        # if plural, head is "Kinder", otherwise "Kind"
+                        if feats[2] == "Pl" and feats[1] != "Dat":
+                            head = "Kinder"
+                        elif feats[2] == "Pl" and feats[1] == "Dat":
+                            head = "Kindern"
+                        elif feats[2] == "Sg" and feats[1] == "Gen":
+                            head = "Kindes"
+                            head_selected = False
+                            kind = True
+                        else:
+                            head = "Kind"
+                            head_selected = False
+                            kind = True
                     elif component[-3] == "beamtey":
                         if feats[2] == "Pl":
                             head = "Beamternen" if feats[1] == "Dat" else "Beamterne"
@@ -772,7 +811,7 @@ class Lexicon:
                     noun += component[3] + component[4]
             else:
                 noun += component[2] + component[4]
-        return noun, head_selected, person
+        return noun, head_selected, person, kind
     
     def __init__(self):
         pass

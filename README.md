@@ -47,7 +47,7 @@ To then run the image in a container, you can call:
 ```
 You will then find the app running on http://localhost:80.
 
-In order to run transfer the docker image to a server, you need to pack it into a tar file and then copy to the server using scp:
+In order to transfer the docker image to a server, you need to pack it into a tar file and then copy to the server using scp:
 ```console
 ~$: sudo docker save -o docker_image.tar docker_image
 ~$: sudo scp -i ~/.ssh/id_rsa docker_image.tar root@<server-ip>:/root/ 

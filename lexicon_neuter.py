@@ -1,105 +1,104 @@
 import re
 
-class Lexicon_Fem:
-    # This class holds all the necessary information to construct the feminine (for words that modify "Person")
-    PRONOUNS = {"Nom": "sie",
-                "Gen": "ihr",
-                "Dat": "ihr",
-                "Acc": "sie"}
+class Lexicon_Neuter:
+    # This class holds all the necessary information to construct the neuter (for words that modify "Kind")
+    PRONOUNS = {"Nom": "es",
+                "Gen": "seines",
+                "Dat": "ihm",
+                "Acc": "es"}
     
-    ARTIKEL_DER = {"Nom": "die",
-                "Gen": "der",
-                "Dat": "der",
-                "Acc": "die"}
+    ARTIKEL_DER = {"Nom": "das",
+                "Gen": "des",
+                "Dat": "dem",
+                "Acc": "das"}
     
-    ARTIKEL_UNSER = {"Nom": "unsere",
-                "Gen": "unserer",
-                "Dat": "unserer",
-                "Acc": "unsere"}
+    ARTIKEL_UNSER = {"Nom": "unser",
+                "Gen": "unseres",
+                "Dat": "unserem",
+                "Acc": "unser"}
     
-    ARTIKEL_EUER = {"Nom": "eure",
-                "Gen": "eurer",
-                "Dat": "eurer",
-                "Acc": "eure"}
+    ARTIKEL_EUER = {"Nom": "euer",
+                "Gen": "eures",
+                "Dat": "eurem",
+                "Acc": "euer"}
     
-    # ein einers einerm ein
-    ARTIKEL_EIN = {"Nom": "e",
-                "Gen": "er",
-                "Dat": "er",
-                "Acc": "e"}
+    # ein eines einem ein
+    ARTIKEL_EIN = {"Nom": "",
+                "Gen": "es",
+                "Dat": "em",
+                "Acc": ""}
     
-    # jedey jeders jederm jedey
-    ARTIKEL_JEDER = {"Nom": "e",
-                "Gen": "er",
-                "Dat": "er",
-                "Acc": "e"} 
+    # jedey jedes jedem jedey
+    ARTIKEL_JEDER = {"Nom": "es",
+                "Gen": "es",
+                "Dat": "em",
+                "Acc": "es"}
     
     JEDER_PARADIGM = ["jedwed", "jed", "jen", "dies", "welch", "solch", "manch"]
 
     EIN_PARADIGM = ["ein", "kein", "mein", "dein", "sein", "ihr", "ens"]
-    
-        
-    def feminize_possesive_pronoun(word_parse) -> str:
+
+    def neuterize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
         pronoun = ""
         if feats[1] == "Acc":
-            if feats[0] == "Fem":
-                pronoun = "ense"
+            if feats[0] == "Neut":
+                pronoun = "ens"
             elif feats[0] == "Masc":
                 pronoun = "ensen"
             else:
-                pronoun = "ens"
+                pronoun = "ense"
         if feats[1] == "Nom":
-            pronoun = "ense" if feats[0] == "Fem" else "ens"
+            pronoun = "ens" if feats[0] == "Neut" else "ense"
         if feats[1] == "Dat":
-            pronoun = "enser" if feats[0] == "Fem" else "ensem"
+            pronoun = "ensem" if feats[0] == "Neut" else "enser"
         if feats[1] == "Gen":
-            pronoun = "enser" if feats[0] == "Fem" else "ensem"
+            pronoun = "ensem" if feats[0] == "Neut" else "enser"
         return pronoun.capitalize() if word_parse[1][0].isupper() else pronoun
     
-    def feminize_attributing_relative_pronoun(word_parse) -> str:
-        article = "deren"
+    def neuterize_attributing_relative_pronoun(word_parse) -> str:
+        article = "dessen"
         return article.capitalize() if word_parse[1][0].isupper() else article
     
-    def feminize_article(word_parse) -> str:
+    def neuterize_article(word_parse) -> str:
         feats = word_parse[5].split("|")
         # Case Definitive Articles
         if feats[0] == "Def":
             if feats[2] == "_":
                 feats[2] = "Nom"
-            article =  Lexicon_Fem.ARTIKEL_DER.get(feats[2])
+            article = Lexicon_Neuter.ARTIKEL_DER.get(feats[2])
             return article.capitalize() if word_parse[1][0].isupper() else article
-        # Case Indifinitive Artikels, only ein
+        # Case Indefinitive Articles, only ein
         elif feats[0] == "Indef":
-            article = "ein" +  Lexicon_Fem.ARTIKEL_EIN.get(feats[2])
+            article = "ein" + Lexicon_Neuter.ARTIKEL_EIN.get(feats[2])
             return article.capitalize() if word_parse[1][0].isupper() else article
         else:
             word = word_parse[1][0].lower() + word_parse[1][1:] 
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
-            for start in Lexicon_Fem.JEDER_PARADIGM:
+            for start in Lexicon_Neuter.JEDER_PARADIGM:
                 if word.startswith(start):
                     #incase no grammatical case is found, treat as nominative, even if wrong.
                     if feats[1] == "_":
                         feats[1] = "Nom"
-                    article = start + Lexicon_Fem.ARTIKEL_JEDER.get(feats[1])
+                    article = start + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[1])
                     return article.capitalize() if word_parse[1][0].isupper() else article
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
-            for start in Lexicon_Fem.EIN_PARADIGM:
+            for start in Lexicon_Neuter.EIN_PARADIGM:
                 if word.startswith(start):
-                    article = start + Lexicon_Fem.ARTIKEL_EIN.get(feats[1])
+                    article = start + Lexicon_Neuter.ARTIKEL_EIN.get(feats[1])
                     return article.capitalize() if word_parse[1][0].isupper() else article
             if re.match(r"(U|u)(nser|nsre|nsere)", word):
-                article = Lexicon_Fem.ARTIKEL_UNSER.get(feats[1])
+                article = Lexicon_Neuter.ARTIKEL_UNSER.get(feats[1])
                 return article.capitalize() if word_parse[1][0].isupper() else article
             elif re.match(r"(E|e)(uer|ure)", word):
-                article = Lexicon_Fem.ARTIKEL_EUER.get(feats[1])
+                article = Lexicon_Neuter.ARTIKEL_EUER.get(feats[1])
                 return article.capitalize() if word_parse[1][0].isupper() else article
-            # Some articles don't have to be feminized, just return them.
+            # Some articles don't have to be neuterized, just return them.
             else:
                 return word_parse[1]
             raise Exception(f"The Article seems to be not convertable:{word_parse[1]}")
 
-    def feminize_adjectives(word_parse, has_article) -> str:
+    def neuterize_adjectives(word_parse, has_article) -> str:
         feats = word_parse[5].split("|")
         # This is a weird hack to make sure "anders" works correctly
         if word_parse[2].startswith("ander"):
@@ -129,15 +128,15 @@ class Lexicon_Fem:
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
             feats[2] = "Nom"
-        adjective =  adjective + Lexicon_Fem.ARTIKEL_JEDER.get(feats[2])
+        adjective =  adjective + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[2])
         return adjective.capitalize() if word_parse[1][0].isupper() else adjective
     
     # Neutralize possesive jemand, this often doesn't get parsed correctly
-    def feminize_pos_jemand(word_parse) -> str:
+    def neuterize_pos_jemand(word_parse) -> str:
         word = "jemanders"
         return word.capitalize() if word_parse[1][0].isupper() else word
     
-    def feminize_pronoun(word_parse,has_article) -> str:
+    def neuterize_pronoun(word_parse,has_article) -> str:
         feats = word_parse[5].split("|")
         is_capitalized = word_parse[1][0].isupper()
         if feats[0] == "Neut":
@@ -147,7 +146,7 @@ class Lexicon_Fem:
                 feats[3] = "Nom"
             pronoun = word_parse[1]
             if feats[0] == "3":
-                pronoun = Lexicon_Fem.PRONOUNS.get(feats[3])
+                pronoun = Lexicon_Neuter.PRONOUNS.get(feats[3])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PIS":
             pronoun = word_parse[1]
@@ -169,21 +168,21 @@ class Lexicon_Fem:
                         adjective = adjective + "n"
                         return pronoun.capitalize() if is_capitalized else pronoun
                 else:
-                    pronoun = word_parse[2][:-1] + Lexicon_Fem.ARTIKEL_JEDER.get(feats[1])
+                    pronoun = word_parse[2][:-1] + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS" and word_parse[1].startswith("d"):
             if feats[1] == "_":
                 feats[1] = "Nom"
-            pronoun = Lexicon_Fem.ARTIKEL_DER.get(feats[1])
+            pronoun = Lexicon_Neuter.ARTIKEL_DER.get(feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS" or word_parse[4] == "PDS":
             if feats[1] == "_":
                 feats[1] = "Nom"
-            for start in Lexicon_Fem.JEDER_PARADIGM:
+            for start in Lexicon_Neuter.JEDER_PARADIGM:
                 if re.match(start + "e.?$", word_parse[2]):
-                    pronoun = word_parse[2][:-1] + Lexicon_Fem.ARTIKEL_JEDER.get(feats[1]) 
+                    pronoun = word_parse[2][:-1] + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[1]) 
                     return pronoun.capitalize() if is_capitalized else pronoun
-            pronoun = Lexicon_Fem.ARTIKEL_DER.get(feats[1])
+            pronoun = Lexicon_Neuter.ARTIKEL_DER.get(feats[1])
             if re.match(r"d..jenige$", word_parse[2]):
                 pronoun += "jenige"
                 if feats[1] == "Gen" or feats[1] == "Dat":
@@ -194,16 +193,16 @@ class Lexicon_Fem:
                     pronoun += "n"
             return pronoun.capitalize() if is_capitalized else pronoun
 
-    def feminize_word(word_parse,has_article) -> str:
-        # For Plural Cases, it doesn't have to be changed.
+    def neuterize_word(word_parse,has_article) -> str:
+        # For Plural Cases, it doesn't have to be changed. 
         if "Pl" in word_parse[5]:
             return word_parse[1]
-        # feminize Articles
+        # neuterize Articles
         elif word_parse[3] == "ART":
-            return Lexicon_Fem.feminize_article(word_parse)
-        # feminize Pronouns
+            return Lexicon_Neuter.neuterize_article(word_parse)
+        # neuterize Pronouns
         elif word_parse[3] == "PRO":
-            return Lexicon_Fem.feminize_pronoun(word_parse,has_article)
+            return Lexicon_Neuter.neuterize_pronoun(word_parse,has_article)
         else:
             return word_parse[-2]
     
