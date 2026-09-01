@@ -608,6 +608,11 @@ class Lexicon:
                 subadj = "(" + subadj + ")(r|n)?$"
                 match = re.search(subadj.lower(), noun.lower())
                 if match:
+                    # Im Genitiv und Dativ trägt ein substantiviertes Adjektiv immer eine Endung
+                    # ("der Jugendlichen", "meiner Verlobten"). Steht dort die blosse Grundform,
+                    # handelt es sich um ein gewöhnliches Substantiv ("aus Liebe").
+                    if len(feats) > 1 and feats[1] in ("Gen", "Dat") and word_parse[1].lower().endswith(match.group(1).lower()):
+                        continue
                     match_position = match.start()
                     prenoun = noun[:match_position]
                     if len(prenoun) != 1 and not (prenoun.endswith("c") and noun[match_position:].lower().startswith("h")):

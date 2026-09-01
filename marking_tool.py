@@ -22,6 +22,29 @@ class Marking_Tool:
         self.nounlist = nounlist
         self.find_nounphrases()
 
+    # ParZu lässt den Kasus bei substantivierten Adjektiven häufig offen ("meiner Lieben" liefert
+    # "_|_|_"). Die Dependenzrelation des Kopfes verrät ihn aber.
+    DEPREL_CASES = {"subj": "Nom", "pred": "Nom", "obja": "Acc", "objd": "Dat", "objg": "Gen", "gmod": "Gen"}
+
+    # Der Kasus steht je nach Wortart an unterschiedlicher Stelle der Merkmalsliste:
+    # "Fem|Dat|Sg" und "_|_|_" haben ihn an Position 1, "Def|Fem|Dat|Sg" und
+    # "Pos|Neut|Acc|Sg|St|" an Position 2.
+    def case_index(self, pos:int) -> int:
+        return 1 if len(self.parse_list[pos][5].split("|")) == 3 else 2
+
+    def get_case(self, pos:int) -> str:
+        feats = self.parse_list[pos][5].split("|")
+        index = self.case_index(pos)
+        return feats[index] if len(feats) > index else "_"
+
+    # Trägt einen Kasus nach, sofern die Zeile noch keinen hat.
+    def set_missing_case(self, pos:int, case:str):
+        feats = self.parse_list[pos][5].split("|")
+        index = self.case_index(pos)
+        if len(feats) > index and feats[index] == "_":
+            feats[index] = case
+            self.parse_list[pos][5] = "|".join(feats)
+
     def serialize(self):
         return {"parse_list": self.parse_list,
                 "nounphrases": self.nounphrases}
@@ -434,8 +457,18 @@ class Marking_Tool:
         # Neutralize the remaining words in the nounphrase:
         if not plural or self.parse_list[pos][2].endswith("jenige"):
             print("about to neutralize dependent words", self.parse_list[pos][1], self.nounphrases.get(pos+1))
+            # Fehlt dem Kopf der Kasus, wird er aus seiner Dependenzrelation ergänzt und an die
+            # abhängigen Wörter weitergereicht; sonst würde "meiner Lieben" als Nominativ gelesen
+            # und zu "mein Lieben" statt "meinerm Lieben".
+            if self.get_case(pos) == "_":
+                inferred_case = Marking_Tool.DEPREL_CASES.get(self.parse_list[pos][7])
+                if inferred_case:
+                    self.set_missing_case(pos, inferred_case)
+            case = self.get_case(pos)
             for child in self.nounphrases.get(pos+1):
                 article_pos = min(self.nounphrases.get(pos+1))
+                if case != "_":
+                    self.set_missing_case(child-1, case)
                 self.neutralize_word(child-1, has_article, article_pos)
 
 
@@ -762,8 +795,11 @@ class Marking_Tool:
                     nouns += input_form
 
                 # Case: Noun
-                # Here we also need to consider capitalized adjectives that do not depend on a noun:
-                elif word_parse[3] == "N" or (word_parse[3] == "ADJA" and word_parse[1][0].isupper() and not self.parse_list[int(word_parse[6])-1][3] == "N"):
+                # Here we also need to consider capitalized adjectives that do not depend on a noun.
+                # Hängt ein grossgeschriebenes Adjektiv als Genitivattribut ("gmod") an einem Nomen,
+                # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
+                # Adjektiv trägt dort "attr".
+                elif word_parse[3] == "N" or (word_parse[3] == "ADJA" and word_parse[1][0].isupper() and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
                     self.find_nounphrase(word_parse)
                     feats = self.parse_list[pos][5].split("|")
                     if len(feats) == 1:

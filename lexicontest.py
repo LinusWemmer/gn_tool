@@ -239,6 +239,14 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Bäuerinnen kommen.", "Die Bauerne kommen."))
         # Abkürzungen sind keine Personenbezeichnungen:
         test_sentences.append(("Die DDR war ein Staat.", "Die DDR war ein Staat."))
+        # "Einzelne" wird als substantiviertes Adjektiv erkannt:
+        test_sentences.append(("Der Einzelne kann viel bewirken.", "De Einzelne kann viel bewirken."))
+        # Im Dativ ohne Endung ist "Liebe" das Abstraktum, nicht das substantivierte Adjektiv:
+        test_sentences.append(("Er tat es aus Liebe.", "En tat es aus Liebe."))
+        # ... mit Endung dagegen schon; der Kasus stammt dann aus der Dependenzrelation:
+        test_sentences.append(("Ich gebe es meiner Lieben.", "Ich gebe es meinerm Lieben."))
+        # ... auch als Genitivattribut eines Nomens:
+        test_sentences.append(("Das Buch meiner Lieben ist da.", "Das Buch meiners Lieben ist da."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])
