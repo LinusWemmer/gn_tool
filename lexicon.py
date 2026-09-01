@@ -636,7 +636,8 @@ class Lexicon:
                 neutral_base = noun
             return True, "", [[0, noun, neutral_base, "", "substantivized adjective", False]]
         
-        if word_parse[4] == "NE" and has_article:
+        # Abkürzungen wie "DDR" oder "USA" bezeichnen keine Personen und bleiben unmarkiert.
+        if word_parse[4] == "NE" and has_article and not (len(noun) > 1 and noun.isupper()):
             capitalized = noun[0].isupper()
             return True, "", [[0, noun, noun, "", "proper noun", capitalized]]
 

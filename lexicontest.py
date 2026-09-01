@@ -237,6 +237,8 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich gehe zu den Zahnärzten.", "Ich gehe zu den Zahnärzternen."))
         # ... aber nicht bei Substantiven, deren maskuliner Plural keinen Umlaut hat:
         test_sentences.append(("Die Bäuerinnen kommen.", "Die Bauerne kommen."))
+        # Abkürzungen sind keine Personenbezeichnungen:
+        test_sentences.append(("Die DDR war ein Staat.", "Die DDR war ein Staat."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])
