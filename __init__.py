@@ -63,6 +63,7 @@ def search_lonely_adjectives(parse: list, input_text: str):
         glauben = []
         for sentence_number, parse_list in enumerate(parse):
             marking_tool = Marking_Tool(parse_list,{})
+            print ("Input text before finding realizations:", input_text)
             input_text = Marking_Tool.find_realizations(marking_tool,input_text)
             unter = False
             alles = False
@@ -303,7 +304,7 @@ def handle_error(error):
     session["error"] = error_info
     return render_template("report.html", dataToRender= f"""Eingegebener Text: <br/>
         <textarea id="textInput" readonly>{input_text}</textarea><br/><br/>
-        Ein unerwartetes Problem ist aufgetreten. Du kannst uns helfen, dieses Problem zu beheben, indem Du auf „Problem melden“ klickst. In diesem Fall wird der von Dir eingegebene Text zusammen mit einer automatisch erzeugten Fehlerbeschreibung an die Entwicklerne des De-e-Automaten gesendet.<br/><br/>
+        Ein unerwartetes Problem ist aufgetreten. Du kannst uns helfen, dieses Problem zu beheben, indem Du auf „Problem melden“ klickst. In diesem Fall wird der von Dir eingegebene Text zusammen mit einer automatisch erzeugten Fehlerbeschreibung an die Entwicklerne des Inklusivomaten gesendet.<br/><br/>
         <form action="/error_report_sent" method="POST">
         <button type="submit" class="grey-button">Problem melden</button>
         </form>
@@ -349,6 +350,7 @@ def parse():
             print(parse)
             for parse_list in parse:
                 marking_tool = Marking_Tool(parse_list,{},[])
+                print("Modified text before finding realizations:", modified_text)
                 modified_text = Marking_Tool.find_realizations(marking_tool,modified_text)
             marked_nouns = mark_nouns(parse,capitalized_words, glauben)
 
@@ -360,20 +362,20 @@ def parse():
             # sie
             if parse[0][0][1] == "sie":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „sie“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob sich das Wort „sie“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
             # Sie
             elif parse[0][0][1] == "Sie":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „Sie“ als höfliche Alternative zu „du“ verwendet wird, sich auf eine Gruppe von Personen bezieht oder auf eine einzelne Person. In den ersten beiden Fällen ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „Sie“ als höfliche Alternative zu „du“ verwendet wird, sich auf eine Gruppe von Personen bezieht oder auf eine einzelne Person. In den ersten beiden Fällen ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
             # ihr
             elif parse[0][0][1] == "ihr":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. Mit Bezug auf eine einzelne Person kann das Wort „ihr“ entweder eine besitzanzeigende Funktion haben oder die Dativ-Form von „sie“ sein. Im ersten Fall lautet die geschlechtsneutrale Form „ens“, im zweiten Fall „em“. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. Mit Bezug auf eine einzelne Person kann das Wort „ihr“ entweder eine besitzanzeigende Funktion haben oder die Dativ-Form von „sie“ sein. Im ersten Fall lautet die geschlechtsneutrale Form „ens“, im zweiten Fall „em“. "
             # Ihr
             elif parse[0][0][1] == "ihr" or parse[0][0][1] == "Ihr" or parse[0][0][1] == "ihrem" or parse[0][0][1] == "Ihrem" or parse[0][0][1] == "ihres" or parse[0][0][1] == "Ihres" or parse[0][0][1] == "ihrs" or parse[0][0][1] == "Ihrs":
                 warning = True
                 ending = parse[0][0][1][3:]
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ als höfliche Alternative zu „dein" + ending + "“ verwendet wird, Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es als höfliche Alternative zu „dein" + ending + "“ verwendet wird oder Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ als höfliche Alternative zu „dein" + ending + "“ verwendet wird, Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es als höfliche Alternative zu „dein" + ending + "“ verwendet wird oder Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
             # ihre, ihrem, ihr(e)s (since this has two ambiguities, we only give a generic warning for single-word inputs)
             elif parse[0][0][1] == "ihre" or parse[0][0][1] == "Ihre" or parse[0][0][1] == "ihrem" or parse[0][0][1] == "ihres" or parse[0][0][1] == "ihrs":
                 warning = True
@@ -381,31 +383,31 @@ def parse():
             # sein
             elif parse[0][0][1] == "sein":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „sein“ mit besitzanzeigender Funktion oder als Verb verwendet wird. Als Verb sollte es im De-e-System natürlich nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „sein“ mit besitzanzeigender Funktion oder als Verb verwendet wird. Als Verb sollte es im Inklusivum natürlich nicht geändert werden. "
             # die
             elif parse[0][0][1] == "die" or parse[0][0][1] == "Die":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
             # der
             elif parse[0][0][1] == "der" or parse[0][0][1] == "Der":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die maskuline Nominativ-Form oder die feminine Genitiv-Form des bestimmten Artikels ist, sodass nicht klar ist, ob im Inklusivum die Nominativ-Form „de“ oder die Genitiv-Form „ders“ verwendet werden sollte. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die maskuline Nominativ-Form oder die feminine Genitiv-Form des bestimmten Artikels ist, sodass nicht klar ist, ob im Inklusivum die Nominativ-Form „de“ oder die Genitiv-Form „ders“ verwendet werden sollte. "
             # den
             elif parse[0][0][1] == "den" or parse[0][0][1] == "Den":
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die maskuline Akkusativ-Form oder die Dativ-Plural-Form des bestimmten Artikels ist. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die maskuline Akkusativ-Form oder die Dativ-Plural-Form des bestimmten Artikels ist. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
             # meine/keine usw.
             elif (parse[0][0][4] == "PIS" or parse[0][0][4] == "PPOSAT") and parse[0][0][1].endswith("e") and parse[0][0][5].endswith("_") and marked_nouns.find("checkbox-container") == marked_nouns.rfind("checkbox-container"): # The last condition ensures that "seine" and "ihre" are not covered by this warning, as they contain two ambiguities.
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im De-e-System nicht geändert werden. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im zweiten Fall ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
             # Substantiv auf "-er", dass kein Kompositum aus mehreren movierbaren Susbtantiven ist (marked_nouns contains at most one "checkbox-container")
             elif marked_nouns.find("checkbox-container") == marked_nouns.rfind("checkbox-container") and parse[0][0][4] == "NN" and parse[0][0][1].endswith("er") and parse[0][0][5].endswith("_"):
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im ersten Fall lautet die geschlechtsneutrale Form „" + parse[0][0][1] + "e“, im zweiten Fall „" + parse[0][0][1] + "ne“. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im ersten Fall lautet die geschlechtsneutrale Form „" + parse[0][0][1] + "e“, im zweiten Fall „" + parse[0][0][1] + "ne“. "
             # Substantiv auf "-er", dass ein Kompositum aus mehreren movierbaren Susbtantiven ist
             elif parse[0][0][4] == "NN" and parse[0][0][1].endswith("er") and parse[0][0][5].endswith("_"):
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im ersten Fall endet die geschlechtsneutrale Form auf „‑ere“, im zweiten Fall auf „‑erne“. "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob sich das Wort „" + parse[0][0][1] + "“ auf eine einzelne Person bezieht oder auf eine Gruppe von Personen. Im ersten Fall endet die geschlechtsneutrale Form auf „‑ere“, im zweiten Fall auf „‑erne“. "
             # Substantiv wie "Studenten" (declined form is base form with additional "en")
             elif parse[0][0][4] == "NN" and (parse[0][0][1] == parse[0][0][2] + "en" or parse[0][0][1] == "Bauern") and parse[0][0][5].endswith("_"):
                 warning = True
@@ -413,15 +415,15 @@ def parse():
                     plural_form = "Bauerne"
                 else:
                     plural_form = parse[0][0][2] + "erne"
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die Pluralform oder eine nicht-nominative Singularform von „" + parse[0][0][2] + "“ ist. Im ersten Fall lautet die geschlechtsneutrale Form „" + plural_form + "“ (bzw. im Dativ „" + plural_form + "n“), im zweiten Fall „" + parse[0][0][2] + "e“ (bzw. im Genitiv „" + parse[0][0][2] + "es“). "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die Pluralform oder eine nicht-nominative Singularform von „" + parse[0][0][2] + "“ ist. Im ersten Fall lautet die geschlechtsneutrale Form „" + plural_form + "“ (bzw. im Dativ „" + plural_form + "n“), im zweiten Fall „" + parse[0][0][2] + "e“ (bzw. im Genitiv „" + parse[0][0][2] + "es“). "
             # Substantive wie "Kunden" (base form ends in "e" and declined form is base form with additional "n")
             elif parse[0][0][4] == "NN" and parse[0][0][2].endswith("e") and parse[0][0][1] == parse[0][0][2] + "n" and parse[0][0][5].endswith("_"):
                 warning = True
-                special_warning = "Der De-e-Automat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die Pluralform oder eine nicht-nominative Singularform von „" + parse[0][0][2] + "“ ist. Im ersten Fall lautet die geschlechtsneutrale Form „" + parse[0][0][2] + "rne“ (bzw. im Dativ „" + parse[0][0][2] + "rnen“), im zweiten Fall „" + parse[0][0][2] + "re“. (bzw. im Genitiv „" + parse[0][0][2] + "res“). "
+                special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ die Pluralform oder eine nicht-nominative Singularform von „" + parse[0][0][2] + "“ ist. Im ersten Fall lautet die geschlechtsneutrale Form „" + parse[0][0][2] + "rne“ (bzw. im Dativ „" + parse[0][0][2] + "rnen“), im zweiten Fall „" + parse[0][0][2] + "re“. (bzw. im Genitiv „" + parse[0][0][2] + "res“). "
             else:
                 special_warning = ""
             if warning:
-                marked_nouns = marked_nouns + f"""<br/><br/><div class="warning">Hinweis: """ + special_warning + """Allgemein ist es empfehlenswert, mehr als ein Wort einzugeben, damit der De-e-Automat auf Grundlage des grammatischen Kontexts mehrdeutige Wörter korrekt interpretieren kann.</div>"""
+                marked_nouns = marked_nouns + f"""<br/><br/><div class="warning">Hinweis: """ + special_warning + """Allgemein ist es empfehlenswert, mehr als ein Wort einzugeben, damit der Inklusivomat auf Grundlage des grammatischen Kontexts mehrdeutige Wörter korrekt interpretieren kann.</div>"""
 
         session["marked_nouns"] = marked_nouns
         if "checkbox" in marked_nouns:
@@ -442,9 +444,11 @@ def parse():
     
 # The following function neutralizes the selected words and returns the neutralized text.
 @app.route("/mark", methods=["POST", "GET"])
-def neutralize_marked():
+def neutralize_marked(selected_nouns={}):
     if request.method == "POST":
-        selected_nouns = request.form
+        if selected_nouns == {}:
+            selected_nouns = request.form
+        print("Selected nouns:", selected_nouns)
         sentence_number = session.get("sentence_number")
         marking_tool_list = []
         neutralized_text = ""
@@ -467,6 +471,7 @@ def neutralize_marked():
                     component_data = selected_component.split("|")
                     if component_data[0] == noun_data[0] and component_data[1] == noun_data[1]:
                         selected_components.append(int(component_data[2]))
+                print("Neutralizing nounphrase:", noun_data[0], noun_data[1], "with components", selected_components)
                 marking_tool.neutralize_nounphrase(int(noun_data[1])-1, selected_components)
                 list_of_neutralized_nouns.append([noun_data[0], noun_data[1]])
         neutralized_text = ""
@@ -490,6 +495,20 @@ def neutralize_marked():
         input_text = session.get("input_text", "")
         session.clear()
         return render_template("index.html", input_text=input_text)
+    
+# The following function combines parse and neutralize_marked as if every markable word were selected.
+@app.route("/translate_directly", methods=["POST", "GET"])
+def translateDirectly():
+    form = parse()
+    # Within form, search for all occurrences of what stands between """type="checkbox" id="""" and the next quotation mark:
+    pattern = r'type="checkbox"\s+id="([^"]+)"'
+    matches = re.findall(pattern, form)
+    # matches is a list of the form ['0|2|1', '0|4|-2', '0|5|1']. Create an ImmutableMultiDict of the form ImmutableMultiDict([('0|2|1', 'select'), ('0|4|-2', 'select'), ('0|5|1', 'select')]) from it:
+    selected_nouns = {}
+    for match in matches:
+        selected_nouns[match] = "select"
+    return neutralize_marked(selected_nouns=matches)
+
 
 # The following function returns the error report form.
 @app.route("/report", methods=["POST", "GET"])
@@ -499,7 +518,7 @@ def report():
 
     return render_template("report.html", dataToRender= f"""Eingegebener Text: <br/>
         <textarea id="textInput" readonly>{input_text}</textarea><br/><br/>
-        <!--Vom De-e-Automat produzierter Ausgabge-Text: <br/>ouput_text<br/><br/>-->
+        <!--Vom Inklusivomat produzierter Ausgabge-Text: <br/>ouput_text<br/><br/>-->
         Falls Du uns noch weitere Informationen zu dem Problem geben möchtest, kannst Du das hier tun:<br/>
         <form action="/report_sent" method="POST">
         <textarea id="reportText" name="reportText" maxlength="20000"></textarea>
@@ -530,7 +549,7 @@ def report_sent():
             file.write(f"Report text:\n{report_text}\n\n\n")
 
         return render_template("report.html", dataToRender= f"""Die Problem-Meldung wurde abgeschickt.<br/><br/>
-        Vielen Dank für den Beitrag zur Verbesserung des De-e-Automaten!<br/><br/>
+        Vielen Dank für den Beitrag zur Verbesserung des Inklusivomaten!<br/><br/>
         <form action="/" method="POST">
         </form>""")
     else:
@@ -560,7 +579,7 @@ def error_report_sent():
             file.write(f"Error:\n{error}\n\n\n")
 
         return render_template("report.html", dataToRender= f"""Die Problem-Meldung wurde abgeschickt.<br/><br/>
-        Vielen Dank für den Beitrag zur Verbesserung des De-e-Automaten!<br/><br/>
+        Vielen Dank für den Beitrag zur Verbesserung des Inklusivomaten!<br/><br/>
         <form action="/" method="POST">
         </form>""")
     else:
