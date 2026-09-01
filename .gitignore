@@ -8,3 +8,5 @@ external
 config.ini
 make_female_form
 make_inklusive_form
+key_config.py
+docker_image.tar
