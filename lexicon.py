@@ -453,6 +453,20 @@ class Lexicon:
             # Line 967 is the line number of "Ehepartnere" in Lexicon.NEUTRAL_NOUNS
             return True, "", [[0, noun, 967, "", "standard", True]]
 
+        # "Ehemann"/"Ehefrau" werden zu "Ehepartnere" und nicht über person_pattern zu "Eheperson".
+        ehepartner_pattern = r"ehe(m(a|ä)nn(er)?|frau(en)?)$"
+        match = re.search(ehepartner_pattern, noun.lower())
+        if match:
+            match_position = match.start()
+            prenoun = noun[:match_position]
+            if len(prenoun) != 1:
+                prefix, list = Lexicon.check_composite_noun(prenoun,False)
+                original = word_parse[1][match_position:]
+                capitalized = noun[match_position].isupper()
+                # Zeile 967 ist die Zeilennummer von "Ehepartnere" in Lexicon.NEUTRAL_NOUNS
+                list.append([match_position, original, 967, "", "standard", capitalized])
+                return True, prefix, list
+
         person_pattern = r"((m(a|ä)nn(er)?)|(frau(en)?)|herr(e?n)?|damen?)$"
         match = re.search(person_pattern, noun.lower())
         if match:
