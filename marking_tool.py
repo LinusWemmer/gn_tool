@@ -354,6 +354,17 @@ class Marking_Tool:
                 if self.parse_list[child-1][3] == "ART":
                     has_article = True
                     break
+        # Artikel, die Genus und Kasus selbst anzeigen (der, dieser, welcher ...), im Unterschied
+        # zum ein-Paradigma, das im Maskulinum Nominativ endungslos ist (ein, mein, unser ...).
+        has_marked_article = False
+        if pos+1 in self.nounphrases:
+            for child in self.nounphrases.get(pos+1):
+                child_parse = self.parse_list[child-1]
+                if child_parse[3] == "ART" and not any(child_parse[1].lower().startswith(start)
+                                                       for start in Lexicon.EIN_PARADIGM + ["unser", "eue"]):
+                    has_marked_article = True
+                    break
+
         # Determine whether the noun phrase has an article that is not from the ein-Paradigma:
         has_non_ein_article = False
         if pos+1 in self.nounphrases:
@@ -414,7 +425,7 @@ class Marking_Tool:
             print(feats)
             print(selected_components)
             print(self.nounlist)
-            self.parse_list[pos][-2], head_selected, person, kind, junge_person = Lexicon.make_neutralized_noun(pos,selected_components,self.nounlist,feats,has_article)
+            self.parse_list[pos][-2], head_selected, person, kind, junge_person = Lexicon.make_neutralized_noun(pos,selected_components,self.nounlist,feats,has_article,has_marked_article)
             print(self.parse_list[pos][-2])
             # The following line prevents articles of composite nouns with a person noun in non-final position from being neutralized.
             if not head_selected:

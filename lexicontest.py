@@ -250,6 +250,16 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich gebe es meiner Lieben.", "Ich gebe es meinerm Lieben."))
         # ... auch als Genitivattribut eines Nomens:
         test_sentences.append(("Das Buch meiner Lieben ist da.", "Das Buch meiners Lieben ist da."))
+        # Die starke Endung "-er" schlägt einen Artikel, den ParZu im Relativsatz
+        # fälschlich an das substantivierte Adjektiv gehängt hat:
+        test_sentences.append(("Er gab ihm ein Geschenk, welches Zweiterer allerdings schon besaß.", "En gab em ein Geschenk, welches Zweiterey allerdings schon besaß."))
+        test_sentences.append(("Er gab ihm ein Geschenk, das Zweiterer allerdings schon besaß.", "En gab em ein Geschenk, das Zweiterey allerdings schon besaß."))
+        test_sentences.append(("Er gab ihm ein Amt, das Beamter gerne annahm.", "En gab em ein Amt, das Beamtey gerne annahm."))
+        # Nach dem ein-Paradigma bleibt es dagegen schwach:
+        test_sentences.append(("Ein Jugendlicher kommt.", "Ein Jugendliche kommt."))
+        test_sentences.append(("Mein Verlobter kommt.", "Mein Verlobte kommt."))
+        # ... und ein Artikel, der wirklich zum Wort gehört, ebenfalls:
+        test_sentences.append(("Welcher Jugendliche kommt?", "Welchey Jugendliche kommt?"))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

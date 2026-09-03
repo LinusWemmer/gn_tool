@@ -797,7 +797,7 @@ class Lexicon:
     # - head_selected indicates whether the head of the noun phrase was selected and changed into inklusivum.
     # - person indicates whether the head was changed into "Person", so that dependent modifiers need to be made feminine.
     # - kind indicates whether the head was changed into "Kind", so that dependent modifiers need to be made neuter.
-    def make_neutralized_noun(pos,selected_components,nounlist,feats,has_article):
+    def make_neutralized_noun(pos,selected_components,nounlist,feats,has_article,has_marked_article=False):
         head_selected = False
         person = False
         kind = False
@@ -864,7 +864,10 @@ class Lexicon:
                         else:
                             if feats[1] == "_":
                                 feats[1] = "Nom"
-                            if has_article:
+                            # Wie beim substantivierten Adjektiv: "das Beamter" gibt es nicht,
+                            # der Artikel gehört dann nicht zu diesem Wort.
+                            strong_ending = component[2].lower().endswith("beamter")
+                            if has_article and not (strong_ending and has_marked_article):
                                 if feats[1] == "Nom" or feats[1] == "Acc": 
                                     head = "Beamte"
                                 else:
@@ -880,8 +883,15 @@ class Lexicon:
                             head_base = j + "e"
                         if feats[1] == "_":
                             feats[1] = "Nom"
+                        # Trägt die Eingabeform die starke Endung "-er", kann ein Artikel, der Genus
+                        # und Kasus selbst anzeigt, nicht zu ihr gehören -- "das Zweiterer" gibt es
+                        # nicht. In Relativsätzen hängt ParZu aber genau solche Artikel an, und die
+                        # Nominalphrase würde dann fälschlich schwach flektiert. Nach dem
+                        # ein-Paradigma bleibt es schwach, weil das Inklusivum dort bewusst von der
+                        # Standardgrammatik abweicht ("ein Jugendlicher" wird zu "ein Jugendliche").
+                        strong_ending = component[2].lower().endswith(j.lower() + "r")
                         # Weak Flexion, after article
-                        if has_article:
+                        if has_article and not (strong_ending and has_marked_article):
                             if feats[1] == "Nom" or feats[1] == "Acc": 
                                 head = head_base
                             else:
