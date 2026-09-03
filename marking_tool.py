@@ -429,10 +429,14 @@ class Marking_Tool:
                     print("about to feminize dependent words", self.parse_list[pos][1], self.nounphrases.get(pos+1))
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
+                        child_parse = self.parse_list[child-1]
                         # Aus "junges Mädchen" wird "sehr junge Person", damit das Adjektiv
-                        # nicht doppelt erscheint ("junge junge Person").
-                        if junge_person and self.parse_list[child-1][3] == "ADJA" and self.parse_list[child-1][2] == "jung":
-                            self.parse_list[child-1][-2] = "sehr"
+                        # nicht doppelt erscheint ("junge junge Person"). Steigerungsformen
+                        # bleiben dagegen stehen, sonst ginge der Vergleich verloren: "das
+                        # jüngere Mädchen" ist keine "sehr junge Person".
+                        if (junge_person and child_parse[3] == "ADJA" and child_parse[2] == "jung"
+                                and "Comp" not in child_parse[5] and "Sup" not in child_parse[5]):
+                            child_parse[-2] = "sehr"
                         else:
                             self.feminize_word(child-1, has_article, article_pos)
             # If word ends in -sohn or -tochter, make dependent words neuter.

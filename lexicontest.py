@@ -228,6 +228,9 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Junge spielt.", "Die junge Person spielt."))
         test_sentences.append(("Ich sehe ein junges Mädchen.", "Ich sehe eine sehr junge Person."))
         test_sentences.append(("Die Jungs spielen.", "Die jungen Leute spielen."))
+        # Steigerungsformen bleiben erhalten, sonst ginge der Vergleich verloren:
+        test_sentences.append(("Ich sehe das jüngere Mädchen.", "Ich sehe die jüngere junge Person."))
+        test_sentences.append(("Ich sehe das jüngste Mädchen.", "Ich sehe die jüngste junge Person."))
         # "Ehemann"/"Ehefrau" werden zu "Ehepartnere" und nicht zu "Eheperson":
         test_sentences.append(("Ihr Ehemann kommt.", "Ens Ehepartnere kommt."))
         test_sentences.append(("Die Ehefrauen kommen.", "Die Ehepartnerne kommen."))
