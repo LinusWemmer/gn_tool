@@ -324,6 +324,13 @@ class Marking_Tool:
     def neutralize_nounphrase(self, pos:int, selected_components):
         print("about to neutralize nounphrase")
         print(self.parse_list[pos])
+        # Fehlt der Kasus, wird er aus der Dependenzrelation ergänzt. Das muss vor der
+        # Neutralisierung geschehen, damit sowohl der Kopf als auch die abhängigen Wörter ihn
+        # kennen: "meiner Lieben" ist ein Dativ und ergibt "meinerm Lieben", nicht "meinerm Liebe".
+        if self.get_case(pos) == "_":
+            inferred_case = Marking_Tool.DEPREL_CASES.get(self.parse_list[pos][7])
+            if inferred_case:
+                self.set_missing_case(pos, inferred_case)
         feats = self.parse_list[pos][5].split("|")
         if len(feats) == 1:
             feats.append("_")
@@ -473,13 +480,7 @@ class Marking_Tool:
         # Neutralize the remaining words in the nounphrase:
         if not plural or self.parse_list[pos][2].endswith("jenige"):
             print("about to neutralize dependent words", self.parse_list[pos][1], self.nounphrases.get(pos+1))
-            # Fehlt dem Kopf der Kasus, wird er aus seiner Dependenzrelation ergänzt und an die
-            # abhängigen Wörter weitergereicht; sonst würde "meiner Lieben" als Nominativ gelesen
-            # und zu "mein Lieben" statt "meinerm Lieben".
-            if self.get_case(pos) == "_":
-                inferred_case = Marking_Tool.DEPREL_CASES.get(self.parse_list[pos][7])
-                if inferred_case:
-                    self.set_missing_case(pos, inferred_case)
+            # Der Kasus des Kopfes wird an die abhängigen Wörter weitergereicht.
             case = self.get_case(pos)
             for child in self.nounphrases.get(pos+1):
                 article_pos = min(self.nounphrases.get(pos+1))
@@ -816,6 +817,19 @@ class Marking_Tool:
                 # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
                 # Adjektiv trägt dort "attr".
                 elif word_parse[3] == "N" or (word_parse[3] == "ADJA" and word_parse[1][0].isupper() and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
+                    # Ein grossgeschriebenes Adjektiv ohne Nomen darüber ist substantiviert. ParZu
+                    # gibt es aber nicht immer als Nomen aus -- "liebe Kim" wird beim Reparse zu
+                    # einem Nomen, "liebe Juli" wegen des Monatsnamens nicht. Die Zeile wird deshalb
+                    # auf ein Nomen umgeschrieben, so wie unten allein stehende Artikel zu Pronomen
+                    # werden; sonst greift bei der Neutralisierung der Zweig für Substantive nicht.
+                    if word_parse[3] == "ADJA":
+                        # ParZu liefert für solche Wörter oft ein falsches Lemma.
+                        word_parse[2] = word_parse[1]
+                        # Merkmalsliste von "Pos|Genus|Kasus|Numerus|Flexion|" auf "Genus|Kasus|Numerus":
+                        adjective_feats = word_parse[5].split("|")
+                        if len(adjective_feats) >= 4:
+                            self.parse_list[pos][5] = "|".join(adjective_feats[1:4])
+                        self.parse_list[pos][3] = "N"
                     self.find_nounphrase(word_parse)
                     feats = self.parse_list[pos][5].split("|")
                     if len(feats) == 1:
@@ -831,9 +845,6 @@ class Marking_Tool:
                     if word_parse[1] == "Ungarn" and feats[2] == "Pl":
                         word_parse[2] = "Ungar"
                         word_parse[4] = "N"
-                    # Substantivized adjectives that ParZu recognized as adjectives often have a wrong word_parse[2], so we need to correct it:
-                    if word_parse[3] == "ADJA":
-                        word_parse[2] = word_parse[1]
                     # The following looks for articles that are relevant for proper nouns, i.e. masculine and feminine article in the singular:
                     has_article = False
                     for other_word_parse in self.parse_list:
@@ -848,7 +859,17 @@ class Marking_Tool:
                             has_possessive = True
                     print("about to check noun:", word_parse)
                     print("has_article:",has_article)
-                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive)
+                    # Ein Eigenname ohne Artikel wird markierbar, wenn ein Adjektiv an ihm hängt,
+                    # das neutralisiert werden muss ("liebe Sonja" wird zu "liebey Sonja"). Wie bei
+                    # der Artikelprüfung bleiben Neutra aussen vor, damit Ortsnamen wie "das schöne
+                    # Berlin" oder "das alte Europa" unberührt bleiben.
+                    has_adjective = False
+                    for other_word_parse in self.parse_list:
+                        if other_word_parse[6] == word_parse[0] and other_word_parse[3] == "ADJA":
+                            adjective_feats = other_word_parse[5].split("|")
+                            if len(adjective_feats) > 1 and adjective_feats[1] in ("Masc", "Fem"):
+                                has_adjective = True
+                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective)
                     print(list)
                     if list == []:
                         nouns += escape(word_parse[-2])

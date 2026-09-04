@@ -273,6 +273,15 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich gebe dem Hampelmann das Buch.", "Ich gebe dem Hampelmenschen das Buch."))
         test_sentences.append(("Das Auto des Hampelmanns ist rot.", "Das Auto des Hampelmenschen ist rot."))
         test_sentences.append(("Die Hampelmänner stehen da.", "Die Hampelmenschen stehen da."))
+        # Grossgeschriebene Adjektive ohne Nomen darüber werden auch dann neutralisiert, wenn
+        # ParZu sie nach dem Reparse weiter als Adjektiv führt ("Juli" ist auch ein Monat):
+        test_sentences.append(("Willkommen, liebe Juli!", "Willkommen, liebey Juli!"))
+        test_sentences.append(("Willkommen, liebe Kim!", "Willkommen, liebey Kim!"))
+        # Ein Adjektiv an einem Eigennamen macht diesen auch ohne Artikel markierbar:
+        test_sentences.append(("Hallo, liebe Sonja!", "Hallo, liebey Sonja!"))
+        test_sentences.append(("Die liebe Sonja kommt.", "De liebe Sonja kommt."))
+        # ... Ortsnamen bleiben davon unberührt, weil sie Neutra sind:
+        test_sentences.append(("Wir besuchen das schöne Berlin.", "Wir besuchen das schöne Berlin."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

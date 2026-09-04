@@ -451,7 +451,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
     # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats,has_article,has_possessive):
+    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -673,7 +673,7 @@ class Lexicon:
             return True, "", [[0, noun, neutral_base, "", "substantivized adjective", False]]
         
         # Abkürzungen wie "DDR" oder "USA" bezeichnen keine Personen und bleiben unmarkiert.
-        if word_parse[4] == "NE" and has_article and not (len(noun) > 1 and noun.isupper()):
+        if word_parse[4] == "NE" and (has_article or has_adjective) and not (len(noun) > 1 and noun.isupper()):
             capitalized = noun[0].isupper()
             return True, "", [[0, noun, noun, "", "proper noun", capitalized]]
 
