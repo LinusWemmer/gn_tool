@@ -316,6 +316,20 @@ class Sentence_Test(unittest.TestCase):
             output_text = undo_hack_for_ordinal_numbers(marking_tool.get_sentence())
             self.assertEqual(output_text, test[1], f"Text {i+1} doesn't have correct output.") 
 
+    # HTML aus dem Eingabetext darf nicht ungefiltert in die Markierungsansicht gelangen,
+    # sonst liesse sich über den Eingabetext beliebiges Markup einschleusen.
+    def test_html_in_input_is_escaped(self):
+        text = 'Der Lehrer <img src=x onerror=alert(1)> und <!-- Kommentar --> die Frau.'
+        parse = get_parse(remove_special_character_gendering(split_prepositions(text)))
+        marking_tool = Marking_Tool(parse[0], {}, [])
+        Marking_Tool.find_realizations(marking_tool, text)
+        form = marking_tool.get_marking_form(0)
+        # Die spitzen Klammern sind entscheidend: maskiert bleibt der Rest wirkungsloser Text.
+        for raw in ["<img", "<!--", "</textarea>"]:
+            self.assertNotIn(raw, form, f"{raw!r} steht ungefiltert im Markierungsformular")
+        self.assertIn("&lt;img", form, "Das eingegebene Markup fehlt in maskierter Form")
+
+
 def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
     marking_form = ""
     sentence_number = 0

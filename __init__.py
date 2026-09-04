@@ -4,6 +4,7 @@ from sentence_data import Sentence_Data
 from flask_session import Session
 
 import parzu_class as parzu
+from html import escape
 import re
 import sys
 import os
@@ -303,7 +304,7 @@ def handle_error(error):
     input_text = session.get("input_text", "")
     session["error"] = error_info
     return render_template("report.html", dataToRender= f"""Eingegebener Text: <br/>
-        <textarea id="textInput" readonly>{input_text}</textarea><br/><br/>
+        <textarea id="textInput" readonly>{escape(input_text or "")}</textarea><br/><br/>
         Ein unerwartetes Problem ist aufgetreten. Du kannst uns helfen, dieses Problem zu beheben, indem Du auf „Problem melden“ klickst. In diesem Fall wird der von Dir eingegebene Text zusammen mit einer automatisch erzeugten Fehlerbeschreibung an die Entwicklerne des Inklusivomaten gesendet.<br/><br/>
         <form action="/error_report_sent" method="POST">
         <button type="submit" class="grey-button">Problem melden</button>
@@ -423,7 +424,7 @@ def parse():
             else:
                 special_warning = ""
             if warning:
-                marked_nouns = marked_nouns + f"""<br/><br/><div class="warning">Hinweis: """ + special_warning + """Allgemein ist es empfehlenswert, mehr als ein Wort einzugeben, damit der Inklusivomat auf Grundlage des grammatischen Kontexts mehrdeutige Wörter korrekt interpretieren kann.</div>"""
+                marked_nouns = marked_nouns + f"""<br/><br/><div class="warning">Hinweis: """ + escape(special_warning) + """Allgemein ist es empfehlenswert, mehr als ein Wort einzugeben, damit der Inklusivomat auf Grundlage des grammatischen Kontexts mehrdeutige Wörter korrekt interpretieren kann.</div>"""
 
         session["marked_nouns"] = marked_nouns
         if "checkbox" in marked_nouns:
@@ -478,6 +479,7 @@ def neutralize_marked(selected_nouns={}):
         for i in range(sentence_number):
             neutralized_text += marking_tool_list[i].get_sentence()
         neutralized_text = undo_hack_for_ordinal_numbers(neutralized_text)
+        neutralized_text = escape(neutralized_text)
         neutralized_text = replace_whitespace_outside_html_tags(neutralized_text)
         input_text = session.get("input_text")
         marked_nouns = session.get("marked_nouns")
@@ -517,7 +519,7 @@ def report():
     #output_text = request.form["outputText"]
 
     return render_template("report.html", dataToRender= f"""Eingegebener Text: <br/>
-        <textarea id="textInput" readonly>{input_text}</textarea><br/><br/>
+        <textarea id="textInput" readonly>{escape(input_text or "")}</textarea><br/><br/>
         <!--Vom Inklusivomat produzierter Ausgabge-Text: <br/>ouput_text<br/><br/>-->
         Falls Du uns noch weitere Informationen zu dem Problem geben möchtest, kannst Du das hier tun:<br/>
         <form action="/report_sent" method="POST">
