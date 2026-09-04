@@ -51,6 +51,10 @@ class Lexicon:
     IRREGULAR_NOUNS_COMPOUND = [r"Prinz(en|essinnen)", r"Hexe(n|r)", r"Witwe(n|rn|r)", r"Br(a|ä)ut(igams)?", r"Hebammen", r"Ammen", r"Homöopathen", r"Sympathisanten"]
     IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere", "Homöopathe", "Sympathisante"]
 
+    # Komposita auf "-mann", die zu "-mensch" statt zu "-person" werden. Eingetragen wird der
+    # Wortteil vor "-mann"; die Pluralform "-männer" wird mit abgedeckt.
+    MENSCH_COMPOUNDS = ["hampel"]
+
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 
     # NEOLOGISMS lists singular forms as well as forms that occur in compounds
@@ -514,6 +518,32 @@ class Lexicon:
             # Line 967 is the line number of "Ehepartnere" in Lexicon.NEUTRAL_NOUNS
             return True, "", [[0, noun, 967, "", "standard", True]]
 
+        # "Mannschaft" wird zu "Team". Das ist ein Neutrum, deshalb müssen die abhängigen
+        # Wörter ins Neutrum gesetzt werden.
+        team_pattern = r"mannschaft(en)?$"
+        match = re.search(team_pattern, noun.lower())
+        if match:
+            match_position = match.start()
+            prenoun = noun[:match_position]
+            if len(prenoun) != 1:
+                prefix, list = Lexicon.check_composite_noun(prenoun,False)
+                original = word_parse[1][match_position:]
+                capitalized = noun[match_position].isupper()
+                list.append([match_position, original, 0, "", "team", capitalized])
+                return True, prefix, list
+
+        # Manche Komposita auf "-mann" werden zu "-mensch" statt zu "-person".
+        for stem in Lexicon.MENSCH_COMPOUNDS:
+            match = re.search(stem + r"(m(a|ä)nn(er)?)$", noun.lower())
+            if match:
+                match_position = match.start(1)
+                prenoun = noun[:match_position]
+                prefix, list = Lexicon.check_composite_noun(prenoun,False)
+                original = word_parse[1][match_position:]
+                capitalized = noun[match_position].isupper()
+                list.append([match_position, original, 0, "", "mensch", capitalized])
+                return True, prefix, list
+
         # "Ehemann"/"Ehefrau" werden zu "Ehepartnere" und nicht über person_pattern zu "Eheperson".
         ehepartner_pattern = r"ehe(m(a|ä)nn(er)?|frau(en)?)$"
         match = re.search(ehepartner_pattern, noun.lower())
@@ -533,7 +563,8 @@ class Lexicon:
         if match:
             match_position = match.start()
             prenoun = noun[:match_position]
-            if len(prenoun) != 1:
+            # "Mannomann" ist ein Ausruf und keine Personenbezeichnung.
+            if len(prenoun) != 1 and prenoun.lower() != "manno":
                 prefix, list = Lexicon.check_composite_noun(prenoun,False)
                 original = word_parse[1][match_position:]
                 capitalized = noun[match_position].isupper()
@@ -844,6 +875,24 @@ class Lexicon:
                             head_selected = False
                             person = True
                             junge_person = True
+                    elif component[-3] == "team":
+                        # "das Team", Genitiv "des Teams", Plural "die Teams".
+                        if feats[2] == "Pl":
+                            head = "Teams"
+                        else:
+                            if feats[1] == "_":
+                                feats[1] = "Nom"
+                            head = "Teams" if feats[1] == "Gen" else "Team"
+                            head_selected = False
+                            kind = True
+                    elif component[-3] == "mensch":
+                        # "Mensch" wird schwach dekliniert: der Mensch, aber des/dem/den Menschen.
+                        if feats[1] == "_":
+                            feats[1] = "Nom"
+                        if feats[2] == "Pl" or feats[1] in ("Gen", "Dat", "Acc"):
+                            head = "Menschen"
+                        else:
+                            head = "Mensch"
                     elif component[-3] == "kind":
                         # if plural, head is "Kinder", otherwise "Kind"
                         if feats[2] == "Pl" and feats[1] != "Dat":
