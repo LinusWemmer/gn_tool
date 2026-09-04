@@ -264,11 +264,14 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Mannschaft gewinnt.", "Das Team gewinnt."))
         test_sentences.append(("Das Auto der Mannschaft ist rot.", "Das Auto des Teams ist rot."))
         test_sentences.append(("Die Fußballmannschaft gewinnt.", "Das Fußballteam gewinnt."))
+        test_sentences.append(("Die Mannschaftsleitung entscheidet.", "Die Teamleitung entscheidet."))
+        test_sentences.append(("Der Mannschaftskapitän kommt.", "De Teamkapitäne kommt."))
         # "Mannomann" ist ein Ausruf und keine Personenbezeichnung:
         test_sentences.append(("Mannomann, war das knapp!", "Mannomann, war das knapp!"))
-        # "Hampelmann" wird zu "Hampelmensch", schwach dekliniert:
-        test_sentences.append(("Der Hampelmann steht da.", "De Hampelmensch steht da."))
-        test_sentences.append(("Ich gebe dem Hampelmann das Buch.", "Ich gebe derm Hampelmenschen das Buch."))
+        # "Hampelmann" wird zu "Hampelmensch", schwach dekliniert und im Maskulinum:
+        test_sentences.append(("Der Hampelmann steht da.", "Der Hampelmensch steht da."))
+        test_sentences.append(("Ich gebe dem Hampelmann das Buch.", "Ich gebe dem Hampelmenschen das Buch."))
+        test_sentences.append(("Das Auto des Hampelmanns ist rot.", "Das Auto des Hampelmenschen ist rot."))
         test_sentences.append(("Die Hampelmänner stehen da.", "Die Hampelmenschen stehen da."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")

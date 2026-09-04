@@ -764,6 +764,19 @@ class Lexicon:
                         list.append([match_position, noun[match_position:j], neutral_core, later_part, "person", False])
                         return prefix, list
                 
+                team_pattern = r"mannschafts?$"
+                match = re.search(team_pattern, noun[:j].lower())
+                if match:
+                    match_position = match.start()
+                    if match_position != 1:
+                        later_part = noun[j:]
+                        neutral_core = "Team"
+                        if not noun[match_position].isupper():
+                            neutral_core = neutral_core.lower()
+                        prefix, list = Lexicon.check_composite_noun(noun[:match_position],False)
+                        list.append([match_position, noun[match_position:j], neutral_core, later_part, "team", False])
+                        return prefix, list
+
                 kind_pattern = r"(töchter|söhne)$"
                 match = re.search(kind_pattern, noun[:j].lower())
                 if match:
@@ -893,6 +906,10 @@ class Lexicon:
                             head = "Menschen"
                         else:
                             head = "Mensch"
+                        # "Mensch" ist ein Maskulinum und behält es, so wie "-person" das
+                        # Femininum bekommt. head_selected verhindert, dass die abhängigen
+                        # Wörter neutralisiert werden.
+                        head_selected = False
                     elif component[-3] == "kind":
                         # if plural, head is "Kinder", otherwise "Kind"
                         if feats[2] == "Pl" and feats[1] != "Dat":
