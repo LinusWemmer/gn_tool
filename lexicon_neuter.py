@@ -38,6 +38,13 @@ class Lexicon_Neuter:
 
     EIN_PARADIGM = ["ein", "kein", "mein", "dein", "sein", "ihr", "ens"]
 
+    # Schlägt die Endung zum Kasus nach. Fehlt der Kasus in ParZus Analyse oder ist er unbekannt,
+    # wird er als Nominativ behandelt. Das kann falsch sein, ist aber besser als ein Abbruch: Bei
+    # ungrammatischer Eingabe wie "ein dumme Frau" lässt ParZu den Kasus offen, und der Zugriff
+    # auf das Paradigma lieferte dann None.
+    def case_ending(paradigm, case) -> str:
+        return paradigm.get(case, paradigm["Nom"])
+
     def neuterize_possesive_pronoun(word_parse) -> str:
         feats = word_parse[5].split("|")
         pronoun = ""
@@ -66,11 +73,11 @@ class Lexicon_Neuter:
         if feats[0] == "Def":
             if feats[2] == "_":
                 feats[2] = "Nom"
-            article = Lexicon_Neuter.ARTIKEL_DER.get(feats[2])
+            article = Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_DER, feats[2])
             return article.capitalize() if word_parse[1][0].isupper() else article
         # Case Indefinitive Articles, only ein
         elif feats[0] == "Indef":
-            article = "ein" + Lexicon_Neuter.ARTIKEL_EIN.get(feats[2])
+            article = "ein" + Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_EIN, feats[2])
             return article.capitalize() if word_parse[1][0].isupper() else article
         else:
             word = word_parse[1][0].lower() + word_parse[1][1:] 
@@ -80,18 +87,18 @@ class Lexicon_Neuter:
                     #incase no grammatical case is found, treat as nominative, even if wrong.
                     if feats[1] == "_":
                         feats[1] = "Nom"
-                    article = start + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[1])
+                    article = start + Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_JEDER, feats[1])
                     return article.capitalize() if word_parse[1][0].isupper() else article
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
             for start in Lexicon_Neuter.EIN_PARADIGM:
                 if word.startswith(start):
-                    article = start + Lexicon_Neuter.ARTIKEL_EIN.get(feats[1])
+                    article = start + Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_EIN, feats[1])
                     return article.capitalize() if word_parse[1][0].isupper() else article
             if re.match(r"(U|u)(nser|nsre|nsere)", word):
-                article = Lexicon_Neuter.ARTIKEL_UNSER.get(feats[1])
+                article = Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_UNSER, feats[1])
                 return article.capitalize() if word_parse[1][0].isupper() else article
             elif re.match(r"(E|e)(uer|ure)", word):
-                article = Lexicon_Neuter.ARTIKEL_EUER.get(feats[1])
+                article = Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_EUER, feats[1])
                 return article.capitalize() if word_parse[1][0].isupper() else article
             # Some articles don't have to be neuterized, just return them.
             else:
@@ -128,7 +135,7 @@ class Lexicon_Neuter:
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
             feats[2] = "Nom"
-        adjective =  adjective + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[2])
+        adjective =  adjective + Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_JEDER, feats[2])
         return adjective.capitalize() if word_parse[1][0].isupper() else adjective
     
     # Neutralize possesive jemand, this often doesn't get parsed correctly
@@ -146,7 +153,7 @@ class Lexicon_Neuter:
                 feats[3] = "Nom"
             pronoun = word_parse[1]
             if feats[0] == "3":
-                pronoun = Lexicon_Neuter.PRONOUNS.get(feats[3])
+                pronoun = Lexicon_Neuter.case_ending(Lexicon_Neuter.PRONOUNS, feats[3])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PIS":
             pronoun = word_parse[1]
@@ -168,21 +175,21 @@ class Lexicon_Neuter:
                         adjective = adjective + "n"
                         return pronoun.capitalize() if is_capitalized else pronoun
                 else:
-                    pronoun = word_parse[2][:-1] + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[1])
+                    pronoun = word_parse[2][:-1] + Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_JEDER, feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS" and word_parse[1].startswith("d"):
             if feats[1] == "_":
                 feats[1] = "Nom"
-            pronoun = Lexicon_Neuter.ARTIKEL_DER.get(feats[1])
+            pronoun = Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_DER, feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS" or word_parse[4] == "PDS":
             if feats[1] == "_":
                 feats[1] = "Nom"
             for start in Lexicon_Neuter.JEDER_PARADIGM:
                 if re.match(start + "e.?$", word_parse[2]):
-                    pronoun = word_parse[2][:-1] + Lexicon_Neuter.ARTIKEL_JEDER.get(feats[1]) 
+                    pronoun = word_parse[2][:-1] + Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_JEDER, feats[1]) 
                     return pronoun.capitalize() if is_capitalized else pronoun
-            pronoun = Lexicon_Neuter.ARTIKEL_DER.get(feats[1])
+            pronoun = Lexicon_Neuter.case_ending(Lexicon_Neuter.ARTIKEL_DER, feats[1])
             if re.match(r"d..jenige$", word_parse[2]):
                 pronoun += "jenige"
                 if feats[1] == "Gen" or feats[1] == "Dat":

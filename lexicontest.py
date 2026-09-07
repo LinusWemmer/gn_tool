@@ -355,6 +355,21 @@ class Sentence_Test(unittest.TestCase):
             output_text = undo_hack_for_ordinal_numbers(marking_tool.get_sentence())
             self.assertEqual(output_text, test[1], f"Text {i+1} doesn't have correct output.") 
 
+    # Bei ungrammatischer Eingabe lässt ParZu den Kasus offen. Der Zugriff auf die Paradigmen
+    # lieferte dann None, und die Übersetzung brach ab, statt einen Nominativ anzunehmen.
+    def test_ungrammatical_input_does_not_crash(self):
+        for text in ("Sie ist ein dumme Frau.",
+                     "Er ist ein dumme Mann.",
+                     "Ich sehe ein dumme Frau."):
+            remaining = text
+            for parse_list in get_parse(remove_special_character_gendering(split_prepositions(text))):
+                marking_tool = Marking_Tool(parse_list, {}, [])
+                remaining = Marking_Tool.find_realizations(marking_tool, remaining)
+                marked = marking_tool.get_marking_form(0)
+                for position, component in re.findall(r'id="\d+\|(\d+)\|(-?\d+)"', marked):
+                    # Darf keine Exception werfen:
+                    marking_tool.neutralize_nounphrase(int(position) - 1, [int(component)])
+
     # ParZus Tokenizer trennt an allen Unicode-Leerzeichen. Kannte die Zuordnung der Wörter auf
     # den Eingabetext eines davon nicht, geriet sie aus dem Tritt und brach mit einer Exception ab.
     def test_unicode_whitespace_is_handled(self):

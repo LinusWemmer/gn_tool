@@ -145,6 +145,13 @@ class Lexicon:
     # Eingabe abgelesen und nicht aus den Wortlisten, weil deren feminine Spalte stellenweise
     # fehlerhaft ist ("Zahnarztin" statt "Zahnärztin"); Wörter, bei denen der Umlaut nichts
     # über den Plural aussagt, stehen in NO_PLURAL_UMLAUT.
+    # Schlägt die Endung zum Kasus nach. Fehlt der Kasus in ParZus Analyse oder ist er unbekannt,
+    # wird er als Nominativ behandelt. Das kann falsch sein, ist aber besser als ein Abbruch: Bei
+    # ungrammatischer Eingabe wie "ein dumme Frau" lässt ParZu den Kasus offen, und der Zugriff
+    # auf das Paradigma lieferte dann None.
+    def case_ending(paradigm, case) -> str:
+        return paradigm.get(case, paradigm["Nom"])
+
     def apply_plural_umlaut(head_base, original, male_noun) -> str:
         for exception in Lexicon.NO_PLURAL_UMLAUT:
             if male_noun.lower().endswith(exception):
@@ -209,7 +216,7 @@ class Lexicon:
         if feats[1] == "_":
             feats[1] = "Nom"
         if -5 in selected_components or -4 in selected_components:
-            ending = Lexicon.ARTIKEL_JEDER.get(feats[1])
+            ending = Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
         else:
             ending = all_components[1][2]
         if ending == "s":
@@ -224,7 +231,7 @@ class Lexicon:
         if feats[1] == "_":
             feats[1] = "Nom"
         if -4 in selected_components:
-            ending = Lexicon.ARTIKEL_JEDER.get(feats[1])
+            ending = Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
         else:
             ending = all_components[1][2]
         if ending == "s":
@@ -266,13 +273,13 @@ class Lexicon:
         if feats[0] == "Def":
             if feats[2] == "_":
                 feats[2] = "Nom"
-            article =  Lexicon.ARTIKEL_DER.get(feats[2])
+            article =  Lexicon.case_ending(Lexicon.ARTIKEL_DER, feats[2])
             return article.capitalize() if is_capitalized else article
         # Case Indifinitive Artikels, only ein
         elif feats[0] == "Indef":
             if feats[2] == "_":
                 feats[2] = "Nom"
-            article = "ein" +  Lexicon.ARTIKEL_EIN.get(feats[2])
+            article = "ein" +  Lexicon.case_ending(Lexicon.ARTIKEL_EIN, feats[2])
             return article.capitalize() if is_capitalized else article
         # All other types of article
         else:
@@ -285,34 +292,34 @@ class Lexicon:
                 if feats[1] == "Nom" or feats[1] == "Acc":
                     return "Deselbe" if is_capitalized else "deselbe"
                 else:
-                    article =  Lexicon.ARTIKEL_DER.get(feats[1]) + "selben"
+                    article =  Lexicon.case_ending(Lexicon.ARTIKEL_DER, feats[1]) + "selben"
                     return article.capitalize() if is_capitalized else article
             # derjenige/diejenige:
             if re.match(r"d..jenige.?$", word):
                 if feats[1] == "Nom" or feats[1] == "Acc":
                     return "Dejenige" if is_capitalized else "dejenige"
                 else:
-                    article =  Lexicon.ARTIKEL_DER.get(feats[1]) + "jenigen"
+                    article =  Lexicon.case_ending(Lexicon.ARTIKEL_DER, feats[1]) + "jenigen"
                     return article.capitalize() if is_capitalized else article
             # Jeder-Paradigm: jeder, jener, dieser, welcher, solcher, mancher, jedweder
             for start in Lexicon.JEDER_PARADIGM:
                 if word.startswith(start):
-                    article = start + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                    article = start + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
                     return article.capitalize() if is_capitalized else article
             # Ein-Paradigm: einer, keiner, meiner, deiner, seiner, ihrer, enser 
             for start in Lexicon.EIN_PARADIGM:
                 if word.startswith(start):
                     sonderzeichen_match = re.match(r"((S|s)ein|(I|i)hr)(([/*_:]?e|\(e\)|s|es|em|en|er)?([/*_:][smnr]|\([rn]\))?)([/*_:])((S|s)ein|(I|i)hr)(([/*_:]?e|\(e\)|s|es|em|en|er)?([/*_:][smnr]|\([rn]\))?)$", word_parse[-2])
                     if sonderzeichen_match:
-                        article = sonderzeichen_match.group(1) + Lexicon.ARTIKEL_EIN.get(feats[1]) + sonderzeichen_match.group(7) + sonderzeichen_match.group(8) + Lexicon.ARTIKEL_EIN.get(feats[1])
+                        article = sonderzeichen_match.group(1) + Lexicon.case_ending(Lexicon.ARTIKEL_EIN, feats[1]) + sonderzeichen_match.group(7) + sonderzeichen_match.group(8) + Lexicon.case_ending(Lexicon.ARTIKEL_EIN, feats[1])
                     else:
-                        article = start + Lexicon.ARTIKEL_EIN.get(feats[1])
+                        article = start + Lexicon.case_ending(Lexicon.ARTIKEL_EIN, feats[1])
                     return article.capitalize() if is_capitalized else article
             if re.match(r"unse?re?.?$", word):
-                article = Lexicon.ARTIKEL_UNSER.get(feats[1])
+                article = Lexicon.case_ending(Lexicon.ARTIKEL_UNSER, feats[1])
                 return article.capitalize() if is_capitalized else article
             elif re.match(r"eue?re?.?$", word):
-                article = Lexicon.ARTIKEL_EUER.get(feats[1])
+                article = Lexicon.case_ending(Lexicon.ARTIKEL_EUER, feats[1])
                 return article.capitalize() if is_capitalized else article
             # Some articles don't have to be neutralized, just return them.
             else:
@@ -364,7 +371,7 @@ class Lexicon:
         # If we for some reason don't get a case, pretend it is nominative.
         if feats[2] == "_":
             feats[2] = "Nom"
-        adjective =  adjective + Lexicon.ARTIKEL_JEDER.get(feats[2])
+        adjective =  adjective + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[2])
         print("adjective:", adjective)
         return adjective.capitalize() if word_parse[1][0].isupper() else adjective
     
@@ -390,7 +397,7 @@ class Lexicon:
                     feats[3] = "Nom"
             pronoun = word_parse[1]
             if feats[0] == "3" or feats[0] == "_":
-                pronoun = Lexicon.PRONOUNS.get(feats[3])
+                pronoun = Lexicon.case_ending(Lexicon.PRONOUNS, feats[3])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PIS":
             pronoun = word_parse[1]
@@ -400,7 +407,7 @@ class Lexicon:
                 pronoun = "mensch"
             elif word_parse[2].endswith("mand"):
                 if feats[1] == "Dat" or feats[1] == "Gen":
-                    pronoun = word_parse[2] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                    pronoun = word_parse[2] + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
                 else:
                     pronoun = word_parse[2]
             else: 
@@ -420,21 +427,21 @@ class Lexicon:
                             pronoun = word_parse[2] + "n"
                             return pronoun.capitalize() if is_capitalized else pronoun
                     else:
-                        pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                        pronoun = word_parse[2][:-1] + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS" and word_parse[1].startswith("d"):
             if feats[1] == "_":
                 feats[1] = "Nom"
-            pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+            pronoun = Lexicon.case_ending(Lexicon.ARTIKEL_DER, feats[1])
             return pronoun.capitalize() if is_capitalized else pronoun
         elif word_parse[4] == "PRELS" or word_parse[4] == "PDS" or word_parse[4] == "PWS":
             if feats[1] == "_":
                 feats[1] = "Nom"
             for start in Lexicon.JEDER_PARADIGM:
                 if re.match(start + "e.?$", word_parse[2]):
-                    pronoun = word_parse[2][:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1]) 
+                    pronoun = word_parse[2][:-1] + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1]) 
                     return pronoun.capitalize() if is_capitalized else pronoun
-            pronoun = Lexicon.ARTIKEL_DER.get(feats[1])
+            pronoun = Lexicon.case_ending(Lexicon.ARTIKEL_DER, feats[1])
             if re.match(r"d..jenige$", word_parse[2]):
                 pronoun += "jenige"
                 if feats[1] == "Gen" or feats[1] == "Dat":
@@ -970,7 +977,7 @@ class Lexicon:
                                 else:
                                     head = "Beamten"
                             else:
-                                head = "Beamt" + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                                head = "Beamt" + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
                     elif component[-3] == "neutral":
                         head = j
                     elif component[-3] == "substantivized adjective":
@@ -995,7 +1002,7 @@ class Lexicon:
                                 head = head_base + "n"
                         # Strong Flexion, on it's own
                         else:
-                            head = head_base[:-1] + Lexicon.ARTIKEL_JEDER.get(feats[1])
+                            head = head_base[:-1] + Lexicon.case_ending(Lexicon.ARTIKEL_JEDER, feats[1])
                     elif component[-3] == "proper noun":
                         head = j
                     else:
