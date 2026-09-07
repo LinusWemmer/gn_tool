@@ -280,6 +280,10 @@ class Sentence_Test(unittest.TestCase):
         # Ein Adjektiv an einem Eigennamen macht diesen auch ohne Artikel markierbar:
         test_sentences.append(("Hallo, liebe Sonja!", "Hallo, liebey Sonja!"))
         test_sentences.append(("Die liebe Sonja kommt.", "De liebe Sonja kommt."))
+        # ... ebenso in der blossen Anrede, wo eine Apposition den Numerus verrät:
+        test_sentences.append(("Lieber Thomas!", "Liebey Thomas!"))
+        # ... und wenn ParZu das Genus des Adjektivs offenlässt:
+        test_sentences.append(("Er gibt sich als heiliger Franz aus.", "En gibt sich als heiligey Franz aus."))
         # ... Ortsnamen bleiben davon unberührt, weil sie Neutra sind:
         test_sentences.append(("Wir besuchen das schöne Berlin.", "Wir besuchen das schöne Berlin."))
         for i,test in enumerate(test_sentences):

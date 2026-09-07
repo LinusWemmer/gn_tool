@@ -246,6 +246,11 @@ class Marking_Tool:
             # Wenn der Satz nur das Substantiv enthält und das Substantiv nicht auf "-en" endet und nicht "Bauern" lautet, setze es in den Singular:
             elif (len(self.parse_list) == 1 or (len(self.parse_list) == 2 and self.parse_list[1][3] == "$.")) and not self.parse_list[pos][1].endswith("en") and not self.parse_list[pos][1] == "Bauern":
                 feats[2] = "Sg"
+            # Ein Substantiv mit einer Apposition im Singular steht selbst im Singular
+            # ("Lieber Thomas!"); ohne diese Prüfung greift unten die Voreinstellung Plural.
+            elif any(other[6] == self.parse_list[pos][0] and other[7] == "app" and "Sg" in other[5]
+                     for other in self.parse_list):
+                feats[2] = "Sg"
             # Wenn das Substantiv nicht von "als" abhängig ist (lässt sich im ParZu-Parsebaum überprüfen),
             # setze den Numerus des Substantivs auf "Pl":
             elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):
@@ -867,7 +872,7 @@ class Marking_Tool:
                     for other_word_parse in self.parse_list:
                         if other_word_parse[6] == word_parse[0] and other_word_parse[3] == "ADJA":
                             adjective_feats = other_word_parse[5].split("|")
-                            if len(adjective_feats) > 1 and adjective_feats[1] in ("Masc", "Fem"):
+                            if len(adjective_feats) > 1 and adjective_feats[1] != "Neut":
                                 has_adjective = True
                     head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective)
                     print(list)
