@@ -51,6 +51,22 @@ class Lexicon:
     IRREGULAR_NOUNS_COMPOUND = [r"Prinz(en|essinnen)", r"Hexe(n|r)", r"Witwe(n|rn|r)", r"Br(a|ä)ut(igams)?", r"Hebammen", r"Ammen", r"Homöopathen", r"Sympathisanten"]
     IRREGULAR_NOUNS_NEUTRAL = ["Prinze", "Hexere", "Witwere", "Braute", "Hebammere", "Ammere", "Homöopathe", "Sympathisante"]
 
+    # Vornamen, die daneben in nennenswertem Umfang gewöhnliche Substantive sind. Sie gelten nur
+    # dann als Personenbezeichnung, wenn eines der PERSON_ADJECTIVES davorsteht -- sonst würde aus
+    # "die schöne Rose" ein "de schöne Rose" und aus "der graue Wolf" ein "de graue Wolf".
+    AMBIGUOUS_NAMES = ["Juli", "Mai", "August", "Rose", "Heide", "Linde", "Iris", "Erika",
+                       "Horst", "Ernst", "Frank", "Wolf", "Mark"]
+
+    # Vornamen, die praktisch nur als Eigennamen vorkommen, von ParZu je nach Kontext aber als
+    # gewöhnliche Substantive getaggt werden ("als heilige Maria"). Sie werden wie Eigennamen
+    # behandelt. Die Liste lässt sich jederzeit erweitern.
+    PROPER_NAMES = ["Maria", "Anna", "Julia", "Klara", "Nele", "Merle", "Frieda", "Jens", "Sven",
+                    "Vera", "Silke", "Lisa", "Noah", "Luca", "Finn", "Emil", "Ida", "Mila",
+                    "Johanna"]
+
+    # Adjektive, die vor einem Namen eine angeredete Person anzeigen.
+    PERSON_ADJECTIVES = ["lieb", "geehrt", "verehrt", "wert"]
+
     # Komposita auf "-mann", die zu "-mensch" statt zu "-person" werden. Eingetragen wird der
     # Wortteil vor "-mann"; die Pluralform "-männer" wird mit abgedeckt.
     MENSCH_COMPOUNDS = ["hampel"]
@@ -451,7 +467,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
     # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False):
+    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -672,8 +688,16 @@ class Lexicon:
                 neutral_base = noun
             return True, "", [[0, noun, neutral_base, "", "substantivized adjective", False]]
         
+        # Eigennamen sind markierbar, wenn ein Artikel oder ein Adjektiv an ihnen hängt. Namen aus
+        # AMBIGUOUS_NAMES sind zugleich gebräuchliche Substantive und zählen nur mit einem
+        # Anrede-Adjektiv; Namen aus PROPER_NAMES taggt ParZu manchmal fälschlich als solche.
         # Abkürzungen wie "DDR" oder "USA" bezeichnen keine Personen und bleiben unmarkiert.
-        if word_parse[4] == "NE" and (has_article or has_adjective) and not (len(noun) > 1 and noun.isupper()):
+        if noun in Lexicon.AMBIGUOUS_NAMES or word_parse[1] in Lexicon.AMBIGUOUS_NAMES:
+            is_name = has_person_adjective
+        else:
+            is_name = ((word_parse[4] == "NE" or noun in Lexicon.PROPER_NAMES)
+                       and (has_article or has_adjective))
+        if is_name and not (len(noun) > 1 and noun.isupper()):
             capitalized = noun[0].isupper()
             return True, "", [[0, noun, noun, "", "proper noun", capitalized]]
 

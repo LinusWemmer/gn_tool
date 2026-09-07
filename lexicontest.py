@@ -284,6 +284,14 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Lieber Thomas!", "Liebey Thomas!"))
         # ... und wenn ParZu das Genus des Adjektivs offenlässt:
         test_sentences.append(("Er gibt sich als heiliger Franz aus.", "En gibt sich als heiligey Franz aus."))
+        # Namen, die ParZu als gewöhnliche Substantive taggt, obwohl sie nur Eigennamen sind:
+        test_sentences.append(("Sie gibt sich als heilige Maria aus.", "En gibt sich als heiligey Maria aus."))
+        # Namen, die zugleich gebräuchliche Substantive sind, zählen nur mit Anrede-Adjektiv:
+        test_sentences.append(("Hallo, liebe Juli!", "Hallo, liebey Juli!"))
+        test_sentences.append(("Liebe Rose!", "Liebey Rose!"))
+        test_sentences.append(("Im Juli fahren wir weg.", "Im Juli fahren wir weg."))
+        test_sentences.append(("Die schöne Rose blüht.", "Die schöne Rose blüht."))
+        test_sentences.append(("Der graue Wolf heult.", "Der graue Wolf heult."))
         # ... Ortsnamen bleiben davon unberührt, weil sie Neutra sind:
         test_sentences.append(("Wir besuchen das schöne Berlin.", "Wir besuchen das schöne Berlin."))
         for i,test in enumerate(test_sentences):
