@@ -880,7 +880,24 @@ class Marking_Tool:
                             # Person bezeichnet ("liebe Juli", aber nicht "im Juli").
                             if other_word_parse[2] in Lexicon.PERSON_ADJECTIVES:
                                 has_person_adjective = True
-                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective)
+                    # Namen aus MASCULINE_NAMES erkennt man am maskulinen Artikel oder Adjektiv;
+                    # bei beiden Wortarten steht das Genus an derselben Stelle der Merkmalsliste.
+                    # ParZu überträgt allerdings das Genus des Substantivs auf das Adjektiv, sodass
+                    # "Lieber Mark!" als Femininum erscheint ("die Mark"). Ohne Artikel zählt daher
+                    # zusätzlich die Oberflächenform: die starke Endung "-er" ist im Nominativ
+                    # maskulin, während sie im Genitiv und Dativ feminin sein könnte.
+                    has_masculine_modifier = False
+                    for other_word_parse in self.parse_list:
+                        if other_word_parse[6] != word_parse[0] or other_word_parse[3] not in ("ART", "ADJA"):
+                            continue
+                        modifier_feats = other_word_parse[5].split("|")
+                        if len(modifier_feats) > 1 and modifier_feats[1] == "Masc":
+                            has_masculine_modifier = True
+                        elif (not has_article and other_word_parse[3] == "ADJA"
+                                and other_word_parse[1].lower().endswith("er")
+                                and feats[1] in ("Nom", "_")):
+                            has_masculine_modifier = True
+                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier)
                     print(list)
                     if list == []:
                         nouns += escape(word_parse[-2])

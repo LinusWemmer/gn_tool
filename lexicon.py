@@ -55,7 +55,12 @@ class Lexicon:
     # dann als Personenbezeichnung, wenn eines der PERSON_ADJECTIVES davorsteht -- sonst würde aus
     # "die schöne Rose" ein "de schöne Rose" und aus "der graue Wolf" ein "de graue Wolf".
     AMBIGUOUS_NAMES = ["Juli", "Mai", "August", "Rose", "Heide", "Linde", "Iris", "Erika",
-                       "Horst", "Ernst", "Frank", "Wolf", "Mark"]
+                       "Horst", "Ernst", "Wolf"]
+
+    # Namen, die sich am Genus vom gleichlautenden Substantiv unterscheiden: "Mark" ist als
+    # Vorname ein Maskulinum, als Substantiv dagegen "die Mark" (Währung, Region) oder "das Mark"
+    # (Knochenmark). Ein maskuliner Artikel oder ein maskulines Adjektiv zeigt daher den Namen an.
+    MASCULINE_NAMES = ["Mark"]
 
     # Vornamen, die praktisch nur als Eigennamen vorkommen, von ParZu je nach Kontext aber als
     # gewöhnliche Substantive getaggt werden ("als heilige Maria"). Sie werden wie Eigennamen
@@ -467,7 +472,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
     # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False):
+    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -692,7 +697,9 @@ class Lexicon:
         # AMBIGUOUS_NAMES sind zugleich gebräuchliche Substantive und zählen nur mit einem
         # Anrede-Adjektiv; Namen aus PROPER_NAMES taggt ParZu manchmal fälschlich als solche.
         # Abkürzungen wie "DDR" oder "USA" bezeichnen keine Personen und bleiben unmarkiert.
-        if noun in Lexicon.AMBIGUOUS_NAMES or word_parse[1] in Lexicon.AMBIGUOUS_NAMES:
+        if noun in Lexicon.MASCULINE_NAMES or word_parse[1] in Lexicon.MASCULINE_NAMES:
+            is_name = has_masculine_modifier
+        elif noun in Lexicon.AMBIGUOUS_NAMES or word_parse[1] in Lexicon.AMBIGUOUS_NAMES:
             is_name = has_person_adjective
         else:
             is_name = ((word_parse[4] == "NE" or noun in Lexicon.PROPER_NAMES)

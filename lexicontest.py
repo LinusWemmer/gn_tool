@@ -292,6 +292,13 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Im Juli fahren wir weg.", "Im Juli fahren wir weg."))
         test_sentences.append(("Die schöne Rose blüht.", "Die schöne Rose blüht."))
         test_sentences.append(("Der graue Wolf heult.", "Der graue Wolf heult."))
+        # "Mark" unterscheidet sich am Genus: der Mark ist ein Name, die/das Mark nicht:
+        test_sentences.append(("Lieber Mark!", "Liebey Mark!"))
+        test_sentences.append(("Der liebe Mark kommt.", "De liebe Mark kommt."))
+        test_sentences.append(("Die Mark war die Währung.", "Die Mark war die Währung."))
+        test_sentences.append(("Das Mark im Knochen ist weich.", "Das Mark im Knochen ist weich."))
+        # "Frank" ist kein gebräuchliches Substantiv und braucht kein Anrede-Adjektiv:
+        test_sentences.append(("Der nette Frank kommt.", "De nette Frank kommt."))
         # ... Ortsnamen bleiben davon unberührt, weil sie Neutra sind:
         test_sentences.append(("Wir besuchen das schöne Berlin.", "Wir besuchen das schöne Berlin."))
         for i,test in enumerate(test_sentences):
