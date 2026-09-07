@@ -180,7 +180,7 @@ def undo_hack_for_ordinal_numbers(input_text: str) -> str:
 def split_prepositions(input_text: str) ->str:
     quotation_mark_pattern = r'„|“|”'
     input_text = re.sub(quotation_mark_pattern, '"', input_text)
-    words = re.split(r"(\s|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_])", input_text)
+    words = re.split(r"(\s|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_])", input_text)
     output = ""
     for word in words:
         if word =="beim":
@@ -243,7 +243,7 @@ def remove_special_character_gendering(input_text: str) ->str:
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})[*_:/]in", r"\1in", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})/-in", r"\1in", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(in\)", r"\1in", input_text)
-    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(inn\)(?=en($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"\1inn", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(inn\)(?=en($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"\1inn", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(innen\)", r"\1innen", input_text)
     input_text = re.sub(r"er[/*_:]sie", "sie", input_text)
     input_text = re.sub(r"sie[/*_:]er", "sie", input_text)
@@ -278,15 +278,15 @@ def remove_special_character_gendering(input_text: str) ->str:
     input_text = re.sub(re.compile(r"([mdks])?([eE])ine[/*_:]\1[eE]in(er|en)?", re.IGNORECASE), r"\1\2ine", input_text)
     input_text = re.sub(re.compile(r"([mdks])?([eE])ine[sm]][/*_:]\1[eE]iner", re.IGNORECASE), r"\1\2iner", input_text)
     input_text = re.sub(re.compile(r"([mdks])?([eE])iner[/*_:]\1[eE]ine[sm]]", re.IGNORECASE), r"\1\2iner", input_text)
-    input_text = re.sub(r"[*_:/]e(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"e[*_:/][rn](?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"er[*_:/]s(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"es[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"er[*_:/]m(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"em[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"\(e\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"e\(r\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"e\(n\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"[*_:/]e(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"e[*_:/][rn](?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"er[*_:/]s(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"es[*_:/]r(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"er[*_:/]m(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"em[*_:/]r(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
+    input_text = re.sub(r"\(e\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"e\(r\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"e\(n\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
     input_text = re.sub(r"[sS]eine?[rsmn]?[/*_:]([iI]hre?[rsmn]?)", r"\1", input_text)
     input_text = re.sub(r"([iI]hr)e?[rsmn]?[/*_:][sS]ein(e?[rsmn]?)", r"\1\2", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ])In", r"\1in", input_text)

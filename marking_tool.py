@@ -1026,9 +1026,9 @@ class Marking_Tool:
             elif re.match(re.compile(r"[mdks]?einer$", re.IGNORECASE),word[1]):
                 pattern = r"([mdks])?eine(r[*_:/][ms]|[ms][*_:/]r|r[*_:/]\1eine[ms]|r)|([mdks])?eine[ms][*_:/]\3einer"
             elif word[1].endswith("e"):
-                pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|[ .,!?;: ‑\n\r\t„“'’\"(){}<>|\[\]+/*_]))"
+                pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))"
             elif word[1].endswith("er"):
-                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|[ .,!?;: ‑\n\r\t„“»«›‹'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|[ .,!?;: ‑\n\r\t„“»«›‹'’\"(){}<>|\[\]+/*_]))"
+                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|[\s.,!?;:‑„“»«›‹'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|[\s.,!?;:‑„“»«›‹'’\"(){}<>|\[\]+/*_]))"
             # elif re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1]):
             #     match = re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1])
             #     pattern = re.escape(word[1]) + "|" + match.group(1) + "In" + match.group(2)
@@ -1038,7 +1038,10 @@ class Marking_Tool:
             if match:
                 realization = match.group(0)
                 remaining_text = input_text[match.end():]
-                whitespace_pattern = "^( |\n|\r|\t| )*"
+                # \s erfasst alle Unicode-Leerzeichen. ParZus Tokenizer trennt auch an schmalen und
+                # typografischen Leerzeichen (U+2000 bis U+200A, U+202F, U+3000 ...); ohne sie
+                # hier liefe die Zuordnung der Wörter auf den Eingabetext aus dem Tritt.
+                whitespace_pattern = "^\\s*"
                 whitespace_match = re.search(whitespace_pattern,remaining_text)
                 input_text = remaining_text[whitespace_match.end():]
                 white_realization = whitespace_match.group(0)

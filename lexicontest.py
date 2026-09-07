@@ -1,6 +1,5 @@
 from lexicon import Lexicon
 from marking_tool import Marking_Tool
-import parzu_class as parzu
 import unittest
 import re
 from __init__ import get_parse
@@ -13,7 +12,6 @@ from __init__ import undo_hack_for_ordinal_numbers
 
 class Sentence_Test(unittest.TestCase):
     def test_sentences(self):
-        ParZu = parzu.Parser(parzu.process_arguments())
         test_sentences = []
         test_sentences.append(("Der Lehrer gibt dem Schüler den Stift.", "De Lehrere gibt derm Schülere den Stift."))
         test_sentences.append(("Er gibt ihr den Stift.", "En gibt em den Stift."))
@@ -356,6 +354,17 @@ class Sentence_Test(unittest.TestCase):
                     list_of_neutralized_nouns.append(nounphrase[0])
             output_text = undo_hack_for_ordinal_numbers(marking_tool.get_sentence())
             self.assertEqual(output_text, test[1], f"Text {i+1} doesn't have correct output.") 
+
+    # ParZus Tokenizer trennt an allen Unicode-Leerzeichen. Kannte die Zuordnung der Wörter auf
+    # den Eingabetext eines davon nicht, geriet sie aus dem Tritt und brach mit einer Exception ab.
+    def test_unicode_whitespace_is_handled(self):
+        for codepoint in (0x2000, 0x2009, 0x202F, 0x205F, 0x3000, 0x2028, 0x2029, 0x0085):
+            text = "Der Lehrer kommt." + chr(codepoint) + "Er ist alt."
+            remaining = text
+            for parse_list in get_parse(remove_special_character_gendering(split_prepositions(text))):
+                marking_tool = Marking_Tool(parse_list, {}, [])
+                # Wirft eine Exception, sobald ein Wort im Eingabetext nicht gefunden wird:
+                remaining = Marking_Tool.find_realizations(marking_tool, remaining)
 
     # HTML aus dem Eingabetext darf nicht ungefiltert in die Markierungsansicht gelangen,
     # sonst liesse sich über den Eingabetext beliebiges Markup einschleusen.
