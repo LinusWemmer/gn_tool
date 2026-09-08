@@ -327,6 +327,12 @@ class Sentence_Test(unittest.TestCase):
         # ... sonst eine Person:
         test_sentences.append(("Der Linke fordert das.", "De Linke fordert das."))
         test_sentences.append(("Eine Linke fordert das.", "Ein Linke fordert das."))
+        # Fehlt ParZu das Genus, wird es an der Form des Determinierers abgelesen:
+        test_sentences.append(("Jede Linke fordert das.", "Jedey Linke fordert das."))
+        test_sentences.append(("Jede Reisende steigt ein.", "Jedey Reisende steigt ein."))
+        test_sentences.append(("Meine Linke schmerzt.", "Meine Linke schmerzt."))
+        # ... "jedes" zeigt ein Neutrum an und damit keine Person:
+        test_sentences.append(("Jedes Gute hat ein Ende.", "Jedes Gute hat ein Ende."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

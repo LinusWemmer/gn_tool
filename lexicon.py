@@ -503,7 +503,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
     # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False,is_epithet=False,has_definite_article=False):
+    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False,is_epithet=False,has_definite_article=False,inferred_gender="_"):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -713,11 +713,13 @@ class Lexicon:
             # Auch hier gilt die Endungsprobe: Im Genitiv und Dativ trägt ein substantiviertes
             # Adjektiv eine Endung, die blosse Grundform ist dort ein gewöhnliches Substantiv
             # ("aus Liebe").
-            if (feats[0] in ("Masc", "Fem") and noun in Lexicon.SUBSTANTIVIZABLE_ADJ
+            # Fehlt das Genus, wird das aus der Form des Determinierers erschlossene verwendet.
+            gender = feats[0] if feats[0] in ("Masc", "Fem") else inferred_gender
+            if (gender in ("Masc", "Fem") and noun in Lexicon.SUBSTANTIVIZABLE_ADJ
                     and not (len(feats) > 1 and feats[1] in ("Gen", "Dat")
                              and word_parse[1].lower().endswith(noun.lower()))
                     and not any(noun.lower().endswith(exception) for exception in Lexicon.NO_SUBST_ADJ)
-                    and not (feats[0] == "Fem" and (has_definite_article or has_possessive)
+                    and not (gender == "Fem" and (has_definite_article or has_possessive)
                              and any(noun.lower().endswith(exception)
                                      for exception in Lexicon.NO_SUBST_ADJ_FEM_DEFINITE))):
                 return True, "", [[0, noun, noun, "", "substantivized adjective", True]]
