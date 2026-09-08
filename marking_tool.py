@@ -322,6 +322,25 @@ class Marking_Tool:
         head = self.parse_list[int(first_noun[6])-1]
         return head[3] == "V" and "Pl" in head[5]
 
+    # Erkennt Beinamen wie "Peter dem Großen" oder "Katharina die Große": ein grossgeschriebenes
+    # Adjektiv, dem unmittelbar ein Artikel und davor ein Eigenname vorangeht. ParZu hängt solche
+    # Adjektive als Attribut an ein späteres Substantiv, sodass sie sonst unmarkiert blieben.
+    # Der vorangehende Artikel gehört mit zur Nominalphrase, auch wenn ParZu ihn anders anbindet.
+    def is_name_epithet(self, pos:int) -> bool:
+        if pos < 2:
+            return False
+        adjective, article, name = self.parse_list[pos], self.parse_list[pos-1], self.parse_list[pos-2]
+        if not (adjective[1][0].isupper() and article[3] == "ART"
+                and not article[1].lower().startswith("das") and name[4] == "NE"):
+            return False
+        if adjective[3] == "ADJA":
+            return True
+        # In den obliquen Kasus gibt ParZu den Beinamen oft als Substantiv aus, lemmatisiert ihn
+        # aber adjektivisch ("Großen" zu "Große"). Diese Endung unterscheidet ihn von einer
+        # gewöhnlichen Apposition, deren Grundform mit der Wortform übereinstimmt ("die Metropole").
+        return (adjective[3] == "N" and "Pl" not in article[5]
+                and adjective[1].lower() in [adjective[2].lower() + ending for ending in ("n", "r", "s", "m")])
+
     def singular_verb(self, pos:int):
         if "Sg" in self.parse_list[pos][5]:
             return True
@@ -842,21 +861,30 @@ class Marking_Tool:
                 # Hängt ein grossgeschriebenes Adjektiv als Genitivattribut ("gmod") an einem Nomen,
                 # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
                 # Adjektiv trägt dort "attr".
-                elif word_parse[3] == "N" or (word_parse[3] == "ADJA" and word_parse[1][0].isupper() and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
+                elif word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and word_parse[1][0].isupper() and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
                     # Ein grossgeschriebenes Adjektiv ohne Nomen darüber ist substantiviert. ParZu
                     # gibt es aber nicht immer als Nomen aus -- "liebe Kim" wird beim Reparse zu
                     # einem Nomen, "liebe Juli" wegen des Monatsnamens nicht. Die Zeile wird deshalb
                     # auf ein Nomen umgeschrieben, so wie unten allein stehende Artikel zu Pronomen
                     # werden; sonst greift bei der Neutralisierung der Zweig für Substantive nicht.
+                    is_epithet = self.is_name_epithet(pos)
                     if word_parse[3] == "ADJA":
                         # ParZu liefert für solche Wörter oft ein falsches Lemma.
                         word_parse[2] = word_parse[1]
-                        # Merkmalsliste von "Pos|Genus|Kasus|Numerus|Flexion|" auf "Genus|Kasus|Numerus":
-                        adjective_feats = word_parse[5].split("|")
+                        # Merkmalsliste von "Pos|Genus|Kasus|Numerus|Flexion|" auf "Genus|Kasus|Numerus".
+                        # Beim Beinamen sind die Merkmale des Adjektivs leer, die des Artikels aber
+                        # gesetzt ("dem" ist "Def|_|Dat|Sg"), deshalb werden sie von dort übernommen.
+                        source_feats = self.parse_list[pos-1][5] if is_epithet else word_parse[5]
+                        adjective_feats = source_feats.split("|")
                         if len(adjective_feats) >= 4:
                             self.parse_list[pos][5] = "|".join(adjective_feats[1:4])
                         self.parse_list[pos][3] = "N"
                     self.find_nounphrase(word_parse)
+                    if is_epithet:
+                        # Der vorangehende Artikel wird der Nominalphrase zugeschlagen, damit er
+                        # mitneutralisiert wird ("Peter dem Großen" ergibt "Peter derm Großen").
+                        if pos not in self.nounphrases[int(word_parse[0])]:
+                            self.nounphrases[int(word_parse[0])].append(pos)
                     feats = self.parse_list[pos][5].split("|")
                     if len(feats) == 1:
                         feats = ["_","_","_"]
@@ -917,7 +945,7 @@ class Marking_Tool:
                                 and other_word_parse[1].lower().endswith("er")
                                 and feats[1] in ("Nom", "_")):
                             has_masculine_modifier = True
-                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier)
+                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier,is_epithet)
                     print(list)
                     if list == []:
                         nouns += escape(word_parse[-2])

@@ -479,7 +479,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
     # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False):
+    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False,is_epithet=False):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -692,13 +692,16 @@ class Lexicon:
                 list.append([match_position, original, match.group(1).capitalize(), "", "substantivized adjective", capitalized])
                 return True, prefix, list
         
-        # The following case covers lonely adjectives that were artificially capitalized before reparsing:
-        if word_parse[1][0].isupper() and word_parse[-2][0].islower():
+        # The following case covers lonely adjectives that were artificially capitalized before
+        # reparsing, sowie Beinamen wie "Peter dem Großen", die von Haus aus grossgeschrieben sind:
+        if (word_parse[1][0].isupper() and word_parse[-2][0].islower()) or is_epithet:
             if noun.endswith("er") or noun.endswith("en") or noun.endswith("em") or noun.endswith("es"):
                 neutral_base = noun[:-1]
             else:
                 neutral_base = noun
-            return True, "", [[0, noun, neutral_base, "", "substantivized adjective", False]]
+            # Künstlich kapitalisierte Adjektive werden wieder kleingeschrieben, ein Beiname
+            # ("Peter dem Großen") behält dagegen seine Grossschreibung.
+            return True, "", [[0, noun, neutral_base, "", "substantivized adjective", is_epithet]]
         
         # Eigennamen sind markierbar, wenn ein Artikel oder ein Adjektiv an ihnen hängt. Namen aus
         # AMBIGUOUS_NAMES sind zugleich gebräuchliche Substantive und zählen nur mit einem

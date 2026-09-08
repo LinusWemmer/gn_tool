@@ -307,8 +307,6 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Wo ist Mutter oder Vater?", "Wo ist Elter?"))
         # ... und echte Doppelnennungen im Plural sind unberührt:
         test_sentences.append(("Die Bürgerinnen und Bürger stimmen ab.", "Die Bürgerne stimmen ab."))
-        # Ein Artikel, den ParZu nicht an sein Substantiv anbinden konnte, ist kein Pronomen:
-        test_sentences.append(("Die von Peter dem Großen gegründete Akademie in Sankt Petersburg sollte die Ausbildung in Russland verbessern und den wissenschaftlichen Vorsprung Westeuropas aufholen.", "Die von Peter dem Großen gegründete Akademie in Sankt Petersburg sollte die Ausbildung in Russland verbessern und den wissenschaftlichen Vorsprung Westeuropas aufholen."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])
@@ -379,6 +377,28 @@ class Sentence_Test(unittest.TestCase):
                 for position, component in re.findall(r'id="\d+\|(\d+)\|(-?\d+)"', marked):
                     # Darf keine Exception werfen:
                     marking_tool.neutralize_nounphrase(int(position) - 1, [int(component)])
+
+    # ParZu bindet in diesem Satz den Artikel "Die" nicht an "Akademie" an und hängt den Beinamen
+    # "Großen" als Attribut an ein späteres Substantiv. Der Ablauf hier entspricht dem der
+    # Anwendung: eine einzige Marking_Tool-Instanz, die genau einmal markiert.
+    def test_dangling_article_and_epithet(self):
+        text = ("Die von Peter dem Großen gegründete Akademie in Sankt Petersburg sollte die "
+                "Ausbildung in Russland verbessern und den wissenschaftlichen Vorsprung "
+                "Westeuropas aufholen.")
+        parse = get_parse(remove_special_character_gendering(split_prepositions(text)))
+        marking_tool = Marking_Tool(parse[0], {}, [])
+        Marking_Tool.find_realizations(marking_tool, text)
+        marked = marking_tool.get_marking_form(0)
+        selection = [(int(a), int(b)) for a, b in re.findall(r'id="\d+\|(\d+)\|(-?\d+)"', marked)]
+        done = []
+        for position, component in selection:
+            if position not in done:
+                components = [c for p, c in selection if p == position]
+                marking_tool.neutralize_nounphrase(position - 1, components)
+                done.append(position)
+        output = marking_tool.get_sentence()
+        self.assertIn("derm Großen", output, "Der Beiname wurde nicht neutralisiert")
+        self.assertNotIn("Diey", output, "Der nicht angebundene Artikel wurde neutralisiert")
 
     # ParZus Tokenizer trennt an allen Unicode-Leerzeichen. Kannte die Zuordnung der Wörter auf
     # den Eingabetext eines davon nicht, geriet sie aus dem Tritt und brach mit einer Exception ab.
