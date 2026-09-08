@@ -307,6 +307,17 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Wo ist Mutter oder Vater?", "Wo ist Elter?"))
         # ... und echte Doppelnennungen im Plural sind unberührt:
         test_sentences.append(("Die Bürgerinnen und Bürger stimmen ab.", "Die Bürgerne stimmen ab."))
+        # Jedes Adjektiv gilt bei eindeutigem Genus als substantiviert, nicht nur die kuratierte Liste:
+        test_sentences.append(("Die Reisende steigt ein.", "De Reisende steigt ein."))
+        test_sentences.append(("Der Betroffene klagt.", "De Betroffene klagt."))
+        test_sentences.append(("Die Überlebende berichtet.", "De Überlebende berichtet."))
+        test_sentences.append(("Katharina die Große kam.", "Katharina de Große kam."))
+        # ... im Neutrum bezeichnet es keine Person:
+        test_sentences.append(("Das Gute siegt.", "Das Gute siegt."))
+        # ... und deadjektivische Abstrakta bleiben aussen vor:
+        test_sentences.append(("Die Ebene ist flach.", "Die Ebene ist flach."))
+        test_sentences.append(("Die Klasse lacht.", "Die Klasse lacht."))
+        test_sentences.append(("Auf diese Weise geht es.", "Auf diese Weise geht es."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

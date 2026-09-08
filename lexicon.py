@@ -69,6 +69,16 @@ class Lexicon:
                     "Vera", "Silke", "Lisa", "Noah", "Luca", "Finn", "Emil", "Ida", "Mila",
                     "Johanna"]
 
+    # Wörter, die auf ein Adjektiv zurückgehen, aber keine Person bezeichnen -- meist
+    # deadjektivische Abstrakta auf "-e" ("die Tiefe", "die Ebene", "die Weise"). Der Abgleich
+    # erfolgt über das Wortende, damit Komposita mitgehen ("Vorgehensweise", "Arbeiterklasse",
+    # "Regierungsebene"). Ermittelt aus den Kollisionen mit den häufigsten Substantiven der
+    # ParZu-Frequenzdaten.
+    NO_SUBST_ADJ = ["weise", "ebene", "klasse", "flotte", "note", "dichte", "breite", "weite",
+                    "tiefe", "ferne", "reife", "schwere", "strenge", "wunde", "wüste", "dürre",
+                    "rasse", "banane", "alternative", "kontroverse", "offensive", "exekutive",
+                    "parallele", "innere", "linke", "weiche"]
+
     # Adjektive, die vor einem Namen eine angeredete Person anzeigen.
     PERSON_ADJECTIVES = ["lieb", "geehrt", "verehrt", "wert"]
 
@@ -116,6 +126,15 @@ class Lexicon:
     with open("static/substantivierte_adjektive.txt") as f_sub_adj:
         for line in f_sub_adj:
             SUBST_ADJ.append(line.rstrip())
+
+    # Substantivierungsformen aller Adjektive und Partizipien, erzeugt mit dem Zmorge-Transducer
+    # aus /usr/share/dict/ngerman (siehe static/Adjektiv-Skript.py). Sie greifen nur, wenn ParZu
+    # ein eindeutiges Genus liefert; die kuratierte Liste oben bleibt für die Fälle zuständig, in
+    # denen Maskulinum und Neutrum formal zusammenfallen.
+    SUBSTANTIVIZABLE_ADJ = set()
+    with open("static/substantivierbare_adjektive.txt") as f_adj:
+        for line in f_adj:
+            SUBSTANTIVIZABLE_ADJ.add(line.rstrip())
 
     UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
 
@@ -681,6 +700,20 @@ class Lexicon:
                         list.append([match_position, original, match.group(1).capitalize(), "", "substantivized adjective", capitalized])
                         return True, prefix, list
             
+            # Über die kuratierte Liste hinaus zählt jedes Adjektiv als substantiviert, sofern
+            # ParZu ein eindeutiges Genus liefert: Ein neutrum substantiviertes Adjektiv bezeichnet
+            # keine Person ("das Gute"), ein maskulines oder feminines dagegen schon ("die
+            # Reisende"). Im Genitiv und Dativ fallen Maskulinum und Neutrum formal zusammen, dort
+            # bleibt die kuratierte Liste zuständig.
+            # Auch hier gilt die Endungsprobe: Im Genitiv und Dativ trägt ein substantiviertes
+            # Adjektiv eine Endung, die blosse Grundform ist dort ein gewöhnliches Substantiv
+            # ("aus Liebe").
+            if (feats[0] in ("Masc", "Fem") and noun in Lexicon.SUBSTANTIVIZABLE_ADJ
+                    and not (len(feats) > 1 and feats[1] in ("Gen", "Dat")
+                             and word_parse[1].lower().endswith(noun.lower()))
+                    and not any(noun.lower().endswith(exception) for exception in Lexicon.NO_SUBST_ADJ)):
+                return True, "", [[0, noun, noun, "", "substantivized adjective", True]]
+
             sprachige_pattern = r"(..+sprachige)(r|n|m|s)?$"
             match = re.search(sprachige_pattern, noun.lower())
             if match:
