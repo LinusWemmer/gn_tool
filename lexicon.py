@@ -84,6 +84,27 @@ class Lexicon:
     # "mit seiner Linken"), sonst eine Person ("der Linke", "eine Linke").
     NO_SUBST_ADJ_FEM_DEFINITE = ["linke"]
 
+    # Eigennamen, die keine Person bezeichnen. Nötig, weil die Regel für Eigennamen mit Artikel
+    # ("Wo ist die Kim?" wird zu "Wo ist de Kim?") sonst auch Länder-, Gewässer- und
+    # Organisationsnamen erfasst und "aus der Community" zu "aus derm Community" machte.
+    # Akronyme wie EU oder NATO sind bereits über die Grossschreibung ausgenommen, artikellose
+    # Namen wie Deutschland oder China stehen ohnehin aussen vor. Die Liste ist erweiterbar.
+    NO_PERSON_NAMES = [
+        # Fremdwörter, die ParZu als Eigennamen führt:
+        "community", "location", "performance", "message", "story", "crew", "lobby", "szene",
+        # Länder und Regionen, die einen Artikel tragen:
+        "schweiz", "türkei", "ukraine", "irak", "iran", "kosovo", "balkan", "niederlande",
+        "slowakei", "mongolei", "philippinen", "sudan", "libanon", "jemen", "kongo", "krim",
+        "elfenbeinküste", "sahara", "karibik", "arktis", "antarktis", "toskana", "bretagne",
+        "normandie", "provence", "riviera", "algarve", "pfalz", "lausitz", "eifel", "uckermark",
+        "sowjetunion", "bundesrepublik", "emirate", "seychellen", "malediven", "kanaren", "azoren",
+        # Gewässer und Gebirge:
+        "rhein", "donau", "elbe", "main", "mosel", "spree", "oder", "themse", "seine", "wolga",
+        "nil", "amazonas", "harz", "schwarzwald", "himalaya", "anden", "alpen",
+        # Organisationen:
+        "union", "kommission", "bundestag", "bundesrat", "sowjetunion",
+    ]
+
     # Adjektive, die vor einem Namen eine angeredete Person anzeigen.
     PERSON_ADJECTIVES = ["lieb", "geehrt", "verehrt", "wert"]
 
@@ -767,7 +788,8 @@ class Lexicon:
             is_name = has_person_adjective
         else:
             is_name = ((word_parse[4] == "NE" or noun in Lexicon.PROPER_NAMES)
-                       and (has_article or has_adjective))
+                       and (has_article or has_adjective)
+                       and noun.lower() not in Lexicon.NO_PERSON_NAMES)
         if is_name and not (len(noun) > 1 and noun.isupper()):
             capitalized = noun[0].isupper()
             return True, "", [[0, noun, noun, "", "proper noun", capitalized]]
