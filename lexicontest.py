@@ -307,6 +307,8 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Wo ist Mutter oder Vater?", "Wo ist Elter?"))
         # ... und echte Doppelnennungen im Plural sind unberührt:
         test_sentences.append(("Die Bürgerinnen und Bürger stimmen ab.", "Die Bürgerne stimmen ab."))
+        # Ein Artikel, den ParZu nicht an sein Substantiv anbinden konnte, ist kein Pronomen:
+        test_sentences.append(("Die von Peter dem Großen gegründete Akademie in Sankt Petersburg sollte die Ausbildung in Russland verbessern und den wissenschaftlichen Vorsprung Westeuropas aufholen.", "Die von Peter dem Großen gegründete Akademie in Sankt Petersburg sollte die Ausbildung in Russland verbessern und den wissenschaftlichen Vorsprung Westeuropas aufholen."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

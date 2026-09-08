@@ -968,7 +968,11 @@ class Marking_Tool:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
-                elif word_parse[3] == "ART" and word_parse[6] == "0" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[1].startswith("das") and not word_parse[2] == "wenige":
+                # Ein Artikel an der Satzwurzel wird pronominal verwendet ("Nur eine von hundert
+                # kennt ..."). Dann kennt ParZu sein Genus. Bleibt es unbestimmt, handelt es sich
+                # um einen Artikel, den ParZu nur nicht an sein Substantiv anbinden konnte -- so
+                # in "Die von Peter dem Großen gegründete Akademie ...".
+                elif word_parse[3] == "ART" and word_parse[6] == "0" and word_parse[5].split("|")[1:2] in (["Masc"], ["Fem"]) and ("Pl" not in word_parse[5]) and not word_parse[1].startswith("das") and not word_parse[2] == "wenige":
                     # Search if the article is part of a noun phrase:
                     article_dependent = False
                     for key in self.nounphrases:
