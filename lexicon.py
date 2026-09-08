@@ -67,7 +67,12 @@ class Lexicon:
     # behandelt. Die Liste lässt sich jederzeit erweitern.
     PROPER_NAMES = ["Maria", "Anna", "Julia", "Klara", "Nele", "Merle", "Frieda", "Jens", "Sven",
                     "Vera", "Silke", "Lisa", "Noah", "Luca", "Finn", "Emil", "Ida", "Mila",
-                    "Johanna"]
+                    "Johanna",
+                    # Namen, die static/personennamen.txt aussortiert, weil sie im Korpus in
+                    # geringem Umfang auch als gewöhnliches Wort vorkommen -- bei ihnen
+                    # überwiegt der Name aber deutlich.
+                    "Frank", "Peer", "Tim", "Bert", "Severin", "Leonardo", "Daphne", "Viola",
+                    "Rosa"]
 
     # Wörter, die auf ein Adjektiv zurückgehen, aber keine Person bezeichnen -- meist
     # deadjektivische Abstrakta auf "-e" ("die Tiefe", "die Ebene", "die Weise"). Der Abgleich
@@ -161,6 +166,25 @@ class Lexicon:
     with open("static/substantivierbare_adjektive.txt") as f_adj:
         for line in f_adj:
             SUBSTANTIVIZABLE_ADJ.add(line.rstrip())
+
+    # Vor- und Nachnamen, an denen ein Artikel oder Adjektiv markierbar wird ("die Kim" wird
+    # zu "de Kim"). Erzeugt von static/Namen-Skript.py aus drei Namensammlungen; wer im Korpus
+    # oder in Zmorge als gewöhnliches Wort belegt ist, steht nicht drin ("Berg", "Bauer",
+    # "Community"), ebensowenig Länder- und Gewässernamen.
+    PERSON_NAMES = set()
+    with open("static/personennamen.txt") as f_person_names:
+        for line in f_person_names:
+            if not line.startswith("#"):
+                PERSON_NAMES.add(line.rstrip())
+
+    # Namen auf "-mann", die keine gewöhnlichen Wörter sind. Ohne sie würde aus "Hermann"
+    # ein "Herperson" und aus "Riemann" ein "Rieperson". "Zimmermann", "Bergmann" und
+    # "Kaufmann" stehen nicht drin und bleiben deshalb über person_pattern markierbar.
+    NAMES_IN_MANN = set()
+    with open("static/namen_auf_mann.txt") as f_mann_names:
+        for line in f_mann_names:
+            if not line.startswith("#"):
+                NAMES_IN_MANN.add(line.rstrip())
 
     UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
 
@@ -639,6 +663,10 @@ class Lexicon:
 
         person_pattern = r"((m(a|ä)nn(er)?)|(frau(en)?)|herr(e?n)?|damen?)$"
         match = re.search(person_pattern, noun.lower())
+        # Namen wie "Hermann" oder "Pellmann" enden zwar auf "-mann", sind aber keine
+        # Komposita mit einer Personenbezeichnung.
+        if noun in Lexicon.NAMES_IN_MANN or word_parse[1] in Lexicon.NAMES_IN_MANN:
+            match = None
         if match:
             match_position = match.start()
             prenoun = noun[:match_position]
@@ -778,16 +806,19 @@ class Lexicon:
             # ("Peter dem Großen") behält dagegen seine Grossschreibung.
             return True, "", [[0, noun, neutral_base, "", "substantivized adjective", is_epithet]]
         
-        # Eigennamen sind markierbar, wenn ein Artikel oder ein Adjektiv an ihnen hängt. Namen aus
-        # AMBIGUOUS_NAMES sind zugleich gebräuchliche Substantive und zählen nur mit einem
-        # Anrede-Adjektiv; Namen aus PROPER_NAMES taggt ParZu manchmal fälschlich als solche.
+        # Eigennamen sind markierbar, wenn ein Artikel oder ein Adjektiv an ihnen hängt und der
+        # Name als Vor- oder Nachname geführt wird. Die Liste der Personennamen ersetzt die
+        # frühere Regel, jedes von ParZu als NE getaggte Wort zu nehmen -- die erfasste auch
+        # Länder-, Gewässer- und Organisationsnamen. Namen aus AMBIGUOUS_NAMES sind zugleich
+        # gebräuchliche Substantive und zählen nur mit einem Anrede-Adjektiv.
         # Abkürzungen wie "DDR" oder "USA" bezeichnen keine Personen und bleiben unmarkiert.
         if noun in Lexicon.MASCULINE_NAMES or word_parse[1] in Lexicon.MASCULINE_NAMES:
             is_name = has_masculine_modifier
         elif noun in Lexicon.AMBIGUOUS_NAMES or word_parse[1] in Lexicon.AMBIGUOUS_NAMES:
             is_name = has_person_adjective
         else:
-            is_name = ((word_parse[4] == "NE" or noun in Lexicon.PROPER_NAMES)
+            is_name = ((noun in Lexicon.PERSON_NAMES or word_parse[1] in Lexicon.PERSON_NAMES
+                        or noun in Lexicon.PROPER_NAMES)
                        and (has_article or has_adjective)
                        and noun.lower() not in Lexicon.NO_PERSON_NAMES)
         if is_name and not (len(noun) > 1 and noun.isupper()):

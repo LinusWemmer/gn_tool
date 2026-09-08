@@ -147,6 +147,32 @@ coincide. `Lexicon.NO_SUBST_ADJ` excludes deadjectival abstracts that are not pe
 definite article or possessive (`die Linke` the party, `mit seiner Linken` the hand) but a person
 otherwise (`der Linke`, `eine Linke`).
 
+### Person names
+
+`static/personennamen.txt` (~86600 first and last names) is what makes a proper noun markable: an
+article or adjective hanging off a name is neutralized (`die Kim` → `de Kim`, `der bekannte Euler`
+→ `de bekannte Euler`), and only names **in this list** qualify. It replaced the earlier rule "any
+token ParZu tags `NE`", which also caught country, river and organisation names (`die Nato` → `de
+Nato`). `Lexicon.PROPER_NAMES` is the curated override for names the generator drops (`Frank` —
+`frank und frei` makes it look like an adjective in the corpus); `AMBIGUOUS_NAMES`,
+`MASCULINE_NAMES` and `NO_PERSON_NAMES` still take precedence over the list.
+
+`static/namen_auf_mann.txt` (~1800 entries) blocks `person_pattern` for names ending in `-mann`
+that are not ordinary words, so `Hermann` no longer becomes `Herperson`. `Zimmermann`, `Bergmann`
+and `Kaufmann` are deliberately **absent** — they are real common nouns and must keep turning into
+`Zimmerperson` etc.
+
+Both files come from `static/Namen-Skript.py` (run from inside `static/`), which downloads three
+name collections (Winkelmann's firstname-database, the phonet4n surname list, Wikidata) and prunes
+them with two independent tests for "this is also an ordinary word": the ParZu frequency data in
+`statistics/freq_data.pl` (drops `Berg`, `Bauer`, `Kai`, `Community`) and Zmorge (drops corpus-absent
+words like `Ahorn`, `Amsel`). Both are needed — the frequency data misses rare words, and Zmorge
+lists many pure first names as nouns (`Anna`, `Julia`, `Noah`). A **lexicalized** Zmorge `<+NN>`
+reading is also what separates `Zimmermann` from `Neumann`: `Neu<#>mann` is only a productive
+decomposition, which Zmorge forms for any name. The script queries Wikidata live, so a rerun can
+differ slightly; it aborts if a query returns implausibly few rows (the endpoint truncates silently
+during outages instead of erroring).
+
 ## Conventions
 
 - Comments and user-facing strings are German; code identifiers are English. Keep that split.
