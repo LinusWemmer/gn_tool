@@ -252,6 +252,14 @@ class Marking_Tool:
             elif any(other[6] == self.parse_list[pos][0] and other[7] == "app" and "Pl" not in other[5]
                      for other in self.parse_list):
                 feats[2] = "Sg"
+            # Ein attributives Adjektiv auf "-er" im Maskulinum ist der starke Nominativ Singular
+            # ("Du kleiner Lehrer"); im Plural stünde dort "kleine" oder "kleinen". Damit lässt sich
+            # der Numerus bestimmen, den ParZu beim Substantiv offenlässt.
+            elif any(other[6] == self.parse_list[pos][0] and other[3] == "ADJA"
+                     and other[1].lower().endswith("er") and "Pl" not in other[5]
+                     and other[5].split("|")[1:2] == ["Masc"]
+                     for other in self.parse_list):
+                feats[2] = "Sg"
             # Wenn das Substantiv nicht von "als" abhängig ist (lässt sich im ParZu-Parsebaum überprüfen),
             # setze den Numerus des Substantivs auf "Pl":
             elif not re.match(r"(A|a)ls", self.parse_list[int(self.parse_list[pos][6])-1][1]):

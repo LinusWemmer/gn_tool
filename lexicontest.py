@@ -347,6 +347,11 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der 37-Jährige sagte das.", "De 37-Jährige sagte das."))
         test_sentences.append(("Die 18-Jährige gewann.", "De 18-Jährige gewann."))
         test_sentences.append(("Der 37-jährige Mann sagte das.", "Die 37-jährige Person sagte das."))
+        # Ein Adjektiv auf "-er" im Maskulinum zeigt den Singular an, den ParZu offenlässt:
+        test_sentences.append(("Du kleiner Lehrer!", "Du kleiney Lehrere!"))
+        # ... im Plural bleibt es beim Plural:
+        test_sentences.append(("Kleine Lehrer kommen.", "Kleine Lehrerne kommen."))
+        test_sentences.append(("Die Arbeit kleiner Lehrer ist wichtig.", "Die Arbeit kleiner Lehrerne ist wichtig."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])
