@@ -299,6 +299,14 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der nette Frank kommt.", "De nette Frank kommt."))
         # ... Ortsnamen bleiben davon unberührt, weil sie Neutra sind:
         test_sentences.append(("Wir besuchen das schöne Berlin.", "Wir besuchen das schöne Berlin."))
+        # Zwei Einzelpersonen als Subjekt eines pluralischen Verbs werden nicht wie eine
+        # Doppelnennung zusammengezogen:
+        test_sentences.append(("Wo sind Mutter und Vater?", "Wo sind Elter und Elter?"))
+        test_sentences.append(("Wo sind Sohn und Tochter?", "Wo sind Kind und Kind?"))
+        # ... bei singularischem Verb bleibt die Zusammenführung dagegen richtig:
+        test_sentences.append(("Wo ist Mutter oder Vater?", "Wo ist Elter?"))
+        # ... und echte Doppelnennungen im Plural sind unberührt:
+        test_sentences.append(("Die Bürgerinnen und Bürger stimmen ab.", "Die Bürgerne stimmen ab."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

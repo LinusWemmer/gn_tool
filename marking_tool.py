@@ -305,6 +305,23 @@ class Marking_Tool:
                     else:
                         feats[2] = "Sg"
 
+    # Zwei singularische Substantive, die zusammen das Subjekt eines pluralischen Verbs bilden,
+    # bezeichnen zwei verschiedene Personen: "Wo sind Mutter und Vater?" fragt nach zweien. Solche
+    # Paare dürfen nicht wie eine Doppelnennung ("Bürgerinnen und Bürger", die dieselbe Gruppe
+    # zweimal benennt) zu einer Form zusammengezogen werden.
+    # Das Argument ist die Position der Konjunktion.
+    def is_plural_subject_pair(self, pos:int) -> bool:
+        if pos < 1 or pos + 1 >= len(self.parse_list):
+            return False
+        first_noun = self.parse_list[pos-1]
+        second_noun = self.parse_list[pos+1]
+        if "Sg" not in first_noun[5] or "Sg" not in second_noun[5]:
+            return False
+        if first_noun[7] != "subj" or int(first_noun[6]) == 0:
+            return False
+        head = self.parse_list[int(first_noun[6])-1]
+        return head[3] == "V" and "Pl" in head[5]
+
     def singular_verb(self, pos:int):
         if "Sg" in self.parse_list[pos][5]:
             return True
@@ -593,6 +610,9 @@ class Marking_Tool:
         noun_pair_prefixes = {}
         for pos, word_parse in enumerate(self.parse_list):
             if word_parse[1] == "und" or word_parse[1] == "oder" or word_parse[1] == "/" or word_parse[1] == "bzw." or word_parse[1] == "bzw" or word_parse[1] == "+":
+                # Zwei Einzelpersonen als Subjekt eines pluralischen Verbs werden nicht zusammengezogen.
+                if self.is_plural_subject_pair(pos):
+                    continue
                 # Schaue, ob das Wort davor ein feminines Personensubstantiv ist:
                 for j, line in enumerate(Lexicon.FEMALE_NOUNS):
                     if self.parse_list[pos-1][2] == line:
