@@ -169,6 +169,12 @@ class Lexicon:
     # Eingabe abgelesen und nicht aus den Wortlisten, weil deren feminine Spalte stellenweise
     # fehlerhaft ist ("Zahnarztin" statt "Zahnärztin"); Wörter, bei denen der Umlaut nichts
     # über den Plural aussagt, stehen in NO_PLURAL_UMLAUT.
+    # Prüft, ob ein Wort grossgeschrieben ist. Der erste Buchstabe ist nicht immer das erste
+    # Zeichen: "37-Jährige" beginnt mit einer Ziffer.
+    def starts_uppercase(word) -> bool:
+        letters = [character for character in word if character.isalpha()]
+        return bool(letters) and letters[0].isupper()
+
     # Schlägt die Endung zum Kasus nach. Fehlt der Kasus in ParZus Analyse oder ist er unbekannt,
     # wird er als Nominativ behandelt. Das kann falsch sein, ist aber besser als ein Abbruch: Bei
     # ungrammatischer Eingabe wie "ein dumme Frau" lässt ParZu den Kasus offen, und der Zugriff
@@ -715,14 +721,19 @@ class Lexicon:
             # ("aus Liebe").
             # Fehlt das Genus, wird das aus der Form des Determinierers erschlossene verwendet.
             gender = feats[0] if feats[0] in ("Masc", "Fem") else inferred_gender
-            if (gender in ("Masc", "Fem") and noun in Lexicon.SUBSTANTIVIZABLE_ADJ
+            # Bei Altersangaben wie "37-Jährige" steht das substantivierte Adjektiv im zweiten
+            # Bestandteil; die Zahl davor wird als Vorderglied unverändert übernommen.
+            number_match = re.match(r"(\d+-)(.+)$", noun)
+            number_prefix = number_match.group(1) if number_match else ""
+            core = number_match.group(2) if number_match else noun
+            if (gender in ("Masc", "Fem") and core in Lexicon.SUBSTANTIVIZABLE_ADJ
                     and not (len(feats) > 1 and feats[1] in ("Gen", "Dat")
-                             and word_parse[1].lower().endswith(noun.lower()))
-                    and not any(noun.lower().endswith(exception) for exception in Lexicon.NO_SUBST_ADJ)
+                             and word_parse[1].lower().endswith(core.lower()))
+                    and not any(core.lower().endswith(exception) for exception in Lexicon.NO_SUBST_ADJ)
                     and not (gender == "Fem" and (has_definite_article or has_possessive)
-                             and any(noun.lower().endswith(exception)
+                             and any(core.lower().endswith(exception)
                                      for exception in Lexicon.NO_SUBST_ADJ_FEM_DEFINITE))):
-                return True, "", [[0, noun, noun, "", "substantivized adjective", True]]
+                return True, number_prefix, [[len(number_prefix), core, core, "", "substantivized adjective", True]]
 
             sprachige_pattern = r"(..+sprachige)(r|n|m|s)?$"
             match = re.search(sprachige_pattern, noun.lower())

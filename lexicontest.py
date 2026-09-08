@@ -343,6 +343,10 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Lieblingsomi kommt.", "De Lieblingsowi kommt."))
         # "ihr" bleibt markierbar, auch wenn es sich nicht auf eine Person bezieht:
         test_sentences.append(("Die Zeitschriften stellten ihr Erscheinen ein.", "Die Zeitschriften stellten ens Erscheinen ein."))
+        # Altersangaben: die Grossschreibung steht hinter der Zahl, das Adjektiv im zweiten Teil:
+        test_sentences.append(("Der 37-Jährige sagte das.", "De 37-Jährige sagte das."))
+        test_sentences.append(("Die 18-Jährige gewann.", "De 18-Jährige gewann."))
+        test_sentences.append(("Der 37-jährige Mann sagte das.", "Die 37-jährige Person sagte das."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

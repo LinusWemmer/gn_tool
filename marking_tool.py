@@ -330,7 +330,7 @@ class Marking_Tool:
         if pos < 2:
             return False
         adjective, article, name = self.parse_list[pos], self.parse_list[pos-1], self.parse_list[pos-2]
-        if not (adjective[1][0].isupper() and article[3] == "ART"
+        if not (Lexicon.starts_uppercase(adjective[1]) and article[3] == "ART"
                 and not article[1].lower().startswith("das") and name[4] == "NE"):
             return False
         if adjective[3] == "ADJA":
@@ -869,7 +869,7 @@ class Marking_Tool:
                 # Hängt ein grossgeschriebenes Adjektiv als Genitivattribut ("gmod") an einem Nomen,
                 # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
                 # Adjektiv trägt dort "attr".
-                elif word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and word_parse[1][0].isupper() and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
+                elif word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
                     # Ein grossgeschriebenes Adjektiv ohne Nomen darüber ist substantiviert. ParZu
                     # gibt es aber nicht immer als Nomen aus -- "liebe Kim" wird beim Reparse zu
                     # einem Nomen, "liebe Juli" wegen des Monatsnamens nicht. Die Zeile wird deshalb
