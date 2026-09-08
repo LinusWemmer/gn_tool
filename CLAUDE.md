@@ -143,6 +143,9 @@ unambiguous masculine or feminine — a neuter nominalized adjective denotes a t
 so the curated list above stays responsible for the genitive and dative, where masculine and neuter
 coincide. `Lexicon.NO_SUBST_ADJ` excludes deadjectival abstracts that are not persons (`die Tiefe`,
 `die Ebene`, `die Weise`), matched by word ending so compounds are covered.
+`Lexicon.NO_SUBST_ADJ_FEM_DEFINITE` holds words that only denote a thing in the feminine with a
+definite article or possessive (`die Linke` the party, `mit seiner Linken` the hand) but a person
+otherwise (`der Linke`, `eine Linke`).
 
 ## Conventions
 

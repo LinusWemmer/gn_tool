@@ -77,7 +77,12 @@ class Lexicon:
     NO_SUBST_ADJ = ["weise", "ebene", "klasse", "flotte", "note", "dichte", "breite", "weite",
                     "tiefe", "ferne", "reife", "schwere", "strenge", "wunde", "wüste", "dürre",
                     "rasse", "banane", "alternative", "kontroverse", "offensive", "exekutive",
-                    "parallele", "innere", "linke", "weiche"]
+                    "parallele", "weiche"]
+
+    # "Linke" bezeichnet je nach Umgebung eine Person oder nicht. Mit bestimmtem Artikel oder
+    # Possessivum im Femininum ist die Partei oder die Hand gemeint ("die Linke", "der Linken",
+    # "mit seiner Linken"), sonst eine Person ("der Linke", "eine Linke").
+    NO_SUBST_ADJ_FEM_DEFINITE = ["linke"]
 
     # Adjektive, die vor einem Namen eine angeredete Person anzeigen.
     PERSON_ADJECTIVES = ["lieb", "geehrt", "verehrt", "wert"]
@@ -498,7 +503,7 @@ class Lexicon:
     # Lexicon.NEOLOGISMS, "neutral" for nouns from Lexicon.NEUTRAL_NOUNS, "beamtey" for "Beamter"/"Beamte"/"Beamten",
     # "substantivized adjective" for nouns from Lexicon.SUBST_ADJ or ending in "sprachige", "person" for "Mann", "Frau",
     # "Herr" and "Dame", "kind" for "Sohn" and "Tochter"), and capitalized is a Boolean indicating whether the head of the nounphrase is capitalized.
-    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False,is_epithet=False):
+    def check_noun(word_parse,feats,has_article,has_possessive,has_adjective=False,has_person_adjective=False,has_masculine_modifier=False,is_epithet=False,has_definite_article=False):
         print("check_noun")
         print("word_parse:", word_parse)
         noun = word_parse[2]
@@ -711,7 +716,10 @@ class Lexicon:
             if (feats[0] in ("Masc", "Fem") and noun in Lexicon.SUBSTANTIVIZABLE_ADJ
                     and not (len(feats) > 1 and feats[1] in ("Gen", "Dat")
                              and word_parse[1].lower().endswith(noun.lower()))
-                    and not any(noun.lower().endswith(exception) for exception in Lexicon.NO_SUBST_ADJ)):
+                    and not any(noun.lower().endswith(exception) for exception in Lexicon.NO_SUBST_ADJ)
+                    and not (feats[0] == "Fem" and (has_definite_article or has_possessive)
+                             and any(noun.lower().endswith(exception)
+                                     for exception in Lexicon.NO_SUBST_ADJ_FEM_DEFINITE))):
                 return True, "", [[0, noun, noun, "", "substantivized adjective", True]]
 
             sprachige_pattern = r"(..+sprachige)(r|n|m|s)?$"

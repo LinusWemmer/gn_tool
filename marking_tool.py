@@ -945,7 +945,14 @@ class Marking_Tool:
                                 and other_word_parse[1].lower().endswith("er")
                                 and feats[1] in ("Nom", "_")):
                             has_masculine_modifier = True
-                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier,is_epithet)
+                    # Ein bestimmter Artikel unterscheidet sich vom unbestimmten und vom
+                    # Possessivum; "Die Linke" ist die Partei, "eine Linke" eine Person.
+                    has_definite_article = False
+                    for other_word_parse in self.parse_list:
+                        if (other_word_parse[6] == word_parse[0] and other_word_parse[4] == "ART"
+                                and other_word_parse[5].startswith("Def")):
+                            has_definite_article = True
+                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier,is_epithet,has_definite_article)
                     print(list)
                     if list == []:
                         nouns += escape(word_parse[-2])

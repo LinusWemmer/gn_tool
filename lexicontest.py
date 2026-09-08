@@ -318,6 +318,15 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Ebene ist flach.", "Die Ebene ist flach."))
         test_sentences.append(("Die Klasse lacht.", "Die Klasse lacht."))
         test_sentences.append(("Auf diese Weise geht es.", "Auf diese Weise geht es."))
+        # Auch im Dativ, wo Maskulinum und Neutrum zusammenfallen, greift die kuratierte Liste:
+        test_sentences.append(("Die Reisende sprach mit dem Betroffenen.", "De Reisende sprach mit derm Betroffenen."))
+        test_sentences.append(("Er half dem Beteiligten.", "En half derm Beteiligten."))
+        # "Linke" ist mit bestimmtem Artikel im Femininum die Partei oder die Hand ...
+        test_sentences.append(("Die Linke fordert das.", "Die Linke fordert das."))
+        test_sentences.append(("Der Linken gefällt das.", "Der Linken gefällt das."))
+        # ... sonst eine Person:
+        test_sentences.append(("Der Linke fordert das.", "De Linke fordert das."))
+        test_sentences.append(("Eine Linke fordert das.", "Ein Linke fordert das."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])
