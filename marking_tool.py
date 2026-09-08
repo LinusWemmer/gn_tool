@@ -765,8 +765,16 @@ class Marking_Tool:
 
         nouns = ""
         for pos, word_parse in enumerate(self.parse_list):
+            # split_prepositions hat "im", "am", "zur" und dergleichen in Präposition und Artikel
+            # zerlegt; vom Artikel steht im Eingabetext nur das "m" oder "r". Ein solcher Rest ist
+            # kein eigenständiges Wort und darf nicht markierbar sein -- er wird als Teil der
+            # Nominalphrase mitneutralisiert. ParZu taggt ihn sonst gelegentlich als
+            # Relativpronomen, woraus dann "iderm Anschluss" statt "im Anschluss" würde.
+            if word_parse[3] in ("ART", "PRO") and word_parse[-2] in ("m", "r"):
+                nouns += escape(word_parse[-2])
+                nouns += escape(word_parse[-1])
             # Wenn pos die Position einer Doppelnennung ist, dann mache die gesamte Doppelnennung markierbar:
-            if pos in noun_pair_positions:
+            elif pos in noun_pair_positions:
                 self.find_nounphrase(word_parse)
                 input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{"<u>" + escape(word_parse[-2]) + escape(word_parse[-1]) + escape(self.parse_list[pos+1][-2]) + escape(self.parse_list[pos+1][-1]) + escape(self.parse_list[pos+2][-2]) + "</u>"}</label></div>{escape(self.parse_list[pos+2][-1])}"""
                 nouns += input_form

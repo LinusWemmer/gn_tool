@@ -333,6 +333,16 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Meine Linke schmerzt.", "Meine Linke schmerzt."))
         # ... "jedes" zeigt ein Neutrum an und damit keine Person:
         test_sentences.append(("Jedes Gute hat ein Ende.", "Jedes Gute hat ein Ende."))
+        # Der von split_prepositions abgespaltene Artikel ("im" wird zu "in dem") ist kein
+        # eigenständiges Wort und darf nicht markierbar sein:
+        test_sentences.append(("Er kam im Anschluss an die Sitzung.", "En kam im Anschluss an die Sitzung."))
+        # "Omi" darf nicht mitten in einem Wort anschlagen ("NationalkOMItees"):
+        test_sentences.append(("Das Bild des Nationalkomitees ist alt.", "Das Bild des Nationalkomitees ist alt."))
+        # ... als eigenes Wort und als Kopf eines Kompositums aber schon:
+        test_sentences.append(("Meine Omi kommt.", "Mein Owi kommt."))
+        test_sentences.append(("Die Lieblingsomi kommt.", "De Lieblingsowi kommt."))
+        # "ihr" bleibt markierbar, auch wenn es sich nicht auf eine Person bezieht:
+        test_sentences.append(("Die Zeitschriften stellten ihr Erscheinen ein.", "Die Zeitschriften stellten ens Erscheinen ein."))
         for i,test in enumerate(test_sentences):
             print(f"Testing sentence {i + 1}.")
             input_text = hack_for_ordinal_numbers(test[0])

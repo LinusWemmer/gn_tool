@@ -826,7 +826,7 @@ class Lexicon:
                     if match:
                         match_position = match.start()
                         found_neologism = match.group(0)
-                        if match_position != 1 and not (noun[:match_position].endswith("c") and found_neologism.lower().startswith("h")) and not (noun[j:].lower().startswith("ch") and found_neologism.endswith("s")) and not found_neologism.lower() == "base" and not found_neologism.lower() == "opa" and not found_neologism.lower() == "oma":
+                        if match_position != 1 and not (noun[:match_position].endswith("c") and found_neologism.lower().startswith("h")) and not (noun[j:].lower().startswith("ch") and found_neologism.endswith("s")) and not found_neologism.lower() in ("base", "opa", "oma", "opi", "omi"):
                             neutral_core = Lexicon.NEOLOGISMS_COMPOUND[i]
                             later_part = noun[j:]
                             if not noun[match_position].isupper():
