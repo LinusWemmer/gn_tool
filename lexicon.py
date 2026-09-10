@@ -110,6 +110,39 @@ class Lexicon:
         "union", "kommission", "bundestag", "bundesrat", "sowjetunion",
     ]
 
+    # Adjektive auf "-männisch" gehen auf ein Substantiv auf "-mann" zurück, dessen Plural auf
+    # "-leute" endet. Das Inklusivum bildet sie darauf: "kaufmännisch" wird zu "kaufleutisch".
+    # Aufgenommen sind nur Stämme mit einem etablierten "-leute"-Plural -- "staatsmännisch" und
+    # "weltmännisch" bleiben aussen vor, denn "Staatsleute" und "Weltleute" gibt es nicht (der
+    # Plural lautet dort "Staatsmänner"). Geprüft wird das Wortende des Stammes, damit Komposita
+    # mitgehen ("unfachmännisch", "wirtschaftsfachmännisch").
+    MANN_ADJECTIVE_STEMS = ["kauf", "berg", "lands", "fach", "see"]
+
+    # Adjektive mit einer eigenen Form im Inklusivum, die keiner Regel folgen.
+    IRREGULAR_ADJECTIVES = {"jungfräulich": "jungferlich"}
+
+    # Die Endungen, die ein attributives Adjektiv tragen kann. Ohne Endung steht es adverbial
+    # oder prädikativ ("Er grüsste landsmännisch").
+    ADJECTIVE_ENDINGS = r"(e|em|en|er|es)?"
+
+    # Gibt die Inklusivum-Form eines Adjektivs zurück, oder None, wenn es keine gibt.
+    def neutralize_adjective(word: str):
+        if not word:
+            return None
+        match = re.fullmatch(r"(.*)männisch" + Lexicon.ADJECTIVE_ENDINGS, word.lower())
+        if match and any(match.group(1).endswith(stem)
+                         for stem in Lexicon.MANN_ADJECTIVE_STEMS):
+            neutral = match.group(1) + "leutisch" + (match.group(2) or "")
+        else:
+            for original, replacement in Lexicon.IRREGULAR_ADJECTIVES.items():
+                match = re.fullmatch(original + Lexicon.ADJECTIVE_ENDINGS, word.lower())
+                if match:
+                    neutral = replacement + (match.group(1) or "")
+                    break
+            else:
+                return None
+        return neutral[0].upper() + neutral[1:] if word[0].isupper() else neutral
+
     # Adjektive, die vor einem Namen eine angeredete Person anzeigen.
     PERSON_ADJECTIVES = ["lieb", "geehrt", "verehrt", "wert"]
 
