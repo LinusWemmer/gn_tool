@@ -349,6 +349,19 @@ class Marking_Tool:
         return (adjective[3] == "N" and "Pl" not in article[5]
                 and adjective[1].lower() in [adjective[2].lower() + ending for ending in ("n", "r", "s", "m")])
 
+    # Lässt ParZu den Numerus eines Personalpronomens offen, entscheidet das folgende Finitverb
+    # darüber. In "Sie haben ein Keil zwischen die Bürger getrieben" verliert ParZu wegen des
+    # fehlerhaften "ein Keil" den Bezug und gibt "Sie" ohne Numerus als Akkusativobjekt aus.
+    # Wegen "haben" kann es aber nur Plural oder Höflichkeitsform sein, und beides ist nicht
+    # markierbar. Ein ausgewiesener Singular bleibt unberührt ("Sie hat das Buch gelesen").
+    def plural_by_verb(self, pos:int) -> bool:
+        if "Sg" in self.parse_list[pos][5].split("|"):
+            return False
+        for later_parse in self.parse_list[pos+1:]:
+            if later_parse[4] in ("VVFIN", "VAFIN", "VMFIN"):
+                return "Pl" in later_parse[5].split("|")
+        return False
+
     def singular_verb(self, pos:int):
         if "Sg" in self.parse_list[pos][5]:
             return True
@@ -1003,7 +1016,7 @@ class Marking_Tool:
                     list.insert(0, [int(word_parse[0]), 0, "", "", prefix, "prefix", False, False])
                     self.nounlist.extend(list)
                 # Case: Pronoun
-                elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle"): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
+                elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not self.plural_by_verb(pos): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
                     print("found pronoun:",word_parse)
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
