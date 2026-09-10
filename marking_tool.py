@@ -1127,7 +1127,14 @@ class Marking_Tool:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
-                elif word_parse[4] == "PRELS" and not dependent:
+                # Ein Relativpronomen, das ParZu an keine Nominalphrase angebunden hat, bleibt
+                # markierbar -- im Neutrum und im Plural aber nicht: "was" und "das" bezeichnen
+                # keine Person ("wenig zu hören, was man kennt"), und Pluralformen sind im
+                # Inklusivum ohnehin unverändert. Dieselben Bedingungen gelten im Zweig für
+                # Relativpronomen an einem Eigennamen.
+                elif (word_parse[4] == "PRELS" and not dependent
+                        and not word_parse[5].startswith("Neut")
+                        and not word_parse[5].endswith("Pl")):
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form

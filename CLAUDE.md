@@ -46,8 +46,9 @@ for tests.
 
 `markingtest.py` is **stale and fails** (last touched 2023-09-09, unchanged since). It hands
 `Marking_Tool` the raw CoNLL lines without splitting them on tabs — unlike `get_parse` — and its
-expected HTML predates the `div.checkbox-container` wrapper that `create_input_form` now emits. Fix
-those two things before trusting it; do not read its failure as a regression.
+expected HTML predates both the `div.checkbox-container` wrapper that `create_input_form` now emits
+and the `span.markable` that replaced `<u>` for the highlighting. Fix those three things before
+trusting it; do not read its failure as a regression.
 
 ### Local prerequisites
 

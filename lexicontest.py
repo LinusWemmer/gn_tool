@@ -531,6 +531,20 @@ class Sentence_Test(unittest.TestCase):
         # Der Wechsel auf lila haengt daran, dass das Label unmittelbar auf sein Kaestchen folgt.
         self.assertRegex(form, r'<input type="checkbox"[^>]*>\s*<label ')
 
+    def test_neuter_relative_pronoun_is_not_markable(self):
+        # "was" bezeichnet keine Person. ParZu bindet es hier an keine Nominalphrase an, wodurch
+        # es in den Zweig für freistehende Relativpronomen fiel -- der prüfte das Genus nicht.
+        text = ("In der direkten Reaktion darauf war aus Politik und Feuilletons wenig zu hören, "
+                "was man nicht schon tausend Mal gehört hätte.")
+        parse = get_parse(remove_special_character_gendering(split_prepositions(text)))
+        marking_tool = Marking_Tool(parse[0], {}, [])
+        Marking_Tool.find_realizations(marking_tool, text)
+        form = marking_tool.get_marking_form(0)
+        markable = re.findall(r'<span class="markable">([^<]*)</span>', form)
+        self.assertNotIn("was", markable, "\"was\" ist markierbar")
+        # "man" soll dagegen weiterhin markierbar sein.
+        self.assertIn("man", markable, "\"man\" ist nicht mehr markierbar")
+
     def test_output_highlights_only_the_changed_parts(self):
         # Nur der geänderte Teil eines Wortes wird hervorgehoben; wird ausschliesslich gestrichen,
         # bleibt kein Stück übrig und das ganze Wort wird hervorgehoben.
