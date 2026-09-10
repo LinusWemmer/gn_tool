@@ -554,7 +554,17 @@ class Sentence_Test(unittest.TestCase):
                   ("der", "de", '<span class="changed">de</span>'),
                   ("Frau", "Person", '<span class="changed">Person</span>'),
                   ("alten", "alten", "alten"),
-                  ("und", "", "")]
+                  ("und", "", ""),
+                  # "en" wird immer ganz hervorgehoben, damit es unabhängig von der Quellform
+                  # gleich aussieht -- über den gemeinsamen Anfang "e" bliebe bei "er" nur das
+                  # "n" farbig, bei "sie" dagegen das ganze Wort.
+                  ("er", "en", '<span class="changed">en</span>'),
+                  ("Er", "En", '<span class="changed">En</span>'),
+                  ("sie", "en", '<span class="changed">en</span>'),
+                  ("Sie", "En", '<span class="changed">En</span>'),
+                  ("ihn", "en", '<span class="changed">en</span>'),
+                  # Ein unverändertes "en" bleibt ohne Hervorhebung.
+                  ("en", "en", "en")]
         for original, neutralized, expected in faelle:
             self.assertEqual(Marking_Tool.highlight_change(original, neutralized), expected,
                              f"{original!r} -> {neutralized!r}")

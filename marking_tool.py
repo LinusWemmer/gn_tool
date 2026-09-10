@@ -70,6 +70,10 @@ class Marking_Tool:
     def highlight_change(original: str, neutralized: str) -> str:
         if original == neutralized:
             return escape(neutralized)
+        # "en" wird immer ganz hervorgehoben. Sonst sähe ein "en" aus "er" anders aus als eines
+        # aus "sie" oder "ihn": Beim gemeinsamen Anfang "e" bliebe nur das "n" farbig.
+        if neutralized in ("en", "En"):
+            return f'<span class="changed">{escape(neutralized)}</span>'
         if neutralized == "":
             # Ganz gestrichene Wortformen ergäben ein leeres Element, etwa bei der Zusammenführung
             # einer Doppelnennung ("Bürgerinnen und Bürger" wird zu "Bürgerne").
