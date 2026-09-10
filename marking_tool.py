@@ -21,6 +21,9 @@ class Marking_Tool:
         # nounlist is a list of lists, where each list contains the following information about a noun:
         # [word_index_from_1, position_of_noun_in_composite_noun, original, neutralized, suffix, noun_type, capitalized, head_identified_as_person_noun]
         self.nounlist = nounlist
+        # Indizes der Substantive, die ein Kästchen bekommen haben. nounlist taugt dafür nicht:
+        # Dort landet für jedes Substantiv ein "prefix"-Eintrag, auch für nicht markierbare.
+        self.marked_nouns = []
         self.find_nounphrases()
 
     # ParZu lässt den Kasus bei substantivierten Adjektiven häufig offen ("meiner Lieben" liefert
@@ -86,6 +89,28 @@ class Marking_Tool:
             self.nounphrases[int(word_parse[0])] = self.find_children(word_parse[0],False)
         print(self.nounphrases)
 
+    # Ein Relativpronomen braucht kein eigenes Kästchen, wenn es schon als abhängiges Wort einer
+    # markierten Nominalphrase erfasst ist. In "einen Sohn, Max, der 1863 geboren wurde" hängt es
+    # über die Apposition an "Sohn" und wird mit diesem neutralisiert; ein eigenes Kästchen würde
+    # dessen Kongruenz überschreiben, denn "ein Kind" verlangt "das" und nicht "de". Hängt es
+    # dagegen an einem nicht markierbaren Namen ("Kim, die gestern kam"), bleibt es nötig.
+    def covered_by_marked_nounphrase(self, word_parse) -> bool:
+        index = int(word_parse[0])
+        return any(index in self.nounphrases.get(marked, []) for marked in self.marked_nouns)
+
+    # Sammelt die Relativpronomen der Relativsätze, die an den Appositionen unterhalb von "pos"
+    # hängen. Appositionen können gestaffelt sein ("der Lehrerin, Frau Meier"), deshalb wird die
+    # Kette ganz verfolgt.
+    def find_apposition_relatives(self, pos: str, preposition: bool):
+        children = []
+        for word_parse in self.parse_list:
+            if word_parse[6] == pos and word_parse[3] == "N" and word_parse[7] == "app":
+                for relative_parse in self.parse_list:
+                    if relative_parse[6] == word_parse[0] and relative_parse[7] == "rel":
+                        children.extend(self.find_children(relative_parse[0], preposition))
+                children.extend(self.find_apposition_relatives(word_parse[0], preposition))
+        return children
+
     # The last argument keeps track of whether we have traversed a preposition in the parse tree.
     def find_children(self, pos: str, preposition: bool):
         children = []
@@ -101,17 +126,18 @@ class Marking_Tool:
                 # In relative sentences that depend on the noun phrase, we want to include the relative pronoun, but nothing else.
                 if word_parse[4] == "PRELS":
                     break
-            # Ein abhängiges Substantiv gehört nicht zur Nominalphrase -- ein Relativsatz an einer
-            # Apposition dagegen schon, denn die Apposition bezeichnet dieselbe Person: In "eine
-            # Tochter, Ida, hatte, die 1863 geboren wurde" hängt der Relativsatz an "Ida" und
-            # meint damit die Tochter. Andere abhängige Substantive bleiben aussen vor, weil ihr
-            # Relativsatz sich auf sie selbst bezieht ("das Buch der Lehrerin, die ...").
-            elif word_parse[6] == pos and word_parse[3] == "N" and word_parse[7] == "app":
-                for relative_parse in self.parse_list:
-                    if relative_parse[6] == word_parse[0] and relative_parse[7] == "rel":
-                        children.extend(self.find_children(relative_parse[0], preposition))
             #else:
             #    children.extend(self.find_dessen(word_parse[0]))
+        # Ein Relativsatz an einer Apposition gehört zur Nominalphrase ihres Kopfes, denn die
+        # Apposition bezeichnet dieselbe Person: In "eine Tochter, Ida, hatte, die 1863 geboren
+        # wurde" hängt der Relativsatz an "Ida" und meint damit die Tochter. Zugerechnet wird er
+        # nur dem Kopf der Appositionskette -- richtete sich das Relativpronomen nach einer
+        # Apposition, die selbst umgeschrieben wird, ergäbe "der Lehrerin, Frau Meier, die kam"
+        # ein "Person Meier, die kam" statt des zum Kopf passenden "Lehrere, de kam".
+        # Andere abhängige Substantive bleiben aussen vor, weil ihr Relativsatz sich auf sie
+        # selbst bezieht ("das Buch der Lehrerin, die ...").
+        if self.parse_list[int(pos)-1][3] == "N" and self.parse_list[int(pos)-1][7] != "app":
+            children.extend(self.find_apposition_relatives(pos, preposition))
         # If the word is a noun followed by a comma followed by an independent der/die/das, the independent der/die/das should be added to childen
         if len(self.parse_list) >= int(pos)+2 and self.parse_list[int(pos)-1][3] == "N" and self.parse_list[int(pos)][1] == "," and self.parse_list[int(pos)+1][2] in ["der","die","das"] and self.parse_list[int(pos)+1][6] == "0":
             children.append(int(self.parse_list[int(pos)+1][0]))
@@ -637,6 +663,7 @@ class Marking_Tool:
     # Recognizes noun phrases that refer to people and generates the html form, with checkboxes next to recognized noun phrases. 
     # [word_index_from_1, position_of_noun_in_composite_noun, original, neutralized, suffix, noun_type, capitalized, head_identified_as_person_noun]
     def get_marking_form(self, sentence_number) -> str:
+        self.marked_nouns = []
         # Suche pronominale Genitivobjekte:
         # Suche Verben, die sinnvollerweise eine Person als Genitivobjekt haben können:
         for pos, word_parse in enumerate(self.parse_list):
@@ -1017,6 +1044,8 @@ class Marking_Tool:
                     else:
                         input_form = Marking_Tool.create_input_form(self, sentence_number, word_parse, list)
                         nouns += escape(prefix) + input_form + escape(word_parse[-1])
+                    if list != []:
+                        self.marked_nouns.append(int(word_parse[0]))
                     for i in range(len(list)):
                         list[i].insert(0, int(word_parse[0]))
                         list[i].append(False)
@@ -1031,7 +1060,7 @@ class Marking_Tool:
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 # Case: Relative pronoun dependent on a proper noun
-                elif word_parse[4] == "PRELS" and pos > 1 and ((self.parse_list[pos-1][1] == "," and self.parse_list[pos-2][4] == "NE") or (pos != 2 and self.parse_list[pos-2][1] == "," and self.parse_list[pos-3][4] == "NE")) and not word_parse[5].startswith("Neut") and not word_parse[5].endswith("Pl"):
+                elif word_parse[4] == "PRELS" and pos > 1 and ((self.parse_list[pos-1][1] == "," and self.parse_list[pos-2][4] == "NE") or (pos != 2 and self.parse_list[pos-2][1] == "," and self.parse_list[pos-3][4] == "NE")) and not word_parse[5].startswith("Neut") and not word_parse[5].endswith("Pl") and not self.covered_by_marked_nounphrase(word_parse):
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
