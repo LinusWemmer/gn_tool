@@ -207,6 +207,8 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich sehe ihre Herrschende.","Ich sehe ens Herrschende."))
         test_sentences.append(("Ich sehe ihre Kollegen.","Ich sehe ense Kollegerne."))
         test_sentences.append(("Ich sehe ihren Kollegen.","Ich sehe ens Kollegere."))
+        test_sentences.append(("Das ist die echte Alternative und die einzige, für die es sich zu kämpfen lohnt.","Das ist die echte Alternative und de einzige, für die es sich zu kämpfen lohnt."))
+        test_sentences.append(("Die Reisende kam.","De Reisende kam."))
         test_sentences.append(("Der Feuerwehrmann, der dort steht, kommt gleich her.","Die Feuerwehrperson, die dort steht, kommt gleich her."))
         test_sentences.append(("Jeglicher Politiker könnte diese Ministerien leiten.","Jeglichey Politikere könnte diese Ministerien leiten."))
         test_sentences.append(("Als ehrlicher Bürger macht man das nicht.","Als ehrlichey Bürgere macht mensch das nicht."))

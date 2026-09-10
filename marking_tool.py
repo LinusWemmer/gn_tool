@@ -993,8 +993,18 @@ class Marking_Tool:
                     # werden; sonst greift bei der Neutralisierung der Zweig für Substantive nicht.
                     is_epithet = self.is_name_epithet(pos)
                     if word_parse[3] == "ADJA":
-                        # ParZu liefert für solche Wörter oft ein falsches Lemma.
-                        word_parse[2] = word_parse[1]
+                        # ParZu liefert für solche Wörter oft ein falsches Lemma. Die
+                        # Grossschreibung der Wortform kann dabei künstlich sein:
+                        # search_lonely_adjectives schreibt allein stehende Adjektive vor dem
+                        # Reparse gross, damit ParZu sie als substantiviert erkennt. Ob sie echt
+                        # ist, verrät die Realisierung aus dem Eingabetext. Ohne diese Prüfung
+                        # wandert die künstliche Grossschreibung ins Lemma und von dort in die
+                        # Ausgabe: "und die einzige, für die es sich zu kämpfen lohnt" ergäbe
+                        # "die Einzige".
+                        lemma = word_parse[1]
+                        if word_parse[-2][:1].islower():
+                            lemma = lemma[:1].lower() + lemma[1:]
+                        word_parse[2] = lemma
                         # Merkmalsliste von "Pos|Genus|Kasus|Numerus|Flexion|" auf "Genus|Kasus|Numerus".
                         # Beim Beinamen sind die Merkmale des Adjektivs leer, die des Artikels aber
                         # gesetzt ("dem" ist "Def|_|Dat|Sg"), deshalb werden sie von dort übernommen.
