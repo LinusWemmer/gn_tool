@@ -405,7 +405,13 @@ class Lexicon:
         feats = word_parse[5].split("|")
         # Plural adjectives don't need to be changed.
         # Undeclined adjectives don't need to be changed.
-        if feats[3] == "Pl" or (word_parse[1] == word_parse[2] and word_parse[1] != "andere" and not word_parse[1].endswith("er")):
+        # Undekliniert ist ein Adjektiv, wenn Wortform und Grundform übereinstimmen ("die rosa
+        # Lehrerin"). Die Pronominaladjektive auf "ander-" lemmatisiert ParZu allerdings nicht,
+        # sodass dort beide Formen gleich sind, obwohl das Wort dekliniert ist ("den anderen
+        # Lehrer"). Eine Deklinationsendung unterscheidet die beiden Fälle: "rosa", "lila" und
+        # "prima" tragen keine, "anderen" und "andere" schon.
+        if feats[3] == "Pl" or (word_parse[1] == word_parse[2]
+                                and not re.search(r"(e|em|en|er|es)$", word_parse[1].lower())):
             return word_parse[1]
         # This is a hack to make sure "letzt-" works correctly
         if word_parse[2] == ("letzte"):
