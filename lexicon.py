@@ -113,6 +113,13 @@ class Lexicon:
     # Adjektive, die vor einem Namen eine angeredete Person anzeigen.
     PERSON_ADJECTIVES = ["lieb", "geehrt", "verehrt", "wert"]
 
+    # Pronominaladjektive, die ParZu nicht lemmatisiert: Wortform und Grundform stimmen dort
+    # überein ("anderen" hat die Grundform "anderen"), obwohl das Wort dekliniert ist. Ohne diese
+    # Liste hielte neutralize_adjectives sie für undekliniert und liesse sie unverändert.
+    # Ermittelt durch einen Parse aller in Frage kommenden Pronominaladjektive.
+    UNLEMMATIZED_ADJ = ["ander", "derartig", "manch", "welch", "jen", "etlich", "selbig",
+                        "irgendwelch"]
+
     # Komposita auf "-mann", die zu "-mensch" statt zu "-person" werden. Eingetragen wird der
     # Wortteil vor "-mann"; die Pluralform "-männer" wird mit abgedeckt.
     MENSCH_COMPOUNDS = ["hampel"]
@@ -406,12 +413,15 @@ class Lexicon:
         # Plural adjectives don't need to be changed.
         # Undeclined adjectives don't need to be changed.
         # Undekliniert ist ein Adjektiv, wenn Wortform und Grundform übereinstimmen ("die rosa
-        # Lehrerin"). Die Pronominaladjektive auf "ander-" lemmatisiert ParZu allerdings nicht,
-        # sodass dort beide Formen gleich sind, obwohl das Wort dekliniert ist ("den anderen
-        # Lehrer"). Eine Deklinationsendung unterscheidet die beiden Fälle: "rosa", "lila" und
-        # "prima" tragen keine, "anderen" und "andere" schon.
-        if feats[3] == "Pl" or (word_parse[1] == word_parse[2]
-                                and not re.search(r"(e|em|en|er|es)$", word_parse[1].lower())):
+        # Lehrerin", "der Schweizer Lehrer", "der super Lehrer"). Die Pronominaladjektive aus
+        # UNLEMMATIZED_ADJ lemmatisiert ParZu nicht, dort sind beide Formen ebenfalls gleich,
+        # obwohl das Wort dekliniert ist ("den anderen Lehrer"). Sie sind daran zu erkennen, dass
+        # sie zugleich mit einem der Stämme beginnen und eine Deklinationsendung tragen --
+        # "mancherlei" beginnt zwar mit "manch", trägt aber keine Endung und bleibt unverändert.
+        word = word_parse[1].lower()
+        declined_pronominal = (any(word.startswith(stem) for stem in Lexicon.UNLEMMATIZED_ADJ)
+                               and re.search(r"(e|em|en|er|es)$", word))
+        if feats[3] == "Pl" or (word_parse[1] == word_parse[2] and not declined_pronominal):
             return word_parse[1]
         # This is a hack to make sure "letzt-" works correctly
         if word_parse[2] == ("letzte"):
