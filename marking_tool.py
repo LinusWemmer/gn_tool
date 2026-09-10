@@ -325,6 +325,15 @@ class Marking_Tool:
                 # Wenn ein Substantiv einen Artikel hat und im Parzu-Parse kein Numerus hat, im Dativ steht und sich ein auf "-en" endender Artikel drauf bezieht, dann ist das Substantiv im Plural.
                 elif feats[1] == "Dat" and self.parse_list[article_position][1].endswith("en"):
                     feats[2] = "Pl"
+                # Steht vor einem substantivierten Adjektiv ein Determinierer auf "-e", so
+                # entscheidet dessen eigene Endung: "ihre Herrschende" ist ein Femininum
+                # Singular, "ihre Herrschenden" ein Plural. Nur in diesen beiden Formen endet
+                # der Determinierer auf "-e"; in den übrigen Kasus lautet er "ihren", "ihrem",
+                # "ihrer" oder "ihres". Bei Possessivformen lässt ParZu den Numerus offen, weil
+                # "ihre" für sich genommen mehrdeutig ist.
+                elif (self.parse_list[article_position][1].endswith("e")
+                      and self.parse_list[pos][1] == self.parse_list[pos][2] + "n"):
+                    feats[2] = "Pl"
                 # Ansonsten ist ein Substantiv mit Artikel und einem nicht erkannten Numerus im Singular.
                 else:
                     feats[2] = "Sg"
