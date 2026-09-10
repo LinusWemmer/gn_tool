@@ -461,6 +461,11 @@ def neutralize_marked(selected_nouns={}):
             nounphrases = {int(k):v for k,v in nounphrases.items()}
             marking_tool = Marking_Tool(parse_list, nounphrases, nounlist)
             marking_tool_list.append(marking_tool)
+        # Die Wortformen vor der Neutralisierung festhalten, damit im Ausgabetext hervorgehoben
+        # werden kann, was sich geändert hat. Die Realisierung eines Wortes steht in row[-2] und
+        # wird von der Neutralisierung überschrieben.
+        original_realizations = [[word_parse[-2] for word_parse in marking_tool.parse_list]
+                                 for marking_tool in marking_tool_list]
         # Neutralize all selected words of the form
         list_of_neutralized_nouns = []
         for selected_noun in selected_nouns:
@@ -477,9 +482,11 @@ def neutralize_marked(selected_nouns={}):
                 list_of_neutralized_nouns.append([noun_data[0], noun_data[1]])
         neutralized_text = ""
         for i in range(sentence_number):
-            neutralized_text += marking_tool_list[i].get_sentence()
+            # Der Text kommt hier schon als HTML mit hervorgehobenen Änderungen; maskiert wird
+            # jedes Textstück einzeln in get_highlighted_sentence, weil ein nachträgliches
+            # escape die Hervorhebungen mit maskieren würde.
+            neutralized_text += marking_tool_list[i].get_highlighted_sentence(original_realizations[i])
         neutralized_text = undo_hack_for_ordinal_numbers(neutralized_text)
-        neutralized_text = escape(neutralized_text)
         neutralized_text = replace_whitespace_outside_html_tags(neutralized_text)
         input_text = session.get("input_text")
         marked_nouns = session.get("marked_nouns")

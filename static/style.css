@@ -88,6 +88,24 @@ textarea {
     white-space: nowrap;
 }
 
+/* Auswählbare Wörter im Markierungsformular sind gelb hinterlegt und wechseln nach dem
+   Auswählen auf lila. Der Wechsel läuft allein über CSS, damit er auch dem Button
+   "Alle auswählbaren Wörter auswählen" folgt, ohne dass dieser etwas davon wissen muss. */
+.markable {
+    background-color: #ffed9c;
+    border-radius: 2px;
+}
+
+.checkbox-container input[type="checkbox"]:checked + label .markable {
+    background-color: #d6b6fe;
+}
+
+/* Im Ausgabetext hervorgehobene Stellen: alles, was sich gegenüber der Eingabe geändert hat. */
+.changed {
+    background-color: #d6b6fe;
+    border-radius: 2px;
+}
+
 #toggleIcon {
     display: none;
 }

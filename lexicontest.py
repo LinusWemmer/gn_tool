@@ -518,6 +518,37 @@ class Sentence_Test(unittest.TestCase):
             self.assertNotIn(raw, form, f"{raw!r} steht ungefiltert im Markierungsformular")
         self.assertIn("&lt;img", form, "Das eingegebene Markup fehlt in maskierter Form")
 
+    def test_markable_words_are_highlightable(self):
+        text = "Ich helfe meiner alten Nachbarin."
+        parse = get_parse(remove_special_character_gendering(split_prepositions(text)))
+        marking_tool = Marking_Tool(parse[0], {}, [])
+        Marking_Tool.find_realizations(marking_tool, text)
+        form = marking_tool.get_marking_form(0)
+        # Auswählbare Wörter tragen die Klasse, an der das Stylesheet den gelben Hintergrund und
+        # den Wechsel auf lila festmacht -- unterstrichen werden sie nicht mehr.
+        self.assertIn('<span class="markable">Nachbarin</span>', form)
+        self.assertNotIn("<u>", form, "Die Unterstreichung ist noch im Markierungsformular")
+        # Der Wechsel auf lila haengt daran, dass das Label unmittelbar auf sein Kaestchen folgt.
+        self.assertRegex(form, r'<input type="checkbox"[^>]*>\s*<label ')
+
+    def test_output_highlights_only_the_changed_parts(self):
+        # Nur der geänderte Teil eines Wortes wird hervorgehoben; wird ausschliesslich gestrichen,
+        # bleibt kein Stück übrig und das ganze Wort wird hervorgehoben.
+        faelle = [("Nachbarin", "Nachbare", 'Nachbar<span class="changed">e</span>'),
+                  ("meiner", "meinerm", 'meiner<span class="changed">m</span>'),
+                  ("Mutter", "Elter", '<span class="changed">El</span>ter'),
+                  ("der", "de", '<span class="changed">de</span>'),
+                  ("Frau", "Person", '<span class="changed">Person</span>'),
+                  ("alten", "alten", "alten"),
+                  ("und", "", "")]
+        for original, neutralized, expected in faelle:
+            self.assertEqual(Marking_Tool.highlight_change(original, neutralized), expected,
+                             f"{original!r} -> {neutralized!r}")
+        # Eingegebenes Markup darf auch hier nicht durchschlagen.
+        highlighted = Marking_Tool.highlight_change("<b>Lehrerin", "<b>Lehrere")
+        self.assertNotIn("<b>", highlighted)
+        self.assertIn("&lt;b&gt;", highlighted)
+
 
 def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
     marking_form = ""

@@ -60,6 +60,45 @@ class Marking_Tool:
                 "nounphrases": self.nounphrases}
 
     # Returns the output sentence.
+    # Gibt den Satz als HTML zurück und hebt hervor, was sich gegenüber dem Eingabetext geändert
+    # hat. Verglichen wird über das gemeinsame Wortanfang- und Wortende-Stück, sodass nur der
+    # geänderte Teil farbig wird: "Nachbarin" ergibt "Nachbar" plus hervorgehobenes "e", "Mutter"
+    # ergibt hervorgehobenes "El" plus "ter". Wird nur gestrichen, ohne dass etwas hinzukommt
+    # ("der" zu "de"), bleibt kein Stück zum Hervorheben übrig -- dann wird das ganze Wort
+    # hervorgehoben, damit die Änderung überhaupt sichtbar ist.
+    @staticmethod
+    def highlight_change(original: str, neutralized: str) -> str:
+        if original == neutralized:
+            return escape(neutralized)
+        if neutralized == "":
+            # Ganz gestrichene Wortformen ergäben ein leeres Element, etwa bei der Zusammenführung
+            # einer Doppelnennung ("Bürgerinnen und Bürger" wird zu "Bürgerne").
+            return ""
+        limit = min(len(original), len(neutralized))
+        prefix = 0
+        while prefix < limit and original[prefix] == neutralized[prefix]:
+            prefix += 1
+        suffix = 0
+        while (suffix < limit - prefix
+               and original[len(original)-1-suffix] == neutralized[len(neutralized)-1-suffix]):
+            suffix += 1
+        changed = neutralized[prefix:len(neutralized)-suffix]
+        if changed == "":
+            return f'<span class="changed">{escape(neutralized)}</span>'
+        return (escape(neutralized[:prefix])
+                + f'<span class="changed">{escape(changed)}</span>'
+                + escape(neutralized[len(neutralized)-suffix:]))
+
+    # Wie get_sentence, aber als HTML mit hervorgehobenen Änderungen. Das Argument enthält die
+    # Wortformen vor der Neutralisierung, in derselben Reihenfolge wie parse_list.
+    def get_highlighted_sentence(self, original_realizations) -> str:
+        sentence = ""
+        for i, word_parse in enumerate(self.parse_list):
+            original = original_realizations[i] if i < len(original_realizations) else word_parse[-2]
+            sentence += Marking_Tool.highlight_change(original, word_parse[-2])
+            sentence += escape(word_parse[-1])
+        return sentence
+
     def get_sentence(self) -> str:
         sentence = ""
         for word_parse in self.parse_list:
@@ -839,7 +878,7 @@ class Marking_Tool:
             # Wenn pos die Position einer Doppelnennung ist, dann mache die gesamte Doppelnennung markierbar:
             elif pos in noun_pair_positions:
                 self.find_nounphrase(word_parse)
-                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{"<u>" + escape(word_parse[-2]) + escape(word_parse[-1]) + escape(self.parse_list[pos+1][-2]) + escape(self.parse_list[pos+1][-1]) + escape(self.parse_list[pos+2][-2]) + "</u>"}</label></div>{escape(self.parse_list[pos+2][-1])}"""
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{'<span class="markable">' + escape(word_parse[-2]) + escape(word_parse[-1]) + escape(self.parse_list[pos+1][-2]) + escape(self.parse_list[pos+1][-1]) + escape(self.parse_list[pos+2][-2]) + '</span>'}</label></div>{escape(self.parse_list[pos+2][-1])}"""
                 nouns += input_form
                 self.parse_list[pos][-1] = ""
                 self.parse_list[pos+1][-2] = ""
@@ -884,14 +923,14 @@ class Marking_Tool:
                     capitalized = word_parse[1][0].isupper()
                     # Since ParZu does not identify the neuter form of possessive pronouns as such, we identify them by the ending "es":
                     if word_parse[1].endswith("es"):
-                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                         nouns += input_form
                         self.nounlist.extend([[int(word_parse[0]), 0, base, "ens", "", "possessive_pronoun_base", capitalized, False], [int(word_parse[0]), len(base), ending, ending, "", "possessive_pronoun_ending", False, False]])
                     else:
-                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{"<u>" + marking_form_base + "</u>"}</label></div>"""
+                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{'<span class="markable">' + marking_form_base + '</span>'}</label></div>"""
                         nouns += input_form
                         if len(ending) > 0:
-                            input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-4}" name="{sentence_number}|{word_parse[0]}|{-4}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-4}">{"<u>" + ending + "</u>"}</label></div>"""
+                            input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-4}" name="{sentence_number}|{word_parse[0]}|{-4}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-4}">{'<span class="markable">' + ending + '</span>'}</label></div>"""
                             nouns += input_form
                         nouns += escape(word_parse[-1])
                         self.nounlist.extend([[int(word_parse[0]), 0, base, "ens", "", "possessive_pronoun_base", capitalized, False], [int(word_parse[0]), len(base), ending, "", "", "possessive_pronoun_ending", False, False]])
@@ -909,13 +948,13 @@ class Marking_Tool:
                         else:
                             base = word_parse[1][:len(word_parse[2]-1)]
                             ending = word_parse[1][len(word_parse[2]-1):]
-                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-5}" name="{sentence_number}|{word_parse[0]}|{-5}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-5}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-5}" name="{sentence_number}|{word_parse[0]}|{-5}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-5}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                         nouns += input_form
                         self.nounlist.extend([[int(word_parse[0]), 0, base, base, "", "possessive_pronoun_base", False, False], [int(word_parse[0]), len(base), ending, "", "", "possessive_pronoun_ending", False, False]])
                 # Case: "sein" as a single word in the input
                 elif word_parse[1] == "sein" and len(self.parse_list) == 1:
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-3}" name="{sentence_number}|{word_parse[0]}|{-3}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-3}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                     self.parse_list[pos] = ['1', 'sein', 'seine', 'ART', 'PPOSAT', 'Neut|Nom|Sg', '0', 'det', '_', '_', 'sein', '']
                     print("modified word_parse for sein")
@@ -924,7 +963,7 @@ class Marking_Tool:
                 # Case: Possessive article
                 elif word_parse[4] == "PPOSAT" and not re.match(r"(M|m|D|d)ein|(U|u)nse?r|(E|e)ue?r", word_parse[1]):
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-2}" name="{sentence_number}|{word_parse[0]}|{-2}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-2}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{-2}" name="{sentence_number}|{word_parse[0]}|{-2}" value="select"><label for="{sentence_number}|{word_parse[0]}|{-2}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
 
                 # Case: Noun
@@ -1045,7 +1084,7 @@ class Marking_Tool:
                         nouns += escape(word_parse[-2])
                         nouns += escape(word_parse[-1])
                     elif len(list) == 1 and list[0][3] == "":
-                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                         nouns += input_form
                     else:
                         input_form = Marking_Tool.create_input_form(self, sentence_number, word_parse, list)
@@ -1063,34 +1102,34 @@ class Marking_Tool:
                 elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not self.plural_by_verb(pos): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
                     print("found pronoun:",word_parse)
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 # Case: Relative pronoun dependent on a proper noun
                 elif word_parse[4] == "PRELS" and pos > 1 and ((self.parse_list[pos-1][1] == "," and self.parse_list[pos-2][4] == "NE") or (pos != 2 and self.parse_list[pos-2][1] == "," and self.parse_list[pos-3][4] == "NE")) and not word_parse[5].startswith("Neut") and not word_parse[5].endswith("Pl") and not self.covered_by_marked_nounphrase(word_parse):
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 # Case: welche
                 elif word_parse[3] == "PRO" and word_parse[4] == "PWS" and word_parse[2] == "welche":
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 # case: jemand (sometimes marked as adjective, should still be neutralizable in that case)
                 elif re.match(r"(J|j)emand(e?)s" , word_parse[1]):
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 elif word_parse[3] == "PREP" and word_parse[4] == "APPRART":
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 elif word_parse[4] == "PRELAT" or word_parse[1].lower() in ["dessen","deren"]:
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 elif word_parse[4] == "PRELS" and not dependent:
                     self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form
                 # Ein Artikel an der Satzwurzel wird pronominal verwendet ("Nur eine von hundert
                 # kennt ..."). Dann kennt ParZu sein Genus. Bleibt es unbestimmt, handelt es sich
@@ -1106,7 +1145,7 @@ class Marking_Tool:
                     if not article_dependent:
                         print("found article:",word_parse)
                         self.find_nounphrase(word_parse)
-                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{"<u>" + escape(word_parse[-2]) + "</u>"}</label></div>{escape(word_parse[-1])}"""
+                        input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                         nouns += input_form
                         # The following is needed so that the "article" is treated as a pronoun during the neutralization process:
                         self.parse_list[pos][3] = "PRO"
@@ -1130,7 +1169,7 @@ class Marking_Tool:
         print(list)
         input_form = ""
         for i in range(len(list)):
-            input_form += f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{i+1}" name="{sentence_number}|{word_parse[0]}|{i+1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{i+1}">{"<u>" + escape(list[i][1]) + "</u>"}</label></div>{escape(list[i][3])}"""
+            input_form += f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{i+1}" name="{sentence_number}|{word_parse[0]}|{i+1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{i+1}">{'<span class="markable">' + escape(list[i][1]) + '</span>'}</label></div>{escape(list[i][3])}"""
             if i == len(list)-1 and list[i][3] == "":
                 input_form += escape(word_parse[-1])
         return input_form
