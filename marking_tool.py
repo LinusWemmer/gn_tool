@@ -11,16 +11,22 @@ import re
 #   - converting a nounphrase into the inklusive form based on the de-e System.
 
 class Marking_Tool:
-    def __init__(self, parse_list, nounphrases = {}, nounlist = []):
+    # nounphrases und nounlist sind bewusst auf None vorbelegt: Ein veränderliches Standardobjekt
+    # wird in Python nur einmal beim Laden der Datei erzeugt und von allen Aufrufen geteilt, die
+    # das Argument weglassen. Ein Satz würde dann Einträge eines früheren Satzes erben, und weil
+    # der Arbeitsprozess der App über Anfragen hinweg lebt, sogar über Anfragen hinweg.
+    # Übergebene Objekte werden weiterhin per Referenz gehalten -- die Wiederherstellung aus der
+    # Session gibt Objekte herein, die die Instanz anschliessend verändert.
+    def __init__(self, parse_list, nounphrases = None, nounlist = None):
     
         # List of the conll parse strings split into a list 
         # The format of the list is as follows (conll format):
         # 0:POSTION 1:FORM 2:STEM 3:CPOSTAG 4:POSTAG 5:FEATS 6:HEAD 7:DEPREL 8:PHEAD
         self.parse_list = parse_list
-        self.nounphrases = nounphrases
+        self.nounphrases = {} if nounphrases is None else nounphrases
         # nounlist is a list of lists, where each list contains the following information about a noun:
         # [word_index_from_1, position_of_noun_in_composite_noun, original, neutralized, suffix, noun_type, capitalized, head_identified_as_person_noun]
-        self.nounlist = nounlist
+        self.nounlist = [] if nounlist is None else nounlist
         # Indizes der Substantive, die ein Kästchen bekommen haben. nounlist taugt dafür nicht:
         # Dort landet für jedes Substantiv ein "prefix"-Eintrag, auch für nicht markierbare.
         self.marked_nouns = []
