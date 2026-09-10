@@ -575,6 +575,19 @@ class Lexicon:
         print("word_parse:", word_parse)
         noun = word_parse[2]
 
+        # search_lonely_adjectives schreibt allein stehende Adjektive vor dem Reparse gross, damit
+        # ParZu sie als substantiviert erkennt. Steht die Wortform gross, die Realisierung aus dem
+        # Eingabetext aber klein, ist die Grossschreibung künstlich: Das Wort ist ein Adjektiv und
+        # darf nicht über die Substantivlisten laufen. Aus "den jungen und den alten Lehrer" würde
+        # sonst "die junge Person" (Junge als Knabe) oder über die Neologismen "de kid".
+        # Der Zweig weiter unten behandelt denselben Fall, kam bisher aber zu spät.
+        if word_parse[1][:1].isupper() and word_parse[-2][:1].islower():
+            if noun.endswith(("er", "en", "em", "es")):
+                neutral_base = noun[:-1]
+            else:
+                neutral_base = noun
+            return True, "", [[0, noun, neutral_base, "", "substantivized adjective", False]]
+
         noun_base = noun[0:-1]
         noun_suffix_length = len(word_parse[1]) - word_parse[1].rfind(noun_base) - len(noun)
 

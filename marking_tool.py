@@ -30,7 +30,33 @@ class Marking_Tool:
         # Indizes der Substantive, die ein Kästchen bekommen haben. nounlist taugt dafür nicht:
         # Dort landet für jedes Substantiv ein "prefix"-Eintrag, auch für nicht markierbare.
         self.marked_nouns = []
+        self.repair_pronominal_articles()
         self.find_nounphrases()
+
+    # ParZu liest "der andere" in "Der eine kam, der andere ging." nicht als Nominalphrase aus
+    # Artikel und substantiviertem Adjektiv, sondern als Relativpronomen im Dativ plus
+    # Indefinitpronomen. Die Neutralisierung ergab dadurch "derm anderey" statt "de andere".
+    # Erkennbar ist der Fall daran, dass ein als Relativpronomen getaggtes "der", "die" oder "das"
+    # unmittelbar vor einem singularischen "eine" oder "andere" steht, das ParZu als Subjekt
+    # desselben Kopfes führt. Als Relativsatz kommt diese Folge kaum vor ("die Frau, der andere
+    # half"), als Nominalphrase dagegen häufig. Die Endung auf "-e" grenzt sie zusätzlich ab:
+    # Nach einem bestimmten Artikel steht die schwache Form, "der einer" gibt es nicht.
+    def repair_pronominal_articles(self):
+        for pos, word_parse in enumerate(self.parse_list[:-1]):
+            following = self.parse_list[pos+1]
+            if (word_parse[4] == "PRELS" and word_parse[1].lower() in ("der", "die", "das")
+                    and word_parse[7] != "subj"
+                    and following[4] == "PIS" and following[2] in ("andere", "eine")
+                    and following[1].lower().endswith("e") and "Pl" not in following[5]
+                    and following[7] == "subj"
+                    # Das Relativpronomen hängt entweder am selben Kopf wie das Indefinitpronomen
+                    # oder, wenn ParZu es gar nicht anbinden konnte, an der Satzwurzel.
+                    and word_parse[6] in ("0", following[6])):
+                word_parse[3] = "ART"
+                word_parse[4] = "ART"
+                word_parse[5] = "Def|" + following[5]
+                word_parse[6] = following[0]
+                word_parse[7] = "det"
 
     # ParZu lässt den Kasus bei substantivierten Adjektiven häufig offen ("meiner Lieben" liefert
     # "_|_|_"). Die Dependenzrelation des Kopfes verrät ihn aber.
@@ -193,9 +219,19 @@ class Marking_Tool:
             children.append(int(self.parse_list[int(pos)+1][0]))
         return children
     
+    # search_lonely_adjectives schreibt allein stehende Adjektive vor dem Reparse gross, damit
+    # ParZu sie als substantiviert erkennt; mark_nouns macht das an der Realisierung rückgängig,
+    # nicht aber an der Wortform. Steht die Wortform gross und die Realisierung klein, ist die
+    # Grossschreibung künstlich und darf nicht in die Ausgabe gelangen: "der andere ging" ergab
+    # sonst "derm Anderey".
+    def artificially_capitalized(self, pos:int) -> bool:
+        word_parse = self.parse_list[pos]
+        return word_parse[1][:1].isupper() and word_parse[-2][:1].islower()
+
     # This function neutralizes the word that has been selected.
     def neutralize_word(self, pos:int, has_article:bool, article_pos:int):
         word_parse = self.parse_list[pos]
+        was_artificially_capitalized = self.artificially_capitalized(pos)
         if word_parse[3] == "ADJA":
             self.parse_list[pos][-2] = Lexicon.neutralize_adjectives(word_parse, has_article)
         elif word_parse[4] == "PIDAT" and pos != article_pos-1:
@@ -229,6 +265,9 @@ class Marking_Tool:
                 self.parse_list[pos][-2] = "derm"
             else:
                 self.parse_list[pos][-2] = neutralized_word
+        if was_artificially_capitalized and self.parse_list[pos][-2][:1].isupper():
+            self.parse_list[pos][-2] = (self.parse_list[pos][-2][:1].lower()
+                                        + self.parse_list[pos][-2][1:])
 
     # This function feminizes the word that has been selected.
     def feminize_word(self, pos:int, has_article:bool, article_pos:int):
@@ -633,7 +672,13 @@ class Marking_Tool:
         else:
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
+            head_artificially_capitalized = self.artificially_capitalized(pos)
             self.parse_list[pos][-2] = Lexicon.neutralize_word(self.parse_list[pos],has_article)
+            # Auch beim Kopf der Nominalphrase darf eine künstliche Grossschreibung nicht in die
+            # Ausgabe gelangen ("der andere ging" ergab sonst "derm Anderey").
+            if head_artificially_capitalized and self.parse_list[pos][-2][:1].isupper():
+                self.parse_list[pos][-2] = (self.parse_list[pos][-2][:1].lower()
+                                            + self.parse_list[pos][-2][1:])
         # Neutralize the remaining words in the nounphrase:
         if not plural or self.parse_list[pos][2].endswith("jenige"):
             print("about to neutralize dependent words", self.parse_list[pos][1], self.nounphrases.get(pos+1))
