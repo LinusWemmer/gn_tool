@@ -101,6 +101,15 @@ class Marking_Tool:
                 # In relative sentences that depend on the noun phrase, we want to include the relative pronoun, but nothing else.
                 if word_parse[4] == "PRELS":
                     break
+            # Ein abhängiges Substantiv gehört nicht zur Nominalphrase -- ein Relativsatz an einer
+            # Apposition dagegen schon, denn die Apposition bezeichnet dieselbe Person: In "eine
+            # Tochter, Ida, hatte, die 1863 geboren wurde" hängt der Relativsatz an "Ida" und
+            # meint damit die Tochter. Andere abhängige Substantive bleiben aussen vor, weil ihr
+            # Relativsatz sich auf sie selbst bezieht ("das Buch der Lehrerin, die ...").
+            elif word_parse[6] == pos and word_parse[3] == "N" and word_parse[7] == "app":
+                for relative_parse in self.parse_list:
+                    if relative_parse[6] == word_parse[0] and relative_parse[7] == "rel":
+                        children.extend(self.find_children(relative_parse[0], preposition))
             #else:
             #    children.extend(self.find_dessen(word_parse[0]))
         # If the word is a noun followed by a comma followed by an independent der/die/das, the independent der/die/das should be added to childen
