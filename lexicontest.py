@@ -563,8 +563,17 @@ class Sentence_Test(unittest.TestCase):
                   ("sie", "en", '<span class="changed">en</span>'),
                   ("Sie", "En", '<span class="changed">En</span>'),
                   ("ihn", "en", '<span class="changed">en</span>'),
+                  # Dasselbe gilt für den Dativ "em" aus "ihm" und "ihr".
+                  ("ihm", "em", '<span class="changed">em</span>'),
+                  ("ihr", "em", '<span class="changed">em</span>'),
+                  ("Ihm", "Em", '<span class="changed">Em</span>'),
                   # Ein unverändertes "en" bleibt ohne Hervorhebung.
-                  ("en", "en", "en")]
+                  ("en", "en", "en"),
+                  ("em", "em", "em"),
+                  # "einerm" ist absichtlich nicht in der Regel: Dass sich nur ein Buchstabe
+                  # geändert hat, bleibt sichtbar.
+                  ("einem", "einerm", 'eine<span class="changed">r</span>m'),
+                  ("einer", "einerm", 'einer<span class="changed">m</span>')]
         for original, neutralized, expected in faelle:
             self.assertEqual(Marking_Tool.highlight_change(original, neutralized), expected,
                              f"{original!r} -> {neutralized!r}")
