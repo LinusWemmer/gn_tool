@@ -55,7 +55,11 @@ def replace_whitespace_outside_html_tags(text):
 
 # The following function capitalizes adjectives that do not modify a noun. It is a hack that ensures that
 # adjectives in conjunctions like "netten" in "einen netten und einen unfreundlichen Kollegen" can be
-# neutralized. The function also replaces "glauben" by "schreiben" internally, since ParZu does not
+# neutralized.
+# Formen von "ein" bleiben davon ausgenommen: Grossgeschrieben liest ParZu sie nicht als
+# substantiviertes Adjektiv, sondern als Artikel. In "den einen und den anderen Lehrer" wurde
+# "Einen" dadurch zum Artikel von "Lehrer", das erste "den" verlor seinen Bezug, und die Ausgabe
+# lautete "den De und de andere Lehrere". The function also replaces "glauben" by "schreiben" internally, since ParZu does not
 # recognize the dative object of "glauben" as such. Similarly it replaces "zeigen" bei "sagen".
 def search_lonely_adjectives(parse: list, input_text: str):
         change = False
@@ -73,7 +77,7 @@ def search_lonely_adjectives(parse: list, input_text: str):
             for word_number, word in enumerate(marking_tool.parse_list):
                 # Wir setzen alle Adjektive, die nicht von einem Nomen abhängen und nicht im Neutrum stehen, auf groß.
                 # Ausnahmen sind "am ...sten", "unter anderem" und "alles andere".
-                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5]:
+                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5] and word[2] != "ein":
                     word[1] = word[1].capitalize()
                     capitalized_words.append([sentence_number,word_number])
                     change = True
