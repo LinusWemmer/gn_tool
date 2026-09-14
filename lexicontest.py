@@ -390,6 +390,22 @@ class Sentence_Test(unittest.TestCase):
         # Gegenstueck dazu: Hier ist der Genitiv Plural echt, denn er haengt an einem Substantiv
         # ("das Gericht"). Der Artikel muss also stehen bleiben.
         test_sentences.append(("Er erkannte seinen Fehler erst, als das Gericht der Nationalsozialisten Saul Cohen zu Tode verurteilte.","En erkannte ensen Fehler erst, als das Gericht der Nationalsozialisterne Saul Cohen zu Tode verurteilte."))
+        # Doppelnennungen, bei denen auch das zweite Substantiv einen eigenen Artikel hat.
+        test_sentences.append(("Der Lehrer oder die Lehrerin ist da.","De Lehrere ist da."))
+        test_sentences.append(("Der gute Lehrer oder die gute Lehrerin ist da.","De gute Lehrere ist da."))
+        test_sentences.append(("Ich sehe den Lehrer oder die Lehrerin.","Ich sehe de Lehrere."))
+        test_sentences.append(("Ich helfe dem Lehrer oder der Lehrerin.","Ich helfe derm Lehrere."))
+        test_sentences.append(("Die Lehrerin oder der Lehrer ist da.","De Lehrere ist da."))
+        test_sentences.append(("Ein Lehrer oder eine Lehrerin kommt.","Ein Lehrere kommt."))
+        test_sentences.append(("Die Bürgerinnen und die Bürger sind gefragt.","Die Bürgerne sind gefragt."))
+        test_sentences.append(("Der Sohn oder die Tochter kommt.","Das Kind kommt."))
+        test_sentences.append(("Der Kaufmann oder die Kauffrau kommt.","Die Kaufperson kommt."))
+        test_sentences.append(("Der Lehrer oder die Lehrerin des Kindes ist da.","De Lehrere des Kindes ist da."))
+        # Keine Doppelnennung: zwei Einzelpersonen als Subjekt eines pluralischen Verbs, und ein
+        # Substantivpaar, das gar nicht zusammengehoert.
+        test_sentences.append(("Der Lehrer und die Lehrerin sind da.","De Lehrere und de Lehrere sind da."))
+        test_sentences.append(("Der Lehrer und die Schüler kamen.","De Lehrere und die Schülerne kamen."))
+        test_sentences.append(("Der Lehrer, die Lehrerin und der Schüler kamen.","De Lehrere, de Lehrere und de Schülere kamen."))
         test_sentences.append(("Das Buch der Lehrer ist da.","Das Buch der Lehrerne ist da."))
         # Ein unangebundenes Relativpronomen nimmt den Numerus des Bezugsworts und ist im
         # Plural nicht markierbar:

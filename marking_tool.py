@@ -462,6 +462,25 @@ class Marking_Tool:
             else:
                 self.parse_list[pos][-2] = neuter_word
 
+    # Numerus des zweiten Substantivs einer schon zusammengezogenen Doppelnennung, sofern an pos
+    # deren erstes Substantiv steht. Erkennbar ist die Zusammenziehung daran, dass die Konjunktion
+    # im Ausgabetext bereits geleert wurde.
+    def paired_noun_number(self, pos:int):
+        if pos + 1 >= len(self.parse_list):
+            return None
+        conjunction = self.parse_list[pos+1]
+        if conjunction[1] not in ("und", "oder", "/", "bzw.", "bzw", "+"):
+            return None
+        if conjunction[-2] != "" or conjunction[-1] != "":
+            return None
+        second = self.second_noun_position(pos+1)
+        if second is None or self.parse_list[second][3] != "N":
+            return None
+        second_feats = self.parse_list[second][5].split("|")
+        if len(second_feats) > 2 and second_feats[2] in ("Sg", "Pl"):
+            return second_feats[2]
+        return None
+
     # This function determines the number of a noun for which no number has been recognized by ParZu.
     def determine_number(self, pos:int, feats:list):
         # Wenn das Substantiv auf "mann", "frau", "herr" oder "dame" endet, dann ist es im Singular.
@@ -482,8 +501,8 @@ class Marking_Tool:
                 feats[2] = "Pl"
         # Wenn das Substantiv das erste Wort in einer Doppelnennung mit einem anderen Substantiv steht, dann übernehme den Numerus des anderen Substantivs:
         # (Überprüfe dabei auch, ob das Substantiv vorher als Teil einer Doppelnennung erkannt wurde, also der Output der Konjunktion auf "" gesetzt wurde.)
-        elif pos + 1 < len(self.parse_list) and (self.parse_list[pos+1][1] == "und" or self.parse_list[pos+1][1] == "oder" or self.parse_list[pos+1][1] == "/" or self.parse_list[pos+1][1] == "bzw." or self.parse_list[pos+1][1] == "bzw" or self.parse_list[pos+1][1] == "+") and self.parse_list[pos+1][-2] == "" and self.parse_list[pos+1][-1] == "" and self.parse_list[pos+2][3] == "N" and len(self.parse_list[pos+2][5].split("|")) >2 and self.parse_list[pos+2][5].split("|")[2] in ["Sg","Pl"]:
-            feats[2] = self.parse_list[pos+2][5].split("|")[2]
+        elif self.paired_noun_number(pos) is not None:
+            feats[2] = self.paired_noun_number(pos)
         else:
             print("Else case of determining number for noun without number")
             article = False
@@ -609,11 +628,34 @@ class Marking_Tool:
     # Paare dürfen nicht wie eine Doppelnennung ("Bürgerinnen und Bürger", die dieselbe Gruppe
     # zweimal benennt) zu einer Form zusammengezogen werden.
     # Das Argument ist die Position der Konjunktion.
-    def is_plural_subject_pair(self, pos:int) -> bool:
-        if pos < 1 or pos + 1 >= len(self.parse_list):
+    # Findet bei einer Doppelnennung das zweite Substantiv. Es steht normalerweise unmittelbar
+    # hinter der Konjunktion ("Lehrer oder Lehrerin"), darf aber auch einen eigenen Artikel und
+    # eigene Attribute mitbringen ("der Lehrer oder die gute Lehrerin"). Die dazwischenstehenden
+    # Woerter muessen dann im Parse als Dependenten genau dieses Substantivs haengen -- sonst
+    # beginnt hinter der Konjunktion etwas anderes als die parallele zweite Nennung.
+    def second_noun_position(self, pos:int):
+        if pos + 1 >= len(self.parse_list):
+            return None
+        if self.parse_list[pos+1][3] != "ART":
+            return pos + 1
+        for other in range(pos + 2, min(pos + 5, len(self.parse_list))):
+            if self.parse_list[other][3] in ("ART", "ADJA"):
+                continue
+            if self.parse_list[other][3] != "N":
+                return None
+            between = self.parse_list[pos+1:other]
+            if all(word[6] == self.parse_list[other][0] for word in between):
+                return other
+            return None
+        return None
+
+    def is_plural_subject_pair(self, pos:int, second:int=None) -> bool:
+        if second is None:
+            second = pos + 1
+        if pos < 1 or second >= len(self.parse_list):
             return False
         first_noun = self.parse_list[pos-1]
-        second_noun = self.parse_list[pos+1]
+        second_noun = self.parse_list[second]
         if "Sg" not in first_noun[5] or "Sg" not in second_noun[5]:
             return False
         if first_noun[7] != "subj" or int(first_noun[6]) == 0:
@@ -969,23 +1011,29 @@ class Marking_Tool:
         noun_pair_indices = {}
         noun_pair_types = {}
         noun_pair_prefixes = {}
+        noun_pair_ends = {}
         for pos, word_parse in enumerate(self.parse_list):
             if word_parse[1] == "und" or word_parse[1] == "oder" or word_parse[1] == "/" or word_parse[1] == "bzw." or word_parse[1] == "bzw" or word_parse[1] == "+":
+                second = self.second_noun_position(pos)
+                if second is None:
+                    continue
+                second_noun = self.parse_list[second]
                 # Zwei Einzelpersonen als Subjekt eines pluralischen Verbs werden nicht zusammengezogen.
-                if self.is_plural_subject_pair(pos):
+                if self.is_plural_subject_pair(pos, second):
                     continue
                 # Schaue, ob das Wort davor ein feminines Personensubstantiv ist:
                 for j, line in enumerate(Lexicon.FEMALE_NOUNS):
                     if self.parse_list[pos-1][2] == line:
                         # Schaue, ob das Wort danach das entsprechende maskuline Personensubstantiv ist:
-                        if self.parse_list[pos+1][2] == Lexicon.MALE_NOUNS[j]:
+                        if second_noun[2] == Lexicon.MALE_NOUNS[j]:
                             # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                             noun_pair_positions.append(pos-1)
                             noun_pair_indices[pos-1] = j
                             noun_pair_types[pos-1] = "standard"
                             noun_pair_prefixes[pos-1] = ""
+                            noun_pair_ends[pos-1] = second
                             # Wenn das maskuline Substantiv auf "ern" endet und nicht "Bauern" ist, dann steht die Konjunktion (und damit das feminine Substantiv) im Dativ:
-                            if self.parse_list[pos+1][1].endswith("ern") and not self.parse_list[pos+1][1] == "Bauern":
+                            if second_noun[1].endswith("ern") and not second_noun[1] == "Bauern":
                                 feats = self.parse_list[pos-1][5].split("|")
                                 feats[1] = "Dat"
                                 self.parse_list[pos-1][5] = "|".join(feats)
@@ -994,29 +1042,31 @@ class Marking_Tool:
                 for j, line in enumerate(Lexicon.MALE_NOUNS):
                     if self.parse_list[pos-1][2] == line:
                         # Schaue, ob das Wort danach das entsprechende feminine Personensubstantiv ist:
-                        if self.parse_list[pos+1][2] == Lexicon.FEMALE_NOUNS[j]:
+                        if second_noun[2] == Lexicon.FEMALE_NOUNS[j]:
                             # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                             noun_pair_positions.append(pos-1)
                             noun_pair_indices[pos-1] = j
                             noun_pair_types[pos-1] = "standard"
                             noun_pair_prefixes[pos-1] = ""
+                            noun_pair_ends[pos-1] = second
                             # Wenn das maskuline Substantiv auf "ern" endet und nicht "Bauern" ist, dann steht die Konjunktion (und damit das feminine Substantiv) im Dativ:
                             if self.parse_list[pos-1][1].endswith("ern") and not self.parse_list[pos-1][1] == "Bauern":
-                                feats = self.parse_list[pos+1][5].split("|")
+                                feats = second_noun[5].split("|")
                                 feats[1] = "Dat"
-                                self.parse_list[pos+1][5] = "|".join(feats)
+                                second_noun[5] = "|".join(feats)
                             break
                 # Schaue, ob das Wort davor ein Wort ist, das durch ein Neologismus ersetzt werden kann:
                 for j, neologism in enumerate(Lexicon.NEOLOGISMS):
                     neologism = "(" + neologism + ")$"
                     if re.match(neologism.lower(), self.parse_list[pos-1][2].lower()):
                         # Schaue, ob das Wort danach das entsprechende Wort ist:
-                        if re.match(neologism.lower(), self.parse_list[pos+1][2].lower()):
+                        if re.match(neologism.lower(), second_noun[2].lower()):
                             # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                             noun_pair_positions.append(pos-1)
                             noun_pair_indices[pos-1] = j
                             noun_pair_types[pos-1] = "neologism"
                             noun_pair_prefixes[pos-1] = ""
+                            noun_pair_ends[pos-1] = second
                             break
                 # Schaue, ob das Wort davor ein Wort ist, das auf "mann", "frau", "herr" oder "dame" endet:
                 person_pattern = r"(.*)((m(a|ä)nn(er)?)|(frau(en)?)|herr|dame)$"
@@ -1024,59 +1074,64 @@ class Marking_Tool:
                 if match:
                     # Schaue, ob das Wort danach das entsprechende Wort ist:
                     same_person_pattern = match.group(1) + r"((m(a|ä)nn(er)?)|(frau(en)?)|herr|dame)$"
-                    if re.match(same_person_pattern, self.parse_list[pos+1][2].lower()):
+                    if re.match(same_person_pattern, second_noun[2].lower()):
                         # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                         noun_pair_positions.append(pos-1)
                         noun_pair_indices[pos-1] = 0
                         noun_pair_types[pos-1] = "person"
                         noun_pair_prefixes[pos-1] = match.group(1).capitalize()
+                        noun_pair_ends[pos-1] = second
                 # Schaue, ob das Wort davor auf "sohn" oder "tochter" endet:
                 kind_pattern = r"(.*)(s(o|ö)hne?|t(o|ö)chter)$"
                 match = re.match(kind_pattern, self.parse_list[pos-1][2].lower())
                 if match:
                     # Schaue, ob das Wort danach das entsprechende Wort ist:
                     same_kind_pattern = match.group(1) + r"(s(o|ö)hne?|t(o|ö)chter)$"
-                    if re.match(same_kind_pattern, self.parse_list[pos+1][2].lower()):
+                    if re.match(same_kind_pattern, second_noun[2].lower()):
                         # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                         noun_pair_positions.append(pos-1)
                         noun_pair_indices[pos-1] = 0
                         noun_pair_types[pos-1] = "kind"
                         noun_pair_prefixes[pos-1] = match.group(1).capitalize()
+                        noun_pair_ends[pos-1] = second
                 # Schaue, ob das Wort davor auf "beamt..." endet:
                 beamt_pattern = r"(.*)(beamt(in(nen)?|e(r|n|m)?))$"
                 match = re.match(beamt_pattern, self.parse_list[pos-1][2].lower())
                 if match:
                     # Schaue, ob das Wort danach das entsprechende Wort ist:
                     same_beamt_pattern = match.group(1) + r"(beamt(in(nen)?|e(r|n|m)?))$"
-                    if re.match(same_beamt_pattern, self.parse_list[pos+1][2].lower()):
+                    if re.match(same_beamt_pattern, second_noun[2].lower()):
                         # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                         noun_pair_positions.append(pos-1)
                         noun_pair_indices[pos-1] = 0
                         noun_pair_types[pos-1] = "beamtey"
                         noun_pair_prefixes[pos-1] = match.group(1).capitalize()
+                        noun_pair_ends[pos-1] = second
                 # Schaue, ob das Wort davor ein Romanismus ist:
                 for j, romanism in enumerate(Lexicon.ROMAN_NOUNS):
                     romanism = "(" + romanism + ")$"
                     if re.match(romanism.lower(), self.parse_list[pos-1][2].lower()):
                         # Schaue, ob das Wort danach der entsprechende Romanismus ist:
-                        if re.match(romanism.lower(), self.parse_list[pos+1][2].lower()):
+                        if re.match(romanism.lower(), second_noun[2].lower()):
                             # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                             noun_pair_positions.append(pos-1)
                             noun_pair_indices[pos-1] = j
                             noun_pair_types[pos-1] = "romanism"
                             noun_pair_prefixes[pos-1] = ""
+                            noun_pair_ends[pos-1] = second
                             break
                 # Schaue, ob das Wort davor ein irreguläres Substantiv ist:
                 for j, irregular_noun in enumerate(Lexicon.IRREGULAR_NOUNS):
                     irregular_noun = "(" + irregular_noun + ")$"
                     if re.match(irregular_noun.lower(), self.parse_list[pos-1][2].lower()):
                         # Schaue, ob das Wort danach das entsprechende irreguläre Substantiv ist:
-                        if re.match(irregular_noun.lower(), self.parse_list[pos+1][2].lower()):
+                        if re.match(irregular_noun.lower(), second_noun[2].lower()):
                             # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                             noun_pair_positions.append(pos-1)
                             noun_pair_indices[pos-1] = j
                             noun_pair_types[pos-1] = "irregular"
                             noun_pair_prefixes[pos-1] = ""
+                            noun_pair_ends[pos-1] = second
                             break
                 # Schaue, ob das Wort davor ein substantiviertes Adjektiv ist:
                 for j, subadj in enumerate(Lexicon.SUBST_ADJ):
@@ -1085,12 +1140,13 @@ class Marking_Tool:
                     if match:
                         # Schaue, ob das Wort danach das entsprechende Wort ist:
                         same_subadj = match.group(1) + r"(r|n)?$"
-                        if re.match(same_subadj.lower(), self.parse_list[pos+1][2].lower()):
+                        if re.match(same_subadj.lower(), second_noun[2].lower()):
                             # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                             noun_pair_positions.append(pos-1)
                             noun_pair_indices[pos-1] = match.group(1).capitalize()
                             noun_pair_types[pos-1] = "substantivized adjective"
                             noun_pair_prefixes[pos-1] = ""
+                            noun_pair_ends[pos-1] = second
                             break
                 # Schaue, ob das Wort davor ein auf "sprachige" endendes substantiviertes Adjektiv ist:
                 sprachige_pattern = r"(..+sprachige)(r|n|m|s)?$"
@@ -1098,12 +1154,13 @@ class Marking_Tool:
                 if match:
                     # Schaue, ob das Wort danach das entsprechende Wort ist:
                     same_sprachige_pattern = match.group(1) + r"(r|n|m|s)?$"
-                    if re.match(same_sprachige_pattern, self.parse_list[pos+1][2].lower()):
+                    if re.match(same_sprachige_pattern, second_noun[2].lower()):
                         # Wenn ja, dann füge die Position des erstens Wortes in die Liste der Doppelnennungen ein, und speichere den Index des ersten Wortes in einem Dictionary:
                         noun_pair_positions.append(pos-1)
                         noun_pair_indices[pos-1] = match.group(1).capitalize()
                         noun_pair_types[pos-1] = "substantivized adjective"
                         noun_pair_prefixes[pos-1] = ""
+                        noun_pair_ends[pos-1] = second
 
         nouns = ""
         for pos, word_parse in enumerate(self.parse_list):
@@ -1126,21 +1183,31 @@ class Marking_Tool:
             # Wenn pos die Position einer Doppelnennung ist, dann mache die gesamte Doppelnennung markierbar:
             elif pos in noun_pair_positions:
                 self.find_nounphrase(word_parse)
-                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{'<span class="markable">' + escape(word_parse[-2]) + escape(word_parse[-1]) + escape(self.parse_list[pos+1][-2]) + escape(self.parse_list[pos+1][-1]) + escape(self.parse_list[pos+2][-2]) + '</span>'}</label></div>{escape(self.parse_list[pos+2][-1])}"""
+                # Die Doppelnennung reicht vom ersten Substantiv bis zum zweiten. Dazwischen steht
+                # die Konjunktion und gegebenenfalls ein eigener Artikel des zweiten Substantivs
+                # ("der Lehrer oder die Lehrerin"); all das kommt in dasselbe Kästchen.
+                end = noun_pair_ends[pos]
+                marked_text = escape(word_parse[-2]) + escape(word_parse[-1])
+                for other in range(pos+1, end):
+                    marked_text += escape(self.parse_list[other][-2]) + escape(self.parse_list[other][-1])
+                marked_text += escape(self.parse_list[end][-2])
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{'<span class="markable">' + marked_text + '</span>'}</label></div>{escape(self.parse_list[end][-1])}"""
                 nouns += input_form
                 self.parse_list[pos][-1] = ""
-                self.parse_list[pos+1][-2] = ""
-                self.parse_list[pos+1][-1] = ""
-                self.parse_list[pos+2][-2] = ""
+                for other in range(pos+1, end+1):
+                    self.parse_list[other][-2] = ""
+                    # Der Leerraum hinter dem letzten Wort der Doppelnennung trennt sie vom Rest
+                    # des Satzes und muss im Ausgabetext stehenbleiben.
+                    if other != end:
+                        self.parse_list[other][-1] = ""
                 prefix = noun_pair_prefixes[pos]
                 if prefix == "":
                     is_capitalized = True
                 else:
                     is_capitalized = False
                 self.nounlist.extend([[int(word_parse[0]), 0, "", "", prefix, "prefix", True, False], [int(word_parse[0]), 0, word_parse[1], noun_pair_indices[pos], "", noun_pair_types[pos], is_capitalized, True]])
-            elif pos-1 in noun_pair_positions:
-                continue
-            elif pos-2 in noun_pair_positions:
+            elif any(other in noun_pair_positions and pos <= noun_pair_ends[other]
+                     for other in range(max(0, pos-4), pos)):
                 continue
             else:
                 # Determine whether pos depends on some noun phrase:
