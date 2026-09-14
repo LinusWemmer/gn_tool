@@ -58,6 +58,10 @@ class Marking_Tool:
                 word_parse[6] = following[0]
                 word_parse[7] = "det"
 
+    # Determinierer, die im Maskulinum Nominativ und im Neutrum endungslos sind. Nach ihnen
+    # steht das folgende Adjektiv in der starken Deklination und trägt das Genus selbst.
+    ENDINGLESS_DETERMINERS = ("ein", "mein", "dein", "sein", "ihr", "unser", "euer", "kein")
+
     # Zeichen, die im Eingabetext unmittelbar auf ein Wort folgen dürfen. find_realizations
     # sucht jedes Wort des Parses im Eingabetext wieder und prüft dabei, dass dahinter eines
     # dieser Zeichen oder das Textende steht. Fehlt ein Zeichen, wird das Wort nicht gefunden
@@ -400,6 +404,15 @@ class Marking_Tool:
                      and other[1].lower().endswith("er") and "Pl" not in other[5]
                      and other[5].split("|")[1:2] == ["Masc"]
                      for other in self.parse_list):
+                feats[2] = "Sg"
+            # Ein Substantiv, das als Apposition an einem Pronomen der ersten oder zweiten Person
+            # hängt, steht im Singular ("Du Armer!", "Ich Armer!"). ParZu lässt den Numerus des
+            # Pronomens dort selbst offen, das Lemma ist aber eindeutig. Ohne diese Prüfung greift
+            # unten die Voreinstellung Plural, und ein pluralisches substantiviertes Adjektiv ist
+            # nicht markierbar.
+            elif (self.parse_list[pos][7] == "app" and int(self.parse_list[pos][6]) != 0
+                  and self.parse_list[int(self.parse_list[pos][6])-1][4] == "PPER"
+                  and self.parse_list[int(self.parse_list[pos][6])-1][2] in ("ich", "du")):
                 feats[2] = "Sg"
             # Wenn das Substantiv nicht von "als" abhängig ist (lässt sich im ParZu-Parsebaum überprüfen),
             # setze den Numerus des Substantivs auf "Pl":
@@ -1170,17 +1183,42 @@ class Marking_Tool:
                     # Determinierers ablesen: "jede" ist feminin, "jeden" maskulin. Nur eindeutige
                     # Endungen zählen -- "der" wäre maskuliner Nominativ oder femininer
                     # Genitiv/Dativ, "dem" maskulin oder neutrum, "das" neutrum.
+                    # Hängt das Substantiv als Apposition an "ich" oder "du", bezeichnet es
+                    # sicher eine Person. ParZu wählt dort manchmal die falsche Grundform, wenn
+                    # die Wortform zugleich ein gewöhnliches Substantiv sein kann: Zu "Du Arme!"
+                    # liefert es "Arm" (die Gliedmasse) statt "Arme". Ist die Wortform selbst
+                    # eine bekannte Substantivierung, wird sie deshalb als Grundform genommen.
+                    if (word_parse[7] == "app" and int(word_parse[6]) != 0
+                            and self.parse_list[int(word_parse[6])-1][4] == "PPER"
+                            and self.parse_list[int(word_parse[6])-1][2] in ("ich", "du")
+                            and word_parse[2] not in Lexicon.SUBSTANTIVIZABLE_ADJ
+                            and word_parse[1] in Lexicon.SUBSTANTIVIZABLE_ADJ):
+                        word_parse[2] = word_parse[1]
+
                     inferred_gender = "_"
                     if feats[0] == "_" and feats[2] != "Pl":
+                        article_form = ""
                         for other_word_parse in self.parse_list:
                             if other_word_parse[6] == word_parse[0] and other_word_parse[3] == "ART":
                                 form = other_word_parse[1].lower()
+                                article_form = form
                                 if form.endswith("en"):
                                     inferred_gender = "Masc"
                                     break
                                 if form.endswith("e"):
                                     inferred_gender = "Fem"
                                     break
+                        # Gibt der Determinierer das Genus nicht her, verrät es die Endung des
+                        # Wortes selbst -- aber nur in der starken Deklination, also nach einem
+                        # endungslosen Determinierer ("ein Anderer") oder ganz ohne einen
+                        # ("Du Armer"). Nach "der", "die" oder "das" steht die schwache Form, die
+                        # im Maskulinum und im Femininum gleich lautet ("der Alte", "die Alte").
+                        if inferred_gender == "_" and (article_form == ""
+                                                       or article_form in Marking_Tool.ENDINGLESS_DETERMINERS):
+                            if word_parse[1].endswith("er"):
+                                inferred_gender = "Masc"
+                            elif word_parse[1].endswith("e"):
+                                inferred_gender = "Fem"
 
                     # Ein bestimmter Artikel unterscheidet sich vom unbestimmten und vom
                     # Possessivum; "Die Linke" ist die Partei, "eine Linke" eine Person.
@@ -1210,7 +1248,7 @@ class Marking_Tool:
                     list.insert(0, [int(word_parse[0]), 0, "", "", prefix, "prefix", False, False])
                     self.nounlist.extend(list)
                 # Case: Pronoun
-                elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not self.plural_by_verb(pos): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
+                elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_" and word_parse[2] != "du") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not self.plural_by_verb(pos): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
                     print("found pronoun:",word_parse)
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""

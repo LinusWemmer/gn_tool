@@ -370,6 +370,19 @@ class Sentence_Test(unittest.TestCase):
         # so wie das gleichgebaute "de Flüchtling".
         test_sentences.append(("Der Sohnemann kam.","De Sprössling kam."))
         test_sentences.append(("Die Sohnemänner kamen.","Die Sprösslinge kamen."))
+        # "Du"/"Ich" bleiben unverändert, die Apposition wird stark dekliniert ("-ey"):
+        test_sentences.append(("Du Arme!","Du Armey!"))
+        test_sentences.append(("Du Armer!","Du Armey!"))
+        test_sentences.append(("Du Kranke!","Du Krankey!"))
+        test_sentences.append(("Du Reisender!","Du Reisendey!"))
+        test_sentences.append(("Ich Armer!","Ich Armey!"))
+        # Nach dem endungslosen "ein" steht die starke Form, die das Genus verrät:
+        test_sentences.append(("Vielleicht kocht ein Anderer.","Vielleicht kocht ein Andere."))
+        # Gegenproben: Nach "der"/"die"/"das" steht die schwache Form, das Genus lässt sich
+        # dort nicht aus der Endung ablesen.
+        test_sentences.append(("Das Gute siegt.","Das Gute siegt."))
+        test_sentences.append(("Ein Reisender kam.","Ein Reisende kam."))
+        test_sentences.append(("Die Reisenden kamen.","Die Reisenden kamen."))
         test_sentences.append(("Der Flüchtling kam.","De Flüchtling kam."))
         # "Feuerwehrfrau" und "Feuerwehrleute" sind gebräuchlich, deshalb bleibt es bei "-person":
         test_sentences.append(("Der Feuerwehrmann kam.","Die Feuerwehrperson kam."))
