@@ -406,6 +406,12 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Lehrer und die Lehrerin sind da.","De Lehrere und de Lehrere sind da."))
         test_sentences.append(("Der Lehrer und die Schüler kamen.","De Lehrere und die Schülerne kamen."))
         test_sentences.append(("Der Lehrer, die Lehrerin und der Schüler kamen.","De Lehrere, de Lehrere und de Schülere kamen."))
+        # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
+        test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
+        test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))
+        test_sentences.append(("Der Lehrer oder die neue Lehrerin ist da.","De Lehrere oder de neue Lehrere ist da."))
+        test_sentences.append(("Der gute Lehrer oder die Lehrerin kommt.","De gute Lehrere oder de Lehrere kommt."))
+        test_sentences.append(("Der alte kluge Lehrer oder die kluge alte Lehrerin kommt.","De alte kluge Lehrere oder de kluge alte Lehrere kommt."))
         test_sentences.append(("Das Buch der Lehrer ist da.","Das Buch der Lehrerne ist da."))
         # Ein unangebundenes Relativpronomen nimmt den Numerus des Bezugsworts und ist im
         # Plural nicht markierbar:

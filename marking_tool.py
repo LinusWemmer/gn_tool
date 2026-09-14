@@ -628,6 +628,11 @@ class Marking_Tool:
     # Paare dürfen nicht wie eine Doppelnennung ("Bürgerinnen und Bürger", die dieselbe Gruppe
     # zweimal benennt) zu einer Form zusammengezogen werden.
     # Das Argument ist die Position der Konjunktion.
+    # Die Lemmata der Adjektive, die an dem Substantiv an position haengen, in Textreihenfolge.
+    def adjective_lemmas(self, position:int) -> list:
+        return [word[2].lower() for word in self.parse_list
+                if word[3] == "ADJA" and word[6] == self.parse_list[position][0]]
+
     # Findet bei einer Doppelnennung das zweite Substantiv. Es steht normalerweise unmittelbar
     # hinter der Konjunktion ("Lehrer oder Lehrerin"), darf aber auch einen eigenen Artikel und
     # eigene Attribute mitbringen ("der Lehrer oder die gute Lehrerin"). Die dazwischenstehenden
@@ -638,15 +643,21 @@ class Marking_Tool:
             return None
         if self.parse_list[pos+1][3] != "ART":
             return pos + 1
-        for other in range(pos + 2, min(pos + 5, len(self.parse_list))):
+        for other in range(pos + 2, len(self.parse_list)):
             if self.parse_list[other][3] in ("ART", "ADJA"):
                 continue
             if self.parse_list[other][3] != "N":
                 return None
             between = self.parse_list[pos+1:other]
-            if all(word[6] == self.parse_list[other][0] for word in between):
-                return other
-            return None
+            if not all(word[6] == self.parse_list[other][0] for word in between):
+                return None
+            # Beide Nennungen muessen dieselben Attribute tragen. "Der gute Lehrer oder die gute
+            # Lehrerin" bezeichnet eine Person und wird zusammengezogen, "der gute Lehrer oder die
+            # schlechte Lehrerin" dagegen zwei -- dort ginge beim Zusammenziehen die Haelfte der
+            # Aussage verloren.
+            if self.adjective_lemmas(pos-1) != self.adjective_lemmas(other):
+                return None
+            return other
         return None
 
     def is_plural_subject_pair(self, pos:int, second:int=None) -> bool:
@@ -1162,6 +1173,12 @@ class Marking_Tool:
                         noun_pair_prefixes[pos-1] = ""
                         noun_pair_ends[pos-1] = second
 
+        # Alle Positionen, die von einer Doppelnennung verschluckt werden: von der Konjunktion bis
+        # zum zweiten Substantiv einschliesslich seines Artikels und seiner Attribute.
+        covered_by_pair = set()
+        for first in noun_pair_positions:
+            covered_by_pair.update(range(first + 1, noun_pair_ends[first] + 1))
+
         nouns = ""
         for pos, word_parse in enumerate(self.parse_list):
             # split_prepositions hat "im", "am", "zur" und dergleichen in Präposition und Artikel
@@ -1206,8 +1223,7 @@ class Marking_Tool:
                 else:
                     is_capitalized = False
                 self.nounlist.extend([[int(word_parse[0]), 0, "", "", prefix, "prefix", True, False], [int(word_parse[0]), 0, word_parse[1], noun_pair_indices[pos], "", noun_pair_types[pos], is_capitalized, True]])
-            elif any(other in noun_pair_positions and pos <= noun_pair_ends[other]
-                     for other in range(max(0, pos-4), pos)):
+            elif pos in covered_by_pair:
                 continue
             else:
                 # Determine whether pos depends on some noun phrase:
