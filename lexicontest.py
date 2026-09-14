@@ -356,6 +356,14 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Weihnachtsmann kommt.","Der Weihnachtsmensch kommt."))
         test_sentences.append(("Der Butzemann erschreckt.","Der Butzemensch erschreckt."))
         test_sentences.append(("Er ist ein Strohmann.","En ist ein Strohmensch."))
+        test_sentences.append(("Der Knochenmann holt ihn.","Der Knochenmensch holt en."))
+        test_sentences.append(("Der Saubermann redete.","Der Saubermensch redete."))
+        test_sentences.append(("Dieser Blödmann stört.","Dieser Blödmensch stört."))
+        test_sentences.append(("Der Pfeifenmann kam.","Der Pfeifenmensch kam."))
+        test_sentences.append(("Er ist ein Weltmann.","En ist ein Weltmensch."))
+        # "Wassermann" wird zu "Wassergeist" und folgt als Neologismus dem Artikel "de":
+        test_sentences.append(("Der Wassermann taucht auf.","De Wassergeist taucht auf."))
+        test_sentences.append(("Die Wassermänner tauchen auf.","Die Wassergeister tauchen auf."))
         # "Feuerwehrfrau" und "Feuerwehrleute" sind gebräuchlich, deshalb bleibt es bei "-person":
         test_sentences.append(("Der Feuerwehrmann kam.","Die Feuerwehrperson kam."))
         # Das Pronomen "jedermann", auch im Genitiv:

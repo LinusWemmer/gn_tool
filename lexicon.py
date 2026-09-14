@@ -163,15 +163,15 @@ class Lexicon:
     # Das Prinzip: Ist weder die Form auf "-frau" noch der Plural auf "-leute" gebräuchlich,
     # passt "-mensch" besser als "-person".
     MENSCH_COMPOUNDS = ["hampel", "ehren", "buh", "bieder", "schnee", "weihnachts", "butze",
-                        "stroh"]
+                        "stroh", "knochen", "sauber", "blöd", "pfeifen", "welt"]
 
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 
     # NEOLOGISMS lists singular forms as well as forms that occur in compounds
-    NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?", r"O(p|m)i", r"Uro(p|m)i", r"Ururo(p|m)i", r"(Mam|Pap)a", r"(Mam|Pap)i"]  
-    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonke", "Couse", "Jungfere", "Kid", "Nifte", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi"]
-    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Owas", "Urowas", "Ururowas", "Tonken", "Cousen", "Jungferne", "Kids", "Niften", "Owis", "Urowis", "Ururowis", "Sasas", "Sasis"]
-    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi"]
+    NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?", r"O(p|m)i", r"Uro(p|m)i", r"Ururo(p|m)i", r"(Mam|Pap)a", r"(Mam|Pap)i", r"Wasserm(a|ä)nn(er)?"]  
+    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonke", "Couse", "Jungfere", "Kid", "Nifte", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist"]
+    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Owas", "Urowas", "Ururowas", "Tonken", "Cousen", "Jungferne", "Kids", "Niften", "Owis", "Urowis", "Ururowis", "Sasas", "Sasis", "Wassergeister"]
+    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist"]
 
     # The next section generates List of Male/Female role nouns an their corresponding neutral forms
     # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
