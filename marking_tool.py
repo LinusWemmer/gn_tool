@@ -51,6 +51,12 @@ class Marking_Tool:
             if following[4] != "NE" or not (following[1] in Lexicon.PERSON_NAMES
                                             or following[1] in Lexicon.PROPER_NAMES):
                 continue
+            # Ein echtes Genitivattribut modifiziert ein Substantiv ("das Gericht der
+            # Nationalsozialisten"). Hängt es an etwas anderem -- im Beispielsatz an der Jahreszahl
+            # "2024" --, ist die Genitivlesart nicht zu halten und die Apposition gemeint.
+            head = int(word_parse[6]) if word_parse[6].isdigit() else 0
+            if head != 0 and self.parse_list[head-1][3] == "N":
+                continue
             feats[-2:] = ["Nom", "Sg"]
             word_parse[5] = "|".join(feats)
             for other in self.parse_list:

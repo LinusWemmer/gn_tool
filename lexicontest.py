@@ -387,6 +387,9 @@ class Sentence_Test(unittest.TestCase):
         # Folgt auf ein vermeintliches "Genitiv Plural" ein Personenname, ist die Apposition
         # gemeint und damit der Singular. Der Fehler tritt nur im vollen Satz auf.
         test_sentences.append(("Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 der Oppositionspolitiker Igor Lednik.","Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 de Oppositionspolitikere Igor Lednik."))
+        # Gegenstueck dazu: Hier ist der Genitiv Plural echt, denn er haengt an einem Substantiv
+        # ("das Gericht"). Der Artikel muss also stehen bleiben.
+        test_sentences.append(("Er erkannte seinen Fehler erst, als das Gericht der Nationalsozialisten Saul Cohen zu Tode verurteilte.","En erkannte ensen Fehler erst, als das Gericht der Nationalsozialisterne Saul Cohen zu Tode verurteilte."))
         test_sentences.append(("Das Buch der Lehrer ist da.","Das Buch der Lehrerne ist da."))
         # Ein unangebundenes Relativpronomen nimmt den Numerus des Bezugsworts und ist im
         # Plural nicht markierbar:
