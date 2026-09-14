@@ -361,9 +361,16 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Dieser Blödmann stört.","Dieser Blödmensch stört."))
         test_sentences.append(("Der Pfeifenmann kam.","Der Pfeifenmensch kam."))
         test_sentences.append(("Er ist ein Weltmann.","En ist ein Weltmensch."))
-        # "Wassermann" wird zu "Wassergeist" und folgt als Neologismus dem Artikel "de":
-        test_sentences.append(("Der Wassermann taucht auf.","De Wassergeist taucht auf."))
+        # "Wassermann" wird zu "Wassergeist". Ein Wassergeist ist keine Person, deshalb behält
+        # das Wort seinen eigenen Artikel, anders als die übrigen Neologismen.
+        test_sentences.append(("Der Wassermann taucht auf.","Der Wassergeist taucht auf."))
         test_sentences.append(("Die Wassermänner tauchen auf.","Die Wassergeister tauchen auf."))
+        test_sentences.append(("Er sprach mit dem Wassermann.","En sprach mit dem Wassergeist."))
+        # "Sohnemann" wird zu "Sprössling" und bekommt als Personenbezeichnung den Artikel "de",
+        # so wie das gleichgebaute "de Flüchtling".
+        test_sentences.append(("Der Sohnemann kam.","De Sprössling kam."))
+        test_sentences.append(("Die Sohnemänner kamen.","Die Sprösslinge kamen."))
+        test_sentences.append(("Der Flüchtling kam.","De Flüchtling kam."))
         # "Feuerwehrfrau" und "Feuerwehrleute" sind gebräuchlich, deshalb bleibt es bei "-person":
         test_sentences.append(("Der Feuerwehrmann kam.","Die Feuerwehrperson kam."))
         # Das Pronomen "jedermann", auch im Genitiv:

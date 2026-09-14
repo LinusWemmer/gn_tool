@@ -167,11 +167,17 @@ class Lexicon:
 
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 
+    # Neologismen, die ein vorhandenes deutsches Wort mit eigenem Genus sind und deshalb ihren
+    # Artikel behalten: "der Wassergeist", nicht "de Wassergeist". Ein Wassergeist ist keine
+    # Person. Die übrigen Neologismen sind Inklusivum-Neubildungen ("Geschwister", "Elter",
+    # "Owa") oder Personenbezeichnungen ("Sprössling") und bekommen wie diese den Artikel "de".
+    NEOLOGISMS_KEEP_ARTICLE = ["Wassergeist"]
+
     # NEOLOGISMS lists singular forms as well as forms that occur in compounds
-    NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?", r"O(p|m)i", r"Uro(p|m)i", r"Ururo(p|m)i", r"(Mam|Pap)a", r"(Mam|Pap)i", r"Wasserm(a|ä)nn(er)?"]  
-    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonke", "Couse", "Jungfere", "Kid", "Nifte", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist"]
-    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Owas", "Urowas", "Ururowas", "Tonken", "Cousen", "Jungferne", "Kids", "Niften", "Owis", "Urowis", "Ururowis", "Sasas", "Sasis", "Wassergeister"]
-    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist"]
+    NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?", r"O(p|m)i", r"Uro(p|m)i", r"Ururo(p|m)i", r"(Mam|Pap)a", r"(Mam|Pap)i", r"Wasserm(a|ä)nn(er)?", r"Sohnem(a|ä)nn(er)?"]  
+    NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonke", "Couse", "Jungfere", "Kid", "Nifte", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist", "Sprössling"]
+    NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Owas", "Urowas", "Ururowas", "Tonken", "Cousen", "Jungferne", "Kids", "Niften", "Owis", "Urowis", "Ururowis", "Sasas", "Sasis", "Wassergeister", "Sprösslinge"]
+    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist", "Sprössling"]
 
     # The next section generates List of Male/Female role nouns an their corresponding neutral forms
     # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
@@ -1080,6 +1086,10 @@ class Lexicon:
                     j = component[3]
                     if component[-3] == "neologism":
                         head = Lexicon.neutralize_neologism(feats, j)
+                        # Behält der Neologismus seinen eigenen Artikel, dürfen die abhängigen
+                        # Wörter nicht neutralisiert werden; head_selected steuert das.
+                        if Lexicon.NEOLOGISMS_NEUTRAL[j] in Lexicon.NEOLOGISMS_KEEP_ARTICLE:
+                            head_selected = False
                     elif component[-3] == "person":
                         # if plural, head is "Leute", otherwise "Person"
                         if feats[2] == "Pl" and feats[1] != "Dat":
