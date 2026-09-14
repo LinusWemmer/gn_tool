@@ -457,6 +457,13 @@ class Lexicon:
     def neutralize_adjectives(word_parse, has_article) -> str:
         print("neutralize adjective:", word_parse, has_article)
         feats = word_parse[5].split("|")
+        # ParZu lässt die Merkmale eines Adjektivs manchmal ganz offen und liefert nur "_" statt
+        # der üblichen Anordnung "Steigerung|Genus|Kasus|Numerus|Flexion|" -- etwa wenn das
+        # zugehörige Substantiv kleingeschrieben ist ("vor einem anderen spieler"). Die Liste
+        # wird deshalb auf die Länge aufgefüllt, die diese Funktion erwartet. Ein fehlender
+        # Kasus gilt weiter unten ohnehin als Nominativ, ein fehlender Numerus als Singular.
+        while len(feats) < 4:
+            feats.append("_")
         # Plural adjectives don't need to be changed.
         # Undeclined adjectives don't need to be changed.
         # Undekliniert ist ein Adjektiv, wenn Wortform und Grundform übereinstimmen ("die rosa

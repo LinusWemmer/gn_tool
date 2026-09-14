@@ -529,6 +529,32 @@ class Sentence_Test(unittest.TestCase):
                     # Darf keine Exception werfen:
                     marking_tool.neutralize_nounphrase(int(position) - 1, [int(component)])
 
+    # Eingaben aus den Fehlermeldungen in reports/reports.txt, die die öffentliche Version zum
+    # Absturz brachten. Allen gemeinsam ist, dass ParZu die Merkmale eines Wortes ganz offen
+    # lässt oder ein Zeichen im Eingabetext nicht wiedergefunden wird; geprüft wird deshalb nur,
+    # dass keine Exception fliegt, nicht eine bestimmte Ausgabe.
+    def test_reported_inputs_do_not_crash(self):
+        for text in (
+                # Trennstriche aus einer PDF-Kopie: "deren" bekommt keine Merkmale.
+                "Über deren Auto-s wird gesprochen.",
+                # "als" nach einem Relativpronomen: dessen Merkmale sind anders angeordnet
+                # als die eines Personalpronomens.
+                "Die Leute, die als Reisende kommen, warten.",
+                # Typografische Anführungszeichen und Gedankenstriche um ein gegendertes Wort.
+                "Das Wort “gender” ist schwierig.",
+                "Das Wort ‚gender‘ ist schwierig.",
+                "Das Wort –gender– ist schwierig.",
+                # Durchgehende Kleinschreibung: "anderen" bekommt keine Merkmale.
+                "der spieler darf sich eine der karten vor einem anderen spieler anschauen"):
+            remaining = text
+            for parse_list in get_parse(remove_special_character_gendering(split_prepositions(text))):
+                marking_tool = Marking_Tool(parse_list, {}, [])
+                remaining = Marking_Tool.find_realizations(marking_tool, remaining)
+                marked = marking_tool.get_marking_form(0)
+                for position, component in re.findall(r'id="\d+\|(\d+)\|(-?\d+)"', marked):
+                    # Darf keine Exception werfen:
+                    marking_tool.neutralize_nounphrase(int(position) - 1, [int(component)])
+
     # ParZu bindet in diesem Satz den Artikel "Die" nicht an "Akademie" an und hängt den Beinamen
     # "Großen" als Attribut an ein späteres Substantiv. Der Ablauf hier entspricht dem der
     # Anwendung: eine einzige Marking_Tool-Instanz, die genau einmal markiert.

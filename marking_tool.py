@@ -58,6 +58,14 @@ class Marking_Tool:
                 word_parse[6] = following[0]
                 word_parse[7] = "det"
 
+    # Zeichen, die im Eingabetext unmittelbar auf ein Wort folgen dürfen. find_realizations
+    # sucht jedes Wort des Parses im Eingabetext wieder und prüft dabei, dass dahinter eines
+    # dieser Zeichen oder das Textende steht. Fehlt ein Zeichen, wird das Wort nicht gefunden
+    # und die Zuordnung bricht mit einer Ausnahme ab: "Das Wort “gender” ist schwierig."
+    # scheiterte daran, dass das schliessende typografische Anführungszeichen fehlte. Die Liste
+    # stand früher an zwei Stellen doppelt und war dabei nicht einmal deckungsgleich.
+    WORD_DELIMITERS = r"[\s.,!?;:‑–—„“”‚‘’»«›‹'\"(){}<>|\[\]+/*_…]"
+
     # ParZu lässt den Kasus bei substantivierten Adjektiven häufig offen ("meiner Lieben" liefert
     # "_|_|_"). Die Dependenzrelation des Kopfes verrät ihn aber.
     DEPREL_CASES = {"subj": "Nom", "pred": "Nom", "obja": "Acc", "objd": "Dat", "objg": "Gen", "gmod": "Gen"}
@@ -407,11 +415,22 @@ class Marking_Tool:
                     if self.parse_list[index_of_last_np_before_als-1][2] == "man":
                         feats[2] = "Sg"
                     elif self.parse_list[index_of_last_np_before_als-1][3] == "N":
-                        feats[1] = otherfeats[1]
-                        feats[2] = otherfeats[2]
+                        if len(otherfeats) >= 3:
+                            feats[1] = otherfeats[1]
+                            feats[2] = otherfeats[2]
                     elif self.parse_list[index_of_last_np_before_als-1][3] == "PRO":
-                        feats[1] = otherfeats[3]
-                        feats[2] = otherfeats[1]
+                        # Die Merkmale eines Pronomens sind je nach Art anders angeordnet:
+                        # Personalpronomen tragen "Person|Numerus|Genus|Kasus" (vier Felder),
+                        # Relativ- und Indefinitpronomen "Genus|Kasus|Numerus" (drei). Ohne diese
+                        # Unterscheidung griff der Zugriff auf den Kasus bei einem
+                        # Relativpronomen ins Leere: "Die Leute, die als Reisende kommen,
+                        # warten." stürzte deshalb ab.
+                        if len(otherfeats) >= 4:
+                            feats[1] = otherfeats[3]
+                            feats[2] = otherfeats[1]
+                        elif len(otherfeats) == 3:
+                            feats[1] = otherfeats[1]
+                            feats[2] = otherfeats[2]
                     # Hier oben und unten werden wahrscheinlich noch mehr Fälle als "N" und "PRO" benötigt, zum Beispiel für den Fall, dass "jemand" als Adjektiv geparst wird.
                 else:
                     # Suche die erste Nominalphrase nach dem Substantiv ohne Numerus (da sich die als-Konstruktion jetzt höchstwahrscheinlich darauf bezieht) und
@@ -1101,7 +1120,12 @@ class Marking_Tool:
                     for other_word_parse in self.parse_list:
                         if other_word_parse[6] == word_parse[0] and other_word_parse[3] == "ART":
                             article_feats = other_word_parse[5].split("|")
-                            if article_feats[-1] != "Pl" and (article_feats[-3] == "Masc" or article_feats[-3] == "Fem"):
+                            # ParZu lässt die Merkmale eines Artikels manchmal ganz offen und
+                            # liefert nur "_" statt "Bestimmtheit|Genus|Kasus|Numerus". Ein
+                            # solcher Artikel sagt nichts über Genus und Numerus aus und zählt
+                            # deshalb wie kein Artikel.
+                            if (len(article_feats) >= 3 and article_feats[-1] != "Pl"
+                                    and (article_feats[-3] == "Masc" or article_feats[-3] == "Fem")):
                                 has_article = True
                     # The following checks whether some possessive form ("sein", "ihr", "mein", "dein", "unser", "euer", "dessen", "deren") is dependent on the noun:
                     has_possessive = False
@@ -1307,9 +1331,9 @@ class Marking_Tool:
             elif re.match(re.compile(r"[mdks]?einer$", re.IGNORECASE),word[1]):
                 pattern = r"([mdks])?eine(r[*_:/][ms]|[ms][*_:/]r|r[*_:/]\1eine[ms]|r)|([mdks])?eine[ms][*_:/]\3einer"
             elif word[1].endswith("e"):
-                pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))"
+                pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|" + Marking_Tool.WORD_DELIMITERS + "))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|" + Marking_Tool.WORD_DELIMITERS + "))"
             elif word[1].endswith("er"):
-                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|[\s.,!?;:‑„“»«›‹'’\"(){}<>|\[\]+/*_]))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|[\s.,!?;:‑„“»«›‹'’\"(){}<>|\[\]+/*_]))"
+                pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|" + Marking_Tool.WORD_DELIMITERS + "))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|" + Marking_Tool.WORD_DELIMITERS + "))"
             # elif re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1]):
             #     match = re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1])
             #     pattern = re.escape(word[1]) + "|" + match.group(1) + "In" + match.group(2)
