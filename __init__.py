@@ -77,7 +77,7 @@ def search_lonely_adjectives(parse: list, input_text: str):
             for word_number, word in enumerate(marking_tool.parse_list):
                 # Wir setzen alle Adjektive, die nicht von einem Nomen abhängen und nicht im Neutrum stehen, auf groß.
                 # Ausnahmen sind "am ...sten", "unter anderem" und "alles andere".
-                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5] and word[2] != "ein":
+                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5] and word[2] != "ein" and not mistagged_verb(parse[sentence_number], word_number):
                     word[1] = word[1].capitalize()
                     capitalized_words.append([sentence_number,word_number])
                     change = True
@@ -114,6 +114,20 @@ def search_lonely_adjectives(parse: list, input_text: str):
         return modified_text, capitalized_words, glauben, change
 
 # The following function checks whether an adjective is lonely, i.e. whether it does not modify a noun.
+# ParZu taggt gelegentlich ein finites Verb als Adjektiv ("mit denen er sich anfreundete").
+# Zwei Merkmale zusammen zeigen das an: Das Wort trägt die volle Adjektiv-Merkmalsliste
+# "Steigerung|Genus|Kasus|Numerus|Flexion|", in der ausser der Steigerung alles leer ist, und es
+# steht nicht vor einem Substantiv. Ein attributives Adjektiv steht immer vor seinem Substantiv --
+# auch das Anrede-Adjektiv in "Willkommen, liebe Juli!", das dieselbe leere Merkmalsliste hat.
+# Ohne diese Unterscheidung schreibt search_lonely_adjectives das Verb gross, ParZu liest es beim
+# Reparse als Substantiv, und aus "anfreundete" wird "anfreundetey".
+def mistagged_verb(parse_list, word_number) -> bool:
+    features = parse_list[word_number][5].split("|")
+    if not (len(features) >= 5 and all(f in ("_", "Pos", "") for f in features)):
+        return False
+    following = parse_list[word_number + 1] if word_number + 1 < len(parse_list) else None
+    return following is None or following[3] not in ("N", "ADJA")
+
 def lonely_adjective(parse: list, sentence_number: int, word_number: int):
     parse_list = parse[sentence_number]
     word = parse_list[word_number]

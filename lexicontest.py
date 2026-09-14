@@ -376,6 +376,10 @@ class Sentence_Test(unittest.TestCase):
         # test_reported_sentences_from_notes; hier nur die Gegenproben.
         test_sentences.append(("Es war den Leuten egal.","Es war den Leuten egal."))
         test_sentences.append(("Das ist Kindern egal.","Das ist Kindern egal."))
+        # ParZu taggt das finite Verb als Adjektiv; der Grossschreibungs-Trick machte daraus ein
+        # Substantiv ("anfreundetey"). Anrede-Adjektive haben dieselbe leere Merkmalsliste,
+        # stehen aber vor einem Substantiv.
+        test_sentences.append(("Ihn besuchten Mathematiker, mit denen er sich anfreundete und denen er half.","En besuchten Mathematikerne, mit denen en sich anfreundete und denen en half."))
         # Folgt auf ein vermeintliches "Genitiv Plural" ein Personenname, ist die Apposition
         # gemeint und damit der Singular. Der Fehler tritt nur im vollen Satz auf.
         test_sentences.append(("Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 der Oppositionspolitiker Igor Lednik.","Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 de Oppositionspolitikere Igor Lednik."))
