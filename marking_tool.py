@@ -34,7 +34,49 @@ class Marking_Tool:
         self.repair_detached_articles()
         self.repair_detached_possessives()
         self.repair_detached_relative_pronouns()
+        self.repair_apposition_before_name()
+        self.repair_predicate_after_sein()
         self.find_nounphrases()
+
+    # "der Oppositionspolitiker Igor Lednik" liest ParZu als Genitiv Plural -- die Form "der" ist
+    # dort nicht von der des maskulinen Nominativ Singular zu unterscheiden. Folgt auf das
+    # Substantiv ein Personenname, ist die Apposition gemeint und damit der Singular. Ohne diese
+    # Prüfung wurde daraus "der Oppositionspolitikerne".
+    def repair_apposition_before_name(self):
+        for pos, word_parse in enumerate(self.parse_list[:-1]):
+            feats = word_parse[5].split("|")
+            if word_parse[3] != "N" or feats[-2:] != ["Gen", "Pl"]:
+                continue
+            following = self.parse_list[pos+1]
+            if following[4] != "NE" or not (following[1] in Lexicon.PERSON_NAMES
+                                            or following[1] in Lexicon.PROPER_NAMES):
+                continue
+            feats[-2:] = ["Nom", "Sg"]
+            word_parse[5] = "|".join(feats)
+            for other in self.parse_list:
+                if other[6] == word_parse[0] and other[3] == "ART":
+                    article_feats = other[5].split("|")
+                    if article_feats[-2:] == ["Gen", "Pl"]:
+                        article_feats[-2:] = ["Nom", "Sg"]
+                        other[5] = "|".join(article_feats)
+
+    # "Damals waren es Soldaten aus den USA" -- ParZu macht "Soldaten" zum Dativobjekt von "sein".
+    # Ein Dativ bei "sein" begleitet aber immer ein Prädikativ ("Das ist Kindern egal"); fehlt
+    # das, ist das Substantiv selbst das Prädikatsnomen und steht im Nominativ. Ohne diese
+    # Prüfung wurde daraus der Dativ Plural "Soldaternen".
+    def repair_predicate_after_sein(self):
+        for word_parse in self.parse_list:
+            if word_parse[3] != "N" or word_parse[7] != "objd" or word_parse[6] == "0":
+                continue
+            verb = self.parse_list[int(word_parse[6])-1]
+            if verb[2] != "sein":
+                continue
+            if any(other[6] == verb[0] and other[7] == "pred" for other in self.parse_list):
+                continue
+            feats = word_parse[5].split("|")
+            if len(feats) >= 2 and feats[-2] == "Dat":
+                feats[-2] = "Nom"
+                word_parse[5] = "|".join(feats)
 
     # Bindet ParZu ein Relativpronomen gar nicht an, fehlt ihm auch der Numerus, und es wird als
     # Singular behandelt -- also markierbar, obwohl es sich auf einen Plural bezieht: In "...

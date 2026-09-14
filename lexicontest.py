@@ -371,6 +371,15 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich sehe ihr Buch.","Ich sehe ens Buch."))
         test_sentences.append(("Ihr Buch ist gut.","Ens Buch ist gut."))
         test_sentences.append(("Ihr seid gekommen.","Ihr seid gekommen."))
+        # Ein Dativ bei "sein" begleitet immer ein Prädikativ; fehlt das, ist das Substantiv
+        # selbst das Prädikatsnomen und steht im Nominativ. Der Auslöser dafür steht in
+        # test_reported_sentences_from_notes; hier nur die Gegenproben.
+        test_sentences.append(("Es war den Leuten egal.","Es war den Leuten egal."))
+        test_sentences.append(("Das ist Kindern egal.","Das ist Kindern egal."))
+        # Folgt auf ein vermeintliches "Genitiv Plural" ein Personenname, ist die Apposition
+        # gemeint und damit der Singular. Der Fehler tritt nur im vollen Satz auf.
+        test_sentences.append(("Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 der Oppositionspolitiker Igor Lednik.","Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 de Oppositionspolitikere Igor Lednik."))
+        test_sentences.append(("Das Buch der Lehrer ist da.","Das Buch der Lehrerne ist da."))
         # Ein unangebundenes Relativpronomen nimmt den Numerus des Bezugsworts und ist im
         # Plural nicht markierbar:
         test_sentences.append(("Zur Sichtbarmachung der Geschlechter werden Bezeichnungsformen verwendet, die mit dem Geschlecht der referierten Personen (fachsprachlich: ihrem Sexus) übereinstimmen.","Zur Sichtbarmachung der Geschlechter werden Bezeichnungsformen verwendet, die mit dem Geschlecht der referierten Personen (fachsprachlich: ensem Sexus) übereinstimmen."))
@@ -662,6 +671,18 @@ class Sentence_Test(unittest.TestCase):
         # "man" soll dagegen weiterhin markierbar sein.
         self.assertIn("man", markable, "\"man\" ist nicht mehr markierbar")
 
+    # Der Satz löst den Fehler nur in voller Länge aus, enthält dann aber weitere, hier nicht
+    # betroffene Schwächen ("Bürgermeister" wird zerlegt). Geprüft wird deshalb nur die Stelle,
+    # um die es geht: ParZu macht "Soldaten" zum Dativobjekt von "sein", woraus der Dativ Plural
+    # "Soldaternen" wurde.
+    def test_predicate_after_sein_is_nominative(self):
+        text = ("Damals waren es Soldaten aus den USA, Italien, Polen und Ungarn, die zwischen "
+                "den Fronten standen, als gewalttätige Hooligans, aufgepeitscht auch von lokalen "
+                "serbischen Politikern, den albanischen Bürgermeister vertreiben wollten.")
+        ausgabe = neutralize_all(text)
+        self.assertIn("Soldaterne", ausgabe)
+        self.assertNotIn("Soldaternen", ausgabe)
+
     def test_output_highlights_only_the_changed_parts(self):
         # Nur der geänderte Teil eines Wortes wird hervorgehoben; wird ausschliesslich gestrichen,
         # bleibt kein Stück übrig und das ganze Wort wird hervorgehoben.
@@ -698,6 +719,40 @@ class Sentence_Test(unittest.TestCase):
         highlighted = Marking_Tool.highlight_change("<b>Lehrerin", "<b>Lehrere")
         self.assertNotIn("<b>", highlighted)
         self.assertIn("&lt;b&gt;", highlighted)
+
+
+# Übersetzt einen Text vollständig, so wie es /translate_directly tut: markieren, alle Kästchen
+# auswählen, neutralisieren. Anders als die Satzpaar-Schleife oben verarbeitet die Funktion auch
+# mehrsätzige Eingaben und gibt nur den Ausgabetext zurück.
+def neutralize_all(text: str) -> str:
+    input_text = hack_for_ordinal_numbers(text)
+    parse = get_parse(remove_special_character_gendering(split_prepositions(input_text)))
+    modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse, input_text)
+    if change:
+        parse = get_parse(remove_special_character_gendering(split_prepositions(modified_text)))
+        remaining = modified_text
+    else:
+        remaining = input_text
+    marking_tools, marked = [], ""
+    for i, parse_list in enumerate(parse):
+        marking_tool = Marking_Tool(parse_list, {}, [])
+        remaining = Marking_Tool.find_realizations(marking_tool, remaining)
+        for address in capitalized_words:
+            if i == address[0]:
+                marking_tool.parse_list[address[1]][2] = marking_tool.parse_list[address[1]][2].lower()
+                marking_tool.parse_list[address[1]][-2] = marking_tool.parse_list[address[1]][-2].lower()
+        marking_tools.append(marking_tool)
+        marked += marking_tool.get_marking_form(i)
+    selected = [(int(a), int(b), int(c)) for a, b, c
+                in re.findall(r'id="(\d+)\|(\d+)\|(-?\d+)"', marked)]
+    done = set()
+    for sentence_number, position, _ in selected:
+        if (sentence_number, position) in done:
+            continue
+        done.add((sentence_number, position))
+        components = [c for s, p, c in selected if s == sentence_number and p == position]
+        marking_tools[sentence_number].neutralize_nounphrase(position - 1, components)
+    return undo_hack_for_ordinal_numbers("".join(t.get_sentence() for t in marking_tools))
 
 
 def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
