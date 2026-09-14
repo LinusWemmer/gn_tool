@@ -356,6 +356,14 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Weihnachtsmann kommt.","Der Weihnachtsmensch kommt."))
         test_sentences.append(("Der Butzemann erschreckt.","Der Butzemensch erschreckt."))
         test_sentences.append(("Er ist ein Strohmann.","En ist ein Strohmensch."))
+        # Nach einer Wechselpräposition lässt ParZu den Kasus offen. Nominativ wäre die einzige
+        # Form ohne "-en", deshalb wird dort der Akkusativ angenommen.
+        test_sentences.append(("Ich glaube nicht an den Weihnachtsmann, aber ich glaube an den Schneemann.","Ich glaube nicht an den Weihnachtsmenschen, aber ich glaube an den Schneemenschen."))
+        test_sentences.append(("Ich glaube an den Weihnachtsmann.","Ich glaube an den Weihnachtsmenschen."))
+        test_sentences.append(("Ich denke an den Weihnachtsmann.","Ich denke an den Weihnachtsmenschen."))
+        # Nach "vor", "zwischen" und den übrigen Präpositionen aus DATIVE_PREPOSITIONS bleibt es
+        # beim Dativ.
+        test_sentences.append(("Er steht vor dem Schneemann.","En steht vor dem Schneemenschen."))
         test_sentences.append(("Der Knochenmann holt ihn.","Der Knochenmensch holt en."))
         test_sentences.append(("Der Saubermann redete.","Der Saubermensch redete."))
         test_sentences.append(("Dieser Blödmann stört.","Dieser Blödmensch stört."))

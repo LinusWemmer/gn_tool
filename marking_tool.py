@@ -74,6 +74,11 @@ class Marking_Tool:
     # "_|_|_"). Die Dependenzrelation des Kopfes verrät ihn aber.
     DEPREL_CASES = {"subj": "Nom", "pred": "Nom", "obja": "Acc", "objd": "Dat", "objg": "Gen", "gmod": "Gen"}
 
+    # Präpositionen, nach denen ein von ParZu nicht erkannter Kasus als Dativ gelesen wird. Die
+    # übrigen Wechselpräpositionen ("an", "auf", "in", "über") regieren in dieser Lage eher den
+    # Akkusativ; siehe die Kasusergänzung in neutralize_nounphrase.
+    DATIVE_PREPOSITIONS = ("zwischen", "unter", "vor", "hinter", "neben", "von", "bei")
+
     # Der Kasus steht je nach Wortart an unterschiedlicher Stelle der Merkmalsliste:
     # "Fem|Dat|Sg" und "_|_|_" haben ihn an Position 1, "Def|Fem|Dat|Sg" und
     # "Pos|Neut|Acc|Sg|St|" an Position 2.
@@ -559,6 +564,19 @@ class Marking_Tool:
             inferred_case = Marking_Tool.DEPREL_CASES.get(self.parse_list[pos][7])
             if inferred_case:
                 self.set_missing_case(pos, inferred_case)
+            elif (self.parse_list[pos][7] == "pn" and int(self.parse_list[pos][6]) != 0
+                    and self.parse_list[int(self.parse_list[pos][6])-1][2]
+                        not in Marking_Tool.DATIVE_PREPOSITIONS):
+                # Ein Substantiv, das von einer Präposition regiert wird, steht nie im Nominativ.
+                # Bei Wechselpräpositionen wie "an" oder "auf" lässt ParZu den Kasus offen, weil
+                # sie Akkusativ und Dativ regieren können; dann wird der Akkusativ angenommen.
+                # Für die Ausgabe macht das nur bei der schwachen Deklination einen Unterschied
+                # ("Ich glaube an den Weihnachtsmenschen"), denn im Inklusivum sind Nominativ und
+                # Akkusativ in allen Paradigmen gleich.
+                preposition_feats = self.parse_list[int(self.parse_list[pos][6])-1][5].split("|")
+                preposition_case = preposition_feats[0] if preposition_feats else "_"
+                self.set_missing_case(pos, preposition_case
+                                      if preposition_case in ("Acc", "Dat", "Gen") else "Acc")
         feats = self.parse_list[pos][5].split("|")
         if len(feats) == 1:
             feats.append("_")
@@ -657,11 +675,11 @@ class Marking_Tool:
             # Nach "zwischen", "unter", "vor", "hinter", "neben", "von", "bei" nicht erkanntes Kasus zu Dativ machen.
             if feats[1] == "_":
                 if int(self.parse_list[pos][6]) != 0:
-                    if self.parse_list[int(self.parse_list[pos][6])-1][2] in ["zwischen","unter","vor","hinter","neben","von","bei"]:
+                    if self.parse_list[int(self.parse_list[pos][6])-1][2] in Marking_Tool.DATIVE_PREPOSITIONS:
                         feats[1] = "Dat"
                     elif int(self.parse_list[int(self.parse_list[pos][6])-1][6]) != 0:
                         if int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6]) != 0:
-                            if self.parse_list[int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6])-1][2] in ["zwischen","unter","vor","hinter","neben","von","bei"]:
+                            if self.parse_list[int(self.parse_list[int(self.parse_list[int(self.parse_list[pos][6])-1][6])-1][6])-1][2] in Marking_Tool.DATIVE_PREPOSITIONS:
                                 feats[1] = "Dat"
             if feats[2] == "Sg" or feats[2] == "_":
                 plural = False
