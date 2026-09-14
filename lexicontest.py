@@ -371,6 +371,9 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich sehe ihr Buch.","Ich sehe ens Buch."))
         test_sentences.append(("Ihr Buch ist gut.","Ens Buch ist gut."))
         test_sentences.append(("Ihr seid gekommen.","Ihr seid gekommen."))
+        # Ein unangebundenes Relativpronomen nimmt den Numerus des Bezugsworts und ist im
+        # Plural nicht markierbar:
+        test_sentences.append(("Zur Sichtbarmachung der Geschlechter werden Bezeichnungsformen verwendet, die mit dem Geschlecht der referierten Personen (fachsprachlich: ihrem Sexus) übereinstimmen.","Zur Sichtbarmachung der Geschlechter werden Bezeichnungsformen verwendet, die mit dem Geschlecht der referierten Personen (fachsprachlich: ensem Sexus) übereinstimmen."))
         # Ein unangebundener Artikel vor einem artikellosen Substantiv gehört zu diesem und ist
         # nicht selbst markierbar:
         test_sentences.append(("Sie lernten sich eines Tages in einem Park kennen, als Jack ihr anbot, ihr die Bücher von der Schule nach Hause zu tragen.","Sie lernten sich eines Tages in einem Park kennen, als Jack em anbot, em die Bücher von der Schule nach Hause zu tragen."))

@@ -33,7 +33,28 @@ class Marking_Tool:
         self.repair_pronominal_articles()
         self.repair_detached_articles()
         self.repair_detached_possessives()
+        self.repair_detached_relative_pronouns()
         self.find_nounphrases()
+
+    # Bindet ParZu ein Relativpronomen gar nicht an, fehlt ihm auch der Numerus, und es wird als
+    # Singular behandelt -- also markierbar, obwohl es sich auf einen Plural bezieht: In "...
+    # werden Bezeichnungsformen verwendet, die mit dem Geschlecht ... übereinstimmen" wurde aus
+    # "die" ein "de". Das Bezugswort eines Relativpronomens ist im Regelfall das nächste
+    # vorangehende Substantiv; dessen Numerus wird deshalb übernommen.
+    def repair_detached_relative_pronouns(self):
+        for pos, word_parse in enumerate(self.parse_list):
+            if word_parse[4] != "PRELS" or word_parse[6] != "0":
+                continue
+            if word_parse[5].split("|")[-1] != "_":
+                continue
+            for other in reversed(self.parse_list[:pos]):
+                if other[3] == "N":
+                    number = other[5].split("|")[-1]
+                    if number in ("Sg", "Pl"):
+                        feats = word_parse[5].split("|")
+                        feats[-1] = number
+                        word_parse[5] = "|".join(feats)
+                    break
 
     # ParZu liest das Dativpronomen "ihr" gelegentlich als Possessivform ("Kannst Du ihr bitte
     # sagen, dass ich komme"). Daraus wurde dann "ens" statt "em". Eine echte Possessivform
