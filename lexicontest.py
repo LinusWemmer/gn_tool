@@ -364,6 +364,16 @@ class Sentence_Test(unittest.TestCase):
         # Nach "vor", "zwischen" und den übrigen Präpositionen aus DATIVE_PREPOSITIONS bleibt es
         # beim Dativ.
         test_sentences.append(("Er steht vor dem Schneemann.","En steht vor dem Schneemenschen."))
+        # Ein unangebundenes "ihr" ist das Dativpronomen, keine Possessivform:
+        test_sentences.append(("Kannst Du ihr bitte sagen, dass ich komme.","Kannst Du em bitte sagen, dass ich komme."))
+        test_sentences.append(("Ich gebe ihr das Buch.","Ich gebe em das Buch."))
+        # Gegenproben: echte Possessivformen und das "ihr" der zweiten Person Plural
+        test_sentences.append(("Ich sehe ihr Buch.","Ich sehe ens Buch."))
+        test_sentences.append(("Ihr Buch ist gut.","Ens Buch ist gut."))
+        test_sentences.append(("Ihr seid gekommen.","Ihr seid gekommen."))
+        # Ein unangebundener Artikel vor einem artikellosen Substantiv gehört zu diesem und ist
+        # nicht selbst markierbar:
+        test_sentences.append(("Sie lernten sich eines Tages in einem Park kennen, als Jack ihr anbot, ihr die Bücher von der Schule nach Hause zu tragen.","Sie lernten sich eines Tages in einem Park kennen, als Jack em anbot, em die Bücher von der Schule nach Hause zu tragen."))
         test_sentences.append(("Der Knochenmann holt ihn.","Der Knochenmensch holt en."))
         test_sentences.append(("Der Saubermann redete.","Der Saubermensch redete."))
         test_sentences.append(("Dieser Blödmann stört.","Dieser Blödmensch stört."))

@@ -31,7 +31,47 @@ class Marking_Tool:
         # Dort landet für jedes Substantiv ein "prefix"-Eintrag, auch für nicht markierbare.
         self.marked_nouns = []
         self.repair_pronominal_articles()
+        self.repair_detached_articles()
+        self.repair_detached_possessives()
         self.find_nounphrases()
+
+    # ParZu liest das Dativpronomen "ihr" gelegentlich als Possessivform ("Kannst Du ihr bitte
+    # sagen, dass ich komme"). Daraus wurde dann "ens" statt "em". Eine echte Possessivform
+    # bestimmt immer ein Substantiv und hängt als "det" daran; bleibt sie unangebunden, bestimmt
+    # sie nichts und ist in Wahrheit das Pronomen. Das "ihr" der zweiten Person Plural ist davon
+    # nicht betroffen, das gibt ParZu als "2|Pl|_|Nom" aus.
+    def repair_detached_possessives(self):
+        for word_parse in self.parse_list:
+            if (word_parse[4] == "PPOSAT" and word_parse[1].lower() == "ihr"
+                    and word_parse[6] == "0"):
+                word_parse[3] = "PRO"
+                word_parse[4] = "PPER"
+                word_parse[5] = "3|Sg|_|Dat"
+
+    # ParZu bindet einen Artikel gelegentlich gar nicht an und deutet ihn als Pronomen ("...,
+    # ihr die Bücher nach Hause zu tragen"). Das Substantiv dahinter verliert dadurch seinen
+    # Artikel -- es wird nicht mitneutralisiert -- und der vermeintliche Pronomen-Artikel wird
+    # fälschlich selbst markierbar. Steht ein solcher Artikel unmittelbar vor einem Substantiv,
+    # das noch keinen hat, wird er diesem zugeschlagen.
+    # Hängt der Artikel dagegen an einer Konjunktion ("..., und der Vater hatte..."), bleibt er
+    # unangetastet: Dort liegt ParZu meist auch beim Kasus des Substantivs daneben, und der
+    # Artikel bekäme dann die falsche Form.
+    def repair_detached_articles(self):
+        for pos, word_parse in enumerate(self.parse_list[:-1]):
+            if word_parse[1].lower() not in ("der", "die", "das", "den", "dem", "des"):
+                continue
+            if word_parse[6] != "0":
+                continue
+            following = self.parse_list[pos+1]
+            if following[3] != "N":
+                continue
+            # Nur wenn das Substantiv noch keinen Artikel hat.
+            if any(other[6] == following[0] and other[3] == "ART" for other in self.parse_list):
+                continue
+            word_parse[3] = "ART"
+            word_parse[4] = "ART"
+            word_parse[6] = following[0]
+            word_parse[7] = "det"
 
     # ParZu liest "der andere" in "Der eine kam, der andere ging." nicht als Nominalphrase aus
     # Artikel und substantiviertem Adjektiv, sondern als Relativpronomen im Dativ plus
