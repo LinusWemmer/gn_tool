@@ -944,6 +944,14 @@ class Marking_Tool:
             if word_parse[3] in ("ART", "PRO") and word_parse[-2] in ("m", "r"):
                 nouns += escape(word_parse[-2])
                 nouns += escape(word_parse[-1])
+            # Wörter mit einer eigenen Form im Inklusivum ("kaufmännisch" wird zu
+            # "kaufleutisch", "jungfräulich" zu "jungferlich"). Sie bekommen ein eigenes Kästchen,
+            # weil sie an keiner Personenbezeichnung hängen müssen. Die Prüfung steht vorn, weil
+            # "Jungfräulichkeit" ein Substantiv ist und sonst im Substantiv-Zweig hängenbliebe.
+            elif Lexicon.neutralize_adjective(word_parse[-2]) is not None:
+                self.find_nounphrase(word_parse)
+                input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
+                nouns += input_form
             # Wenn pos die Position einer Doppelnennung ist, dann mache die gesamte Doppelnennung markierbar:
             elif pos in noun_pair_positions:
                 self.find_nounphrase(word_parse)
@@ -1214,13 +1222,6 @@ class Marking_Tool:
                 elif (word_parse[4] == "PRELS" and not dependent
                         and not word_parse[5].startswith("Neut")
                         and not word_parse[5].endswith("Pl")):
-                    self.find_nounphrase(word_parse)
-                    input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
-                    nouns += input_form
-                # Adjektive mit einer eigenen Form im Inklusivum ("kaufmännisch" wird zu
-                # "kaufleutisch", "jungfräulich" zu "jungferlich"). Sie bekommen ein eigenes
-                # Kästchen, weil sie an keiner Personenbezeichnung hängen müssen.
-                elif Lexicon.neutralize_adjective(word_parse[-2]) is not None:
                     self.find_nounphrase(word_parse)
                     input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                     nouns += input_form

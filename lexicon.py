@@ -112,20 +112,22 @@ class Lexicon:
 
     # Adjektive auf "-männisch" gehen auf ein Substantiv auf "-mann" zurück, dessen Plural auf
     # "-leute" endet. Das Inklusivum bildet sie darauf: "kaufmännisch" wird zu "kaufleutisch".
-    # Aufgenommen sind nur Stämme mit einem etablierten "-leute"-Plural -- "staatsmännisch" und
-    # "weltmännisch" bleiben aussen vor, denn "Staatsleute" und "Weltleute" gibt es nicht (der
-    # Plural lautet dort "Staatsmänner"). Geprüft wird das Wortende des Stammes, damit Komposita
-    # mitgehen ("unfachmännisch", "wirtschaftsfachmännisch").
-    MANN_ADJECTIVE_STEMS = ["kauf", "berg", "lands", "fach", "see"]
+    # Geprüft wird das Wortende des Stammes, damit Komposita mitgehen ("unfachmännisch",
+    # "wirtschaftsfachmännisch").
+    MANN_ADJECTIVE_STEMS = ["kauf", "berg", "lands", "fach", "see", "staats", "weid"]
 
-    # Adjektive mit einer eigenen Form im Inklusivum, die keiner Regel folgen.
-    IRREGULAR_ADJECTIVES = {"jungfräulich": "jungferlich"}
+    # Wörter mit einer eigenen Form im Inklusivum, die keiner Regel folgen. "weltmännisch" lässt
+    # sich nicht auf "-leute" bilden und wird durch "weltgewandt" ersetzt.
+    IRREGULAR_ADJECTIVES = {"jungfräulichkeit": "jungferlichkeit",
+                            "jungfräulich": "jungferlich",
+                            "weltmännisch": "weltgewandt"}
 
     # Die Endungen, die ein attributives Adjektiv tragen kann. Ohne Endung steht es adverbial
     # oder prädikativ ("Er grüsste landsmännisch").
     ADJECTIVE_ENDINGS = r"(e|em|en|er|es)?"
 
     # Gibt die Inklusivum-Form eines Adjektivs zurück, oder None, wenn es keine gibt.
+    # "Jungfräulichkeit" ist ein Substantiv und wird über dieselbe Liste mitbehandelt.
     def neutralize_adjective(word: str):
         if not word:
             return None
