@@ -123,7 +123,8 @@ class Marking_Tool:
         for pos, word_parse in enumerate(self.parse_list[:-1]):
             if word_parse[1].lower() not in ("der", "die", "das", "den", "dem", "des"):
                 continue
-            if word_parse[6] != "0":
+            head = int(word_parse[6]) if word_parse[6].isdigit() else 0
+            if head != 0 and self.parse_list[head-1][3] != "KON":
                 continue
             following = self.parse_list[pos+1]
             if following[3] != "N":
@@ -135,6 +136,17 @@ class Marking_Tool:
             word_parse[4] = "ART"
             word_parse[6] = following[0]
             word_parse[7] = "det"
+            # Hängt der Artikel an einer Konjunktion, liegt ParZu oft auch beim Kasus des
+            # Substantivs daneben. Die Artikelform schränkt ihn aber ein: "der" vor einem
+            # Maskulinum kann nur Nominativ sein, "den" nur Akkusativ.
+            if head != 0:
+                noun_feats = following[5].split("|")
+                if len(noun_feats) >= 3 and noun_feats[0] == "Masc":
+                    erzwungen = {"der": "Nom", "den": "Acc", "dem": "Dat", "des": "Gen"}.get(
+                        word_parse[1].lower())
+                    if erzwungen and noun_feats[1] != erzwungen:
+                        noun_feats[1] = erzwungen
+                        following[5] = "|".join(noun_feats)
 
     # ParZu liest "der andere" in "Der eine kam, der andere ging." nicht als Nominalphrase aus
     # Artikel und substantiviertem Adjektiv, sondern als Relativpronomen im Dativ plus

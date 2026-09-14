@@ -380,6 +380,10 @@ class Sentence_Test(unittest.TestCase):
         # Substantiv ("anfreundetey"). Anrede-Adjektive haben dieselbe leere Merkmalsliste,
         # stehen aber vor einem Substantiv.
         test_sentences.append(("Ihn besuchten Mathematiker, mit denen er sich anfreundete und denen er half.","En besuchten Mathematikerne, mit denen en sich anfreundete und denen en half."))
+        # Hängt der Artikel an der Konjunktion statt am Substantiv, wird er diesem zugeschlagen;
+        # den Kasus gibt dann die Artikelform vor, nicht ParZus Angabe am Substantiv.
+        test_sentences.append(("Eulers Mutter kam selbst aus einer gebildeten Familie, und der Vater hatte mathematische Interessen und bei Jakob I Bernoulli nicht nur Vorlesungen gehört, sondern sogar 1688 eine mathematische Dissertation verfasst.","Eulers Elter kam selbst aus einer gebildeten Familie, und de Elter hatte mathematische Interessen und bei Jakob I Bernoulli nicht nur Vorlesungen gehört, sondern sogar 1688 eine mathematische Dissertation verfasst."))
+        test_sentences.append(("Ich helfe dem Lehrer und dem Schüler.","Ich helfe derm Lehrere und derm Schülere."))
         # Folgt auf ein vermeintliches "Genitiv Plural" ein Personenname, ist die Apposition
         # gemeint und damit der Singular. Der Fehler tritt nur im vollen Satz auf.
         test_sentences.append(("Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 der Oppositionspolitiker Igor Lednik.","Zwischen Mai 2023 und Februar 2024 starben mindestens fünf politisch Inhaftierte an Haftbedingungen, so am 20. Februar 2024 de Oppositionspolitikere Igor Lednik."))
