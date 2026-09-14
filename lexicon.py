@@ -117,27 +117,30 @@ class Lexicon:
     MANN_ADJECTIVE_STEMS = ["kauf", "berg", "lands", "fach", "see", "staats", "weid"]
 
     # Wörter mit einer eigenen Form im Inklusivum, die keiner Regel folgen. "weltmännisch" lässt
-    # sich nicht auf "-leute" bilden und wird durch "weltgewandt" ersetzt.
-    IRREGULAR_ADJECTIVES = {"jungfräulichkeit": "jungferlichkeit",
-                            "jungfräulich": "jungferlich",
-                            "weltmännisch": "weltgewandt"}
+    # sich nicht auf "-leute" bilden und wird durch "weltgewandt" ersetzt. Neben Adjektiven
+    # stehen hier auch ein Substantiv und das Pronomen "jedermann".
+    IRREGULAR_WORDS = {"jungfräulichkeit": "jungferlichkeit",
+                       "jungfräulich": "jungferlich",
+                       "weltmännisch": "weltgewandt",
+                       "jedermann": "jedermensch"}
 
     # Die Endungen, die ein attributives Adjektiv tragen kann. Ohne Endung steht es adverbial
-    # oder prädikativ ("Er grüsste landsmännisch").
-    ADJECTIVE_ENDINGS = r"(e|em|en|er|es)?"
+    # oder prädikativ ("Er grüsste landsmännisch"). Das "s" deckt den Genitiv von "jedermann" ab.
+    WORD_ENDINGS = r"(e|em|en|er|es|s)?"
 
-    # Gibt die Inklusivum-Form eines Adjektivs zurück, oder None, wenn es keine gibt.
-    # "Jungfräulichkeit" ist ein Substantiv und wird über dieselbe Liste mitbehandelt.
-    def neutralize_adjective(word: str):
+    # Gibt die Inklusivum-Form eines unregelmässigen Wortes zurück, oder None, wenn es keine gibt.
+    # Neben Adjektiven laufen hier das Substantiv "Jungfräulichkeit" und das Pronomen "jedermann"
+    # mit, deren Formen sich aus keiner Regel ergeben.
+    def neutralize_irregular_word(word: str):
         if not word:
             return None
-        match = re.fullmatch(r"(.*)männisch" + Lexicon.ADJECTIVE_ENDINGS, word.lower())
+        match = re.fullmatch(r"(.*)männisch" + Lexicon.WORD_ENDINGS, word.lower())
         if match and any(match.group(1).endswith(stem)
                          for stem in Lexicon.MANN_ADJECTIVE_STEMS):
             neutral = match.group(1) + "leutisch" + (match.group(2) or "")
         else:
-            for original, replacement in Lexicon.IRREGULAR_ADJECTIVES.items():
-                match = re.fullmatch(original + Lexicon.ADJECTIVE_ENDINGS, word.lower())
+            for original, replacement in Lexicon.IRREGULAR_WORDS.items():
+                match = re.fullmatch(original + Lexicon.WORD_ENDINGS, word.lower())
                 if match:
                     neutral = replacement + (match.group(1) or "")
                     break
@@ -157,7 +160,10 @@ class Lexicon:
 
     # Komposita auf "-mann", die zu "-mensch" statt zu "-person" werden. Eingetragen wird der
     # Wortteil vor "-mann"; die Pluralform "-männer" wird mit abgedeckt.
-    MENSCH_COMPOUNDS = ["hampel"]
+    # Das Prinzip: Ist weder die Form auf "-frau" noch der Plural auf "-leute" gebräuchlich,
+    # passt "-mensch" besser als "-person".
+    MENSCH_COMPOUNDS = ["hampel", "ehren", "buh", "bieder", "schnee", "weihnachts", "butze",
+                        "stroh"]
 
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 

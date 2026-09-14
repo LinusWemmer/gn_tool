@@ -164,7 +164,7 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Hermann kommt.","Hermann kommt."))
         test_sentences.append(("Wer war der bekannte Zimmermann?","Wer war die bekannte Zimmerperson?"))
         test_sentences.append(("Der Feuerwehrmann kam.","Die Feuerwehrperson kam."))
-        test_sentences.append(("Der Ehrenmann half.","Die Ehrenperson half."))
+        test_sentences.append(("Der Ehrenmann half.","Der Ehrenmensch half."))
         test_sentences.append(("Der nette Frank kommt.","De nette Frank kommt."))
         test_sentences.append(("Die Nato tagt.","Die Nato tagt."))
         test_sentences.append(("Der Ahorn blüht.","Der Ahorn blüht."))
@@ -347,6 +347,21 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich gebe dem Hampelmann das Buch.", "Ich gebe dem Hampelmenschen das Buch."))
         test_sentences.append(("Das Auto des Hampelmanns ist rot.", "Das Auto des Hampelmenschen ist rot."))
         test_sentences.append(("Die Hampelmänner stehen da.", "Die Hampelmenschen stehen da."))
+        # Weitere Komposita auf "-mann", bei denen weder die Form auf "-frau" noch der Plural
+        # auf "-leute" gebräuchlich ist:
+        test_sentences.append(("Er war der Buhmann.","En war der Buhmensch."))
+        test_sentences.append(("Der Biedermann schwieg.","Der Biedermensch schwieg."))
+        test_sentences.append(("Der Schneemann schmilzt.","Der Schneemensch schmilzt."))
+        test_sentences.append(("Die Schneemänner schmelzen.","Die Schneemenschen schmelzen."))
+        test_sentences.append(("Der Weihnachtsmann kommt.","Der Weihnachtsmensch kommt."))
+        test_sentences.append(("Der Butzemann erschreckt.","Der Butzemensch erschreckt."))
+        test_sentences.append(("Er ist ein Strohmann.","En ist ein Strohmensch."))
+        # "Feuerwehrfrau" und "Feuerwehrleute" sind gebräuchlich, deshalb bleibt es bei "-person":
+        test_sentences.append(("Der Feuerwehrmann kam.","Die Feuerwehrperson kam."))
+        # Das Pronomen "jedermann", auch im Genitiv:
+        test_sentences.append(("Jedermann weiß das.","Jedermensch weiß das."))
+        test_sentences.append(("Das gefällt jedermann.","Das gefällt jedermensch."))
+        test_sentences.append(("Das ist jedermanns Sache.","Das ist jedermenschs Sache."))
         # Grossgeschriebene Adjektive ohne Nomen darüber werden auch dann neutralisiert, wenn
         # ParZu sie nach dem Reparse weiter als Adjektiv führt ("Juli" ist auch ein Monat):
         test_sentences.append(("Willkommen, liebe Juli!", "Willkommen, liebey Juli!"))

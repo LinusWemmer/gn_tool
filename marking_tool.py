@@ -581,11 +581,11 @@ class Marking_Tool:
         # Ersetzt wird auch die Wortform und die Grundform, damit eine spätere Neutralisierung als
         # abhängiges Adjektiv die Endung am neuen Stamm bildet und nicht am alten: In "der
         # kaufmännische Angestellte" hängt das Adjektiv zugleich an einer Nominalphrase.
-        neutralized_adjective = Lexicon.neutralize_adjective(self.parse_list[pos][-2])
+        neutralized_adjective = Lexicon.neutralize_irregular_word(self.parse_list[pos][-2])
         if neutralized_adjective is not None:
             self.parse_list[pos][-2] = neutralized_adjective
-            self.parse_list[pos][1] = Lexicon.neutralize_adjective(self.parse_list[pos][1]) or self.parse_list[pos][1]
-            self.parse_list[pos][2] = Lexicon.neutralize_adjective(self.parse_list[pos][2]) or self.parse_list[pos][2]
+            self.parse_list[pos][1] = Lexicon.neutralize_irregular_word(self.parse_list[pos][1]) or self.parse_list[pos][1]
+            self.parse_list[pos][2] = Lexicon.neutralize_irregular_word(self.parse_list[pos][2]) or self.parse_list[pos][2]
             return
         # Neutralize a possessive pronoun
         if self.parse_list[pos][4] == "PPOSAT" and self.parse_list[pos][6] == "0":
@@ -948,7 +948,7 @@ class Marking_Tool:
             # "kaufleutisch", "jungfräulich" zu "jungferlich"). Sie bekommen ein eigenes Kästchen,
             # weil sie an keiner Personenbezeichnung hängen müssen. Die Prüfung steht vorn, weil
             # "Jungfräulichkeit" ein Substantiv ist und sonst im Substantiv-Zweig hängenbliebe.
-            elif Lexicon.neutralize_adjective(word_parse[-2]) is not None:
+            elif Lexicon.neutralize_irregular_word(word_parse[-2]) is not None:
                 self.find_nounphrase(word_parse)
                 input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{0}" name="{sentence_number}|{word_parse[0]}|{0}" value="select"><label for="{sentence_number}|{word_parse[0]}|{0}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                 nouns += input_form
