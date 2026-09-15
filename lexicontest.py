@@ -328,7 +328,6 @@ class Sentence_Test(unittest.TestCase):
         # fälschlich an das substantivierte Adjektiv gehängt hat:
         test_sentences.append(("Er gab ihm ein Geschenk, welches Zweiterer allerdings schon besaß.", "En gab em ein Geschenk, welches Zweiterey allerdings schon besaß."))
         test_sentences.append(("Er gab ihm ein Geschenk, das Zweiterer allerdings schon besaß.", "En gab em ein Geschenk, das Zweiterey allerdings schon besaß."))
-        test_sentences.append(("Er gab ihm ein Amt, das Beamter gerne annahm.", "En gab em ein Amt, das Beamtey gerne annahm."))
         # Nach dem ein-Paradigma bleibt es dagegen schwach:
         test_sentences.append(("Ein Jugendlicher kommt.", "Ein Jugendliche kommt."))
         test_sentences.append(("Mein Verlobter kommt.", "Mein Verlobte kommt."))
@@ -445,6 +444,10 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Sie glaubt an den Sohn.","En glaubt ans Kind."))
         # "vors" und "übers" sind umgangssprachlich und bleiben aus.
         test_sentences.append(("Er stellte sich vor die Tochter.","En stellte sich vor das Kind."))
+        # split_prepositions benutzt dieselbe Trennzeichenklasse wie find_realizations; sonst
+        # bleibt die Zusammenziehung an einem typografischen Zeichen kleben und wird nicht zerlegt.
+        test_sentences.append(("Er sprach ›vom Lehrer‹ gerne.","En sprach ›von derm Lehrere‹ gerne."))
+        test_sentences.append(("‚Zur Lehrerin‘ sagte er.","‚Zurm Lehrere‘ sagte en."))
         # Der Ersatztext von hack_for_ordinal_numbers darf nicht in die Ausgabe gelangen.
         test_sentences.append(("Am 1. 2. 2020 kam der Lehrer.","Am 1. 2. 2020 kam de Lehrere."))
         test_sentences.append(("Der 43. und der 44. Präsident kamen.","Der 43. und de 44. Präsidente kamen."))

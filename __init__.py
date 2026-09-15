@@ -209,7 +209,10 @@ def undo_hack_for_ordinal_numbers(input_text: str) -> str:
 def split_prepositions(input_text: str) ->str:
     quotation_mark_pattern = r'„|“|”'
     input_text = re.sub(quotation_mark_pattern, '"', input_text)
-    words = re.split(r"(\s|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_])", input_text)
+    # Dieselbe Trennzeichenklasse wie in Marking_Tool.find_realizations. Fehlten hier die
+    # typografischen Zeichen, blieb etwa "»im" ein einziges Wort und die Zusammenziehung wurde
+    # nicht zerlegt.
+    words = re.split("(" + Marking_Tool.WORD_DELIMITERS + ")", input_text)
     output = ""
     for word in words:
         if word =="beim":
