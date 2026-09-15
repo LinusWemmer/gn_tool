@@ -163,7 +163,11 @@ class Lexicon:
     # Das Prinzip: Ist weder die Form auf "-frau" noch der Plural auf "-leute" gebräuchlich,
     # passt "-mensch" besser als "-person".
     MENSCH_COMPOUNDS = ["hampel", "ehren", "buh", "bieder", "schnee", "weihnachts", "butze",
-                        "stroh", "knochen", "sauber", "blöd", "pfeifen", "welt"]
+                        "stroh", "knochen", "sauber", "blöd", "pfeifen", "welt",
+                        # "Hauptperson" ist im Deutschen schon belegt und meint etwas anderes;
+                        # der Dienstgrad wird deshalb zu "Hauptmensch". Gilt ueber die
+                        # Endungspruefung auch fuer "Stabshauptmann" und "Oberhauptmann".
+                        "haupt"]
 
     ALREADY_NEUTRAL_NOUNS = ["Gast", "Vormund", "Anarcho", "Hetero", "Homo", "Normalo", "Realo", "Waise", "Geisel", "Koryphäe", "Abkömmling", "Ankömmling", "Eindringling", "Erdling", "Flüchtling", "Fremdling", "Günstling", "Häftling", "Häuptling", "Jüngling", "Lehrling", "Liebling", "Neuling", "Pflegling", "Prüfling", "Säugling", "Schützling", "Sträfling", "Täufling", "Zögling", "Zwilling", "Flüchtling", "Charakter", "Wache", "Profi", "Studi", "Nazi", "Admin", "Fan", "Star", "Boss", "Clown", "Punk", "Hippie", "Freak", "Nerd", "Yuppie", "Hooligan", "Judoka", "Aikidoka", "Karateka", "Barista", "Jedi", "Sith", "Engel"]
 
@@ -286,6 +290,16 @@ class Lexicon:
         "Hessen": "Hesse", "Bayern": "Bayer", "Pommern": "Pommer",
         "Pole": "Pole", "Polen": "Pole", "Ungarn": "Ungar",
     }
+
+    # Hinterglieder, bei denen die Vater/Mutter-Komponente als "Eltern" und nicht als "Elter"
+    # erscheint, weil das Deutsche dafuer bereits ein Wort mit "Eltern" kennt: "Mutterschutz"
+    # ergibt "Elternschutz". Bei den uebrigen Zusammensetzungen bleibt es bei "Elter"
+    # ("Vaterland" -> "Elterland", "Muttersprache" -> "Eltersprache").
+    ELTERN_COMPOUNDS = ("schutz",)
+
+    # Zeilennummer von "Krankenpflegere"; sie wird berechnet, damit sie beim Bearbeiten der
+    # Wortlisten nicht verrutscht.
+    KRANKENPFLEGE_INDEX = NEUTRAL_NOUNS.index("Krankenpflegere")
 
     UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
 
@@ -744,6 +758,20 @@ class Lexicon:
                 list.append([match_position, original, 0, "", "junge_person", capitalized])
                 return True, prefix, list
 
+        # "Krankenschwester" ist eine Berufsbezeichnung, keine Verwandtschaftsbezeichnung -- das
+        # Hinterglied stammt aus der Ordenstradition. Der Beruf heisst im Inklusivum wie die
+        # maskuline Entsprechung "Krankenpfleger". Die Pruefung steht vor den Neologismen, weil
+        # dort sonst die Regel Schwester -> Geschwister griffe ("Krankengeschwister").
+        match = re.search(r"krankenschwestern?$", noun.lower())
+        if match:
+            match_position = match.start()
+            prefix, list = Lexicon.check_composite_noun(noun[:match_position], False)
+            original = word_parse[1][match_position:]
+            capitalized = noun[match_position].isupper()
+            list.append([match_position, original, Lexicon.KRANKENPFLEGE_INDEX, "",
+                         "standard", capitalized])
+            return True, prefix, list
+
         for j, neologism in enumerate(Lexicon.NEOLOGISMS):
             neologism = "(" + neologism + ")$"
             match = re.search(neologism.lower(), noun.lower())
@@ -1048,6 +1076,9 @@ class Lexicon:
                         if match_position != 1 and not (noun[:match_position].endswith("c") and found_neologism.lower().startswith("h")) and not (noun[j:].lower().startswith("ch") and found_neologism.endswith("s")) and not found_neologism.lower() in ("base", "opa", "oma", "opi", "omi"):
                             neutral_core = Lexicon.NEOLOGISMS_COMPOUND[i]
                             later_part = noun[j:]
+                            if (neutral_core == "Elter"
+                                    and later_part.lower() in Lexicon.ELTERN_COMPOUNDS):
+                                neutral_core = "Eltern"
                             if not noun[match_position].isupper():
                                 neutral_core = neutral_core.lower()
                             prefix, list = Lexicon.check_composite_noun(noun[:match_position],False)

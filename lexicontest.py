@@ -490,6 +490,18 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Polen protestierten.","Die Polerne protestierten."))
         test_sentences.append(("Ungarn liegt in Europa.","Ungarn liegt in Europa."))
         test_sentences.append(("Die Ungarn kamen.","Die Ungarne kamen."))
+        # "Mutterschutz" wird zu "Elternschutz", weil das Deutsche dieses Wort bereits kennt;
+        # bei den uebrigen Zusammensetzungen bleibt es bei "Elter-".
+        test_sentences.append(("Der Mutterschutz gilt weiter.","Der Elternschutz gilt weiter."))
+        # "Hauptperson" ist schon belegt und meint etwas anderes, deshalb "-mensch".
+        test_sentences.append(("Der Dienstgrad Hauptmann wird verliehen.","Der Dienstgrad Hauptmensch wird verliehen."))
+        test_sentences.append(("Der Stabshauptmann kam.","Der Stabshauptmensch kam."))
+        # "Krankenschwester" ist eine Berufsbezeichnung, keine Verwandtschaftsbezeichnung.
+        test_sentences.append(("Sie arbeitet als Krankenschwester.","En arbeitet als Krankenpflegere."))
+        test_sentences.append(("Die Krankenschwestern streikten.","Die Krankenpflegerne streikten."))
+        # Die Verwandtschaftsregel selbst bleibt unberührt.
+        test_sentences.append(("Meine Schwester kam.","Mein Geschwister kam."))
+        test_sentences.append(("Die Stiefmutter kam.","De Stiefelter kam."))
         # Ein Adjektiv ohne eigenen Determinierer ist in einer Reihung blosses Attribut und darf
         # nicht als substantiviert gelten; frueher wurde das letzte Glied grossgeschrieben.
         test_sentences.append(("Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen.","Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen."))
