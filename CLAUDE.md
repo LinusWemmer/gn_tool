@@ -72,7 +72,12 @@ selecting every checkbox automatically.
    - `remove_special_character_gendering` — `Lehrer*innen`, `er/sie`, `Kolleg(inn)en` etc. are
      normalized to the plain feminine form so ParZu can tag them.
 2. **Parse** — `get_parse` calls ParZu and returns, per sentence, a list of CoNLL columns split on
-   tabs: `0:ID 1:FORM 2:LEMMA 3:CPOSTAG 4:POSTAG 5:FEATS 6:HEAD 7:DEPREL 8:PHEAD`.
+   tabs: `0:ID 1:FORM 2:LEMMA 3:CPOSTAG 4:POSTAG 5:FEATS 6:HEAD 7:DEPREL 8:PHEAD`. It hands ParZu
+   one **paragraph** at a time (split on blank lines, `PARAGRAPH_BREAK`): ParZu does not treat a
+   blank line as a sentence boundary, so a headline without a final full stop was glued to the
+   paragraph below it and its leading article ended up dangling and markable (`Eine Analyse …` →
+   `Einey Analyse …`). The whitespace between paragraphs is not lost — `find_realizations` reads it
+   from the input text, not from what ParZu was given.
 3. **Reparse for "lonely" adjectives** — `search_lonely_adjectives` capitalizes adjectives that do
    not modify a noun (so `netten` in `einen netten und einen unfreundlichen Kollegen` can be
    neutralized) and swaps `glauben`→`schreiben`, `zeigen`→`sagen` (ParZu mis-tags their dative

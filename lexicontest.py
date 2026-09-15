@@ -502,6 +502,8 @@ class Sentence_Test(unittest.TestCase):
         # Die Verwandtschaftsregel selbst bleibt unberührt.
         test_sentences.append(("Meine Schwester kam.","Mein Geschwister kam."))
         test_sentences.append(("Die Stiefmutter kam.","De Stiefelter kam."))
+        # Ein Bindestrich-Name, dessen erster Teil ein Gebietsname ist, meint immer das Gebiet.
+        test_sentences.append(("Der Landesverband in Sachsen-Anhalt wächst.","Der Landesverband in Sachsen-Anhalt wächst."))
         # Ein Adjektiv ohne eigenen Determinierer ist in einer Reihung blosses Attribut und darf
         # nicht als substantiviert gelten; frueher wurde das letzte Glied grossgeschrieben.
         test_sentences.append(("Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen.","Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen."))
@@ -854,6 +856,23 @@ class Sentence_Test(unittest.TestCase):
     # Ein substantiviertes Adjektiv im Neutrum bezeichnet keine Person ("das Gute", "fürs Erste")
     # und braucht daher kein Kästchen. Die kuratierte Liste in substantivierte_adjektive.txt prüfte
     # als einzige Stelle das Genus nicht.
+    # Eine Leerzeile trennt Abschnitte und damit auch Saetze. ParZu sieht das nicht: Fehlt am Ende
+    # einer Ueberschrift der Punkt, zog es sie mit dem folgenden Absatz zu einem Satz zusammen.
+    # "Eine" blieb darin als unangebundener Artikel haengen und wurde zu "Einey".
+    def test_blank_line_separates_sentences(self):
+        text = ("Eine Analyse von Holger Schwesinger \n"
+                "\n"
+                "Nach Einschätzung des Forschers gehört die Partei zu den extremsten.")
+        erwartet = ("Eine Analyse von Holger Schwesinger \n"
+                    "\n"
+                    "Nach Einschätzung ders Forscheres gehört die Partei zu den extremsten.")
+        self.assertEqual(neutralize_all(text), erwartet)
+        # Der Leerraum zwischen den Abschnitten bleibt erhalten, auch mehrfach.
+        for roh in ["Der Lehrer kam.\n\nDie Lehrerin ging.\n\nDer Arzt blieb.",
+                    "Überschrift ohne Punkt\n\nDer Lehrer kam.\n\n\nNoch ein Absatz."]:
+            self.assertEqual(neutralize_all(roh, select=lambda *_: False), roh,
+                             "Ohne Auswahl muss der Text unveraendert bleiben")
+
     def test_neuter_substantivized_adjective_is_not_markable(self):
         def markierbar(text):
             parse = get_parse(remove_special_character_gendering(split_prepositions(text)))

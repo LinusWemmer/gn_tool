@@ -27,16 +27,26 @@ sentence_data = Sentence_Data()
 options = parzu.process_arguments()
 ParZu = parzu.Parser(options)
 
+# Eine Leerzeile trennt Abschnitte und damit auch Sätze. ParZu sieht das nicht: Fehlt am Ende
+# einer Überschrift der Punkt, zieht es sie mit dem folgenden Absatz zu einem einzigen Satz
+# zusammen. Aus "Eine Analyse von Holger Schwesinger" wurde so der Anfang eines fremden Satzes,
+# in dem "Eine" als unangebundener Artikel hängenblieb und markierbar wurde ("Einey Analyse").
+# Die Abschnitte werden deshalb einzeln geparst. Der Leerraum dazwischen geht dabei nicht
+# verloren: find_realizations liest ihn aus dem Eingabetext, nicht aus dem, was ParZu bekommt.
+PARAGRAPH_BREAK = r"(?:\r?\n[ \t]*){2,}"
+
 def get_parse(text: str):
-    sentences = ParZu.main(text)
     formatted_sentences = []
-    for sentence in sentences:
-        words = sentence.split("\n")
-        words = words[:-2]
-        parse_list = []
-        for word in words:
-           parse_list.append(word.split("\t"))
-        formatted_sentences.append(parse_list)
+    for paragraph in re.split(PARAGRAPH_BREAK, text):
+        if not paragraph.strip():
+            continue
+        for sentence in ParZu.main(paragraph):
+            words = sentence.split("\n")
+            words = words[:-2]
+            parse_list = []
+            for word in words:
+               parse_list.append(word.split("\t"))
+            formatted_sentences.append(parse_list)
     return formatted_sentences
 
 # The following function ensures that whitespace in the input is visible in the output.

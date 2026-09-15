@@ -795,6 +795,11 @@ class Marking_Tool:
     # singularische Artikel im Maskulinum und Femininum zaehlt und fuer den Plural nichts hergibt.
     def means_place_not_people(self, pos:int) -> bool:
         word_parse = self.parse_list[pos]
+        # Ein Bindestrich-Name, dessen erster Teil ein solcher Gebietsname ist, bezeichnet immer
+        # das Gebiet: "Sachsen-Anhalt" ist ein Bundesland und keine Einwohnerschaft. Ohne diese
+        # Zeile wurde daraus "Sachserne-Anhalt".
+        if any(word_parse[1].startswith(name + "-") for name in Lexicon.PEOPLE_OR_PLACE_NAMES):
+            return True
         if not (word_parse[1] in Lexicon.PEOPLE_OR_PLACE_NAMES
                 or word_parse[2] in Lexicon.PEOPLE_OR_PLACE_NAMES):
             return False
