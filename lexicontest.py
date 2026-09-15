@@ -412,6 +412,21 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Lehrer oder die neue Lehrerin ist da.","De Lehrere oder de neue Lehrere ist da."))
         test_sentences.append(("Der gute Lehrer oder die Lehrerin kommt.","De gute Lehrere oder de Lehrere kommt."))
         test_sentences.append(("Der alte kluge Lehrer oder die kluge alte Lehrerin kommt.","De alte kluge Lehrere oder de kluge alte Lehrere kommt."))
+        # split_prepositions zerlegt "vom", "im" und "am"; die Praeposition muss danach wieder
+        # vollstaendig werden, auch wenn das Substantiv zu "-person" oder "-kind" wird.
+        test_sentences.append(("Ich habe es vom Kaufmann gehört.","Ich habe es von der Kaufperson gehört."))
+        test_sentences.append(("Im Kaufmann steckt viel Erfahrung.","In der Kaufperson steckt viel Erfahrung."))
+        test_sentences.append(("Am Kaufmann lag es nicht.","An der Kaufperson lag es nicht."))
+        test_sentences.append(("Ich habe es vom Sohn gehört.","Ich habe es von dem Kind gehört."))
+        test_sentences.append(("Im Sohn steckt viel Kraft.","In dem Kind steckt viel Kraft."))
+        # Der Ersatztext von hack_for_ordinal_numbers darf nicht in die Ausgabe gelangen.
+        test_sentences.append(("Am 1. 2. 2020 kam der Lehrer.","Am 1. 2. 2020 kam de Lehrere."))
+        test_sentences.append(("Der 43. und der 44. Präsident kamen.","Der 43. und de 44. Präsidente kamen."))
+        # Gegenderte Formen von "ein" muessen wie ihre einfachen Entsprechungen behandelt werden.
+        test_sentences.append(("Ein*eine Lehrende kam.","Ein Lehrende kam."))
+        test_sentences.append(("Ein/eine Lehrende kam.","Ein Lehrende kam."))
+        test_sentences.append(("Die Rolle eines*einer Lehrenden ist wichtig.","Die Rolle einers Lehrenden ist wichtig."))
+        test_sentences.append(("Er sprach mit einem*einer Lehrenden.","En sprach mit einerm Lehrenden."))
         test_sentences.append(("Das Buch der Lehrer ist da.","Das Buch der Lehrerne ist da."))
         # Ein unangebundenes Relativpronomen nimmt den Numerus des Bezugsworts und ist im
         # Plural nicht markierbar:

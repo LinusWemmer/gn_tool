@@ -366,6 +366,20 @@ class Marking_Tool:
         word_parse = self.parse_list[pos]
         return word_parse[1][:1].isupper() and word_parse[-2][:1].islower()
 
+    # split_prepositions hat "im", "am" und "vom" in zwei Woerter zerlegt; vom ersten steht im
+    # Eingabetext nur das Bruchstueck "i", "a" oder "vo". Zieht sich der Artikel nicht wieder mit
+    # der Praeposition zusammen (wie "zu" + "derm" zu "zurm"), muss die Praeposition wieder
+    # vollstaendig werden -- sonst entsteht "vo der Kaufperson" statt "von der Kaufperson".
+    PREPOSITION_FRAGMENTS = {"i": "in", "I": "In", "vo": "von", "Vo": "Von", "a": "an", "A": "An"}
+
+    def restore_split_preposition(self, pos:int):
+        if pos == 0:
+            return
+        self.parse_list[pos-1][-1] = " "
+        fragment = self.parse_list[pos-1][-2]
+        if fragment in Marking_Tool.PREPOSITION_FRAGMENTS:
+            self.parse_list[pos-1][-2] = Marking_Tool.PREPOSITION_FRAGMENTS[fragment]
+
     # This function neutralizes the word that has been selected.
     def neutralize_word(self, pos:int, has_article:bool, article_pos:int):
         word_parse = self.parse_list[pos]
@@ -387,19 +401,7 @@ class Marking_Tool:
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "rm"
             elif neutralized_word == "derm" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
-                self.parse_list[pos-1][-1] = " "
-                if self.parse_list[pos-1][-2] == "i":
-                    self.parse_list[pos-1][-2] = "in"
-                elif self.parse_list[pos-1][-2] == "I":
-                    self.parse_list[pos-1][-2] = "In"
-                elif self.parse_list[pos-1][-2] == "vo":
-                    self.parse_list[pos-1][-2] = "von"
-                elif self.parse_list[pos-1][-2] == "Vo":
-                    self.parse_list[pos-1][-2] = "Von"
-                elif self.parse_list[pos-1][-2] == "a":
-                    self.parse_list[pos-1][-2] = "an"
-                elif self.parse_list[pos-1][-2] == "A":
-                    self.parse_list[pos-1][-2] = "An"
+                self.restore_split_preposition(pos)
                 self.parse_list[pos][-2] = "derm"
             else:
                 self.parse_list[pos][-2] = neutralized_word
@@ -429,7 +431,7 @@ class Marking_Tool:
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "r"
             elif feminized_word == "der" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
-                self.parse_list[pos-1][-1] = " "
+                self.restore_split_preposition(pos)
                 self.parse_list[pos][-2] = "der"
             else:
                 self.parse_list[pos][-2] = feminized_word
@@ -457,7 +459,7 @@ class Marking_Tool:
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "m"
             elif neuter_word == "dem" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
-                self.parse_list[pos-1][-1] = " "
+                self.restore_split_preposition(pos)
                 self.parse_list[pos][-2] = "dem"
             else:
                 self.parse_list[pos][-2] = neuter_word
@@ -1587,9 +1589,12 @@ class Marking_Tool:
             elif word[1] in ["der","Der"]:
                 pattern = "([Dd]er([*_:/][Dd]e[ms]|[*_:/][ms])?|[Dd]e[ms][*_:/][Dd]er)"
             elif re.match(re.compile(r"[mdks]?eine$", re.IGNORECASE),word[1]):
-                pattern = r"([mdks])?eine([*_:/][rn]|[*_:/]\1ein(er|en)?)?|([mdks])?ein(er|en)?[*_:/]\4eine|ein[*_:/]e"
+                # "([mdks]?)" statt "([mdks])?": Ein Rueckverweis auf eine Gruppe, die gar nicht
+                # mitgespielt hat, scheitert immer. Die praefixlosen Doppelformen ("ein*eine")
+                # liessen sich deshalb nicht auf den Eingabetext zurueckfuehren.
+                pattern = r"([mdks]?)eine([*_:/][rn]|[*_:/]\1ein(er|en)?)?|([mdks]?)ein(er|en)?[*_:/]\4eine|ein[*_:/]e"
             elif re.match(re.compile(r"[mdks]?einer$", re.IGNORECASE),word[1]):
-                pattern = r"([mdks])?eine(r[*_:/][ms]|[ms][*_:/]r|r[*_:/]\1eine[ms]|r)|([mdks])?eine[ms][*_:/]\3einer"
+                pattern = r"([mdks]?)eine(r[*_:/][ms]|[ms][*_:/]r|r[*_:/]\1eine[ms]|r)|([mdks]?)eine[ms][*_:/]\3einer"
             elif word[1].endswith("e"):
                 pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|" + Marking_Tool.WORD_DELIMITERS + "))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|" + Marking_Tool.WORD_DELIMITERS + "))"
             elif word[1].endswith("er"):

@@ -77,7 +77,7 @@ def search_lonely_adjectives(parse: list, input_text: str):
             for word_number, word in enumerate(marking_tool.parse_list):
                 # Wir setzen alle Adjektive, die nicht von einem Nomen abhängen und nicht im Neutrum stehen, auf groß.
                 # Ausnahmen sind "am ...sten", "unter anderem" und "alles andere".
-                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5] and word[2] != "ein" and not mistagged_verb(parse[sentence_number], word_number):
+                if ((word[3] == "ADJA" and not (am and (word[1].endswith("sten")))) or (word[2] == "andere" and not unter and not alles)) and word[1][0].islower() and lonely_adjective(parse,sentence_number,word_number) and not "Neut" in word[5] and word[2] != "ein" and not mistagged_verb(parse[sentence_number], word_number) and not from_ordinal_hack(parse[sentence_number], word_number):
                     word[1] = word[1].capitalize()
                     capitalized_words.append([sentence_number,word_number])
                     change = True
@@ -121,6 +121,15 @@ def search_lonely_adjectives(parse: list, input_text: str):
 # auch das Anrede-Adjektiv in "Willkommen, liebe Juli!", das dieselbe leere Merkmalsliste hat.
 # Ohne diese Unterscheidung schreibt search_lonely_adjectives das Verb gross, ParZu liest es beim
 # Reparse als Substantiv, und aus "anfreundete" wird "anfreundetey".
+# "rosa" stammt aus hack_for_ordinal_numbers und steht nicht im Eingabetext. Wird es als
+# "einsames" Adjektiv grossgeschrieben, liest ParZu es beim Reparse als Substantiv; es bekommt ein
+# Kästchen, wird neutralisiert, und undo_hack_for_ordinal_numbers findet den Ersatztext nicht mehr
+# wieder. Aus "Am 1. 2. 2020 kam der Lehrer." wurde so "Am 1-tägig rosaey 2. 2020 kam de Lehrere."
+def from_ordinal_hack(parse_list, word_number) -> bool:
+    if word_number == 0 or parse_list[word_number][1].lower() != "rosa":
+        return False
+    return re.fullmatch(r"\d\d?\d?-tägig", parse_list[word_number-1][1]) is not None
+
 def mistagged_verb(parse_list, word_number) -> bool:
     features = parse_list[word_number][5].split("|")
     if not (len(features) >= 5 and all(f in ("_", "Pos", "") for f in features)):
@@ -181,13 +190,15 @@ def mark_nouns(sentences: list, capitalized_adj_addresses, glauben):
 # with dots, e.g. "43. Präsident". The function replaces the dots in such positions with "-tägig rosa".
 # This replacement is undone before the final output.
 def hack_for_ordinal_numbers(input_text: str) -> str:
-    ordinal_number_pattern = r' (\d\d?\d?)\. '
-    input_text = re.sub(ordinal_number_pattern, r' \1-tägig rosa ', input_text)
+    # Das Leerzeichen danach wird nur vorausgeschaut, nicht verbraucht -- sonst fehlt der
+    # naechsten Zahl das fuehrende Leerzeichen und "Am 1. 2. 2020" bliebe halb unersetzt.
+    ordinal_number_pattern = r' (\d\d?\d?)\.(?= )'
+    input_text = re.sub(ordinal_number_pattern, r' \1-tägig rosa', input_text)
     return input_text
 
 def undo_hack_for_ordinal_numbers(input_text: str) -> str:
-    ordinal_number_pattern = r' (\d\d?\d?)-tägig rosa '
-    input_text = re.sub(ordinal_number_pattern, r' \1. ', input_text)
+    ordinal_number_pattern = r' (\d\d?\d?)-tägig rosa(?= )'
+    input_text = re.sub(ordinal_number_pattern, r' \1.', input_text)
     return input_text
 
 # The following function splits prepositions that are conjoined with articles. This is necessary because ParZu
@@ -291,11 +302,21 @@ def remove_special_character_gendering(input_text: str) ->str:
     input_text = re.sub(r"die[/*_:]den", "die", input_text)
     input_text = re.sub(r"Den[/*_:][dD]ie", "Die", input_text)
     input_text = re.sub(r"Die[/*_:][dD]en", "Die", input_text)
-    # eine/ein(er):
-    input_text = re.sub(re.compile(r"([mdks])?([eE])in(er|en)?[/*_:]\1[eE]ine", re.IGNORECASE), r"\1\2ine", input_text)
-    input_text = re.sub(re.compile(r"([mdks])?([eE])ine[/*_:]\1[eE]in(er|en)?", re.IGNORECASE), r"\1\2ine", input_text)
-    input_text = re.sub(re.compile(r"([mdks])?([eE])ine[sm]][/*_:]\1[eE]iner", re.IGNORECASE), r"\1\2iner", input_text)
-    input_text = re.sub(re.compile(r"([mdks])?([eE])iner[/*_:]\1[eE]ine[sm]]", re.IGNORECASE), r"\1\2iner", input_text)
+    # eine/ein(er): Drei Dinge waren hier vertauscht oder verschrieben.
+    # 1. "([mdks])?" statt "([mdks]?)": Eine Gruppe, die gar nicht mitspielt, laesst den
+    #    Rueckverweis "\1" scheitern. Dadurch blieben alle praefixlosen Formen unveraendert --
+    #    aus "Ein*eine Lehrende" wurde "Ein*ein Lehrende".
+    # 2. Ein ueberzaehliges "]" in "[sm]]" machte die beiden Genitiv-/Dativ-Muster unerfuellbar,
+    #    sodass "eines*einer" zu "eines*einers" wurde.
+    # 3. Diese beiden Muster muessen zuerst laufen: Sonst greift das allgemeinere Muster darunter
+    #    auf "einer*eines" zu und macht daraus "eines" statt "einer".
+    # Die Nachschau am Ende verhindert halbe Ersetzungen ("eine*einem" wurde sonst zu "eineem").
+    ein_start = r"(?<![a-zA-ZäöüßÄÖÜẞ])([mdks]?)([eE])"
+    ein_end = r"(?![a-zA-ZäöüßÄÖÜẞ])"
+    input_text = re.sub(re.compile(ein_start + r"ine[sm][/*_:]\1[eE]iner" + ein_end, re.IGNORECASE), r"\1\2iner", input_text)
+    input_text = re.sub(re.compile(ein_start + r"iner[/*_:]\1[eE]ine[sm]" + ein_end, re.IGNORECASE), r"\1\2iner", input_text)
+    input_text = re.sub(re.compile(ein_start + r"in(er|en)?[/*_:]\1[eE]ine" + ein_end, re.IGNORECASE), r"\1\2ine", input_text)
+    input_text = re.sub(re.compile(ein_start + r"ine[/*_:]\1[eE]in(er|en)?" + ein_end, re.IGNORECASE), r"\1\2ine", input_text)
     input_text = re.sub(r"[*_:/]e(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
     input_text = re.sub(r"e[*_:/][rn](?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
     input_text = re.sub(r"er[*_:/]s(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
@@ -375,9 +396,9 @@ def parse():
 
         marked_nouns = undo_hack_for_ordinal_numbers(marked_nouns)
         marked_nouns = replace_whitespace_outside_html_tags(marked_nouns)
-        # Add warning for single word input (only when the word as a whole is marked, i.e. when marked_nouns contains "checkbox" and has no letter after "</u></label></div>"):
+        # Add warning for single word input (only when the word as a whole is marked, i.e. when marked_nouns contains "checkbox" and has no letter after "</span></label></div>"):
         warning = False
-        if len(parse) == 1 and (len(parse[0]) == 1 or (len(parse[0]) == 2 and parse[0][1][3] == "$.")) and marked_nouns.find("checkbox") != -1 and not re.search(r"</u></label></div>[a-zA-ZäöüßÄÖÜẞ]", marked_nouns):
+        if len(parse) == 1 and (len(parse[0]) == 1 or (len(parse[0]) == 2 and parse[0][1][3] == "$.")) and marked_nouns.find("checkbox") != -1 and not re.search(r"</span></label></div>[a-zA-ZäöüßÄÖÜẞ]", marked_nouns):
             # sie
             if parse[0][0][1] == "sie":
                 warning = True
@@ -391,7 +412,7 @@ def parse():
                 warning = True
                 special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. Mit Bezug auf eine einzelne Person kann das Wort „ihr“ entweder eine besitzanzeigende Funktion haben oder die Dativ-Form von „sie“ sein. Im ersten Fall lautet die geschlechtsneutrale Form „ens“, im zweiten Fall „em“. "
             # Ihr
-            elif parse[0][0][1] == "ihr" or parse[0][0][1] == "Ihr" or parse[0][0][1] == "ihrem" or parse[0][0][1] == "Ihrem" or parse[0][0][1] == "ihres" or parse[0][0][1] == "Ihres" or parse[0][0][1] == "ihrs" or parse[0][0][1] == "Ihrs":
+            elif parse[0][0][1] == "Ihr" or parse[0][0][1] == "Ihrem" or parse[0][0][1] == "Ihres" or parse[0][0][1] == "Ihrs":
                 warning = True
                 ending = parse[0][0][1][3:]
                 special_warning = "Der Inklusivomat kann in diesem Fall nicht erkennen, ob das Wort „" + parse[0][0][1] + "“ als höfliche Alternative zu „dein" + ending + "“ verwendet wird, Bezug auf eine einzelne Person oder auf eine Gruppe von Personen nimmt. Wenn es als höfliche Alternative zu „dein" + ending + "“ verwendet wird oder Bezug auf eine Gruppe von Personen nimmt, ist das Wort bereits geschlechtsneutral und sollte daher im Inklusivum nicht geändert werden. "
