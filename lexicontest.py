@@ -417,8 +417,12 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich habe es vom Kaufmann gehört.","Ich habe es von der Kaufperson gehört."))
         test_sentences.append(("Im Kaufmann steckt viel Erfahrung.","In der Kaufperson steckt viel Erfahrung."))
         test_sentences.append(("Am Kaufmann lag es nicht.","An der Kaufperson lag es nicht."))
-        test_sentences.append(("Ich habe es vom Sohn gehört.","Ich habe es von dem Kind gehört."))
-        test_sentences.append(("Im Sohn steckt viel Kraft.","In dem Kind steckt viel Kraft."))
+        # Aendert sich der Artikel selbst nicht, bleibt die Zusammenziehung stehen.
+        test_sentences.append(("Ich habe es vom Sohn gehört.","Ich habe es vom Kind gehört."))
+        test_sentences.append(("Im Sohn steckt viel Kraft.","Im Kind steckt viel Kraft."))
+        test_sentences.append(("Ich habe es zum Sohn gesagt.","Ich habe es zum Kind gesagt."))
+        test_sentences.append(("Fürs Erste kam der Lehrer.","Fürs Erste kam de Lehrere."))
+        test_sentences.append(("Vorm Lehrer stand sie.","Vor derm Lehrere stand en."))
         # Der Ersatztext von hack_for_ordinal_numbers darf nicht in die Ausgabe gelangen.
         test_sentences.append(("Am 1. 2. 2020 kam der Lehrer.","Am 1. 2. 2020 kam de Lehrere."))
         test_sentences.append(("Der 43. und der 44. Präsident kamen.","Der 43. und de 44. Präsidente kamen."))

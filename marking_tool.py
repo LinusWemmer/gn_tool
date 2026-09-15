@@ -405,9 +405,16 @@ class Marking_Tool:
             if neutralized_word == "derm" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "rm"
-            elif neutralized_word == "derm" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
+            elif neutralized_word == self.parse_list[pos][1]:
+                # Der Artikel selbst aendert sich nicht. Dann bleibt auch seine Schreibung aus dem
+                # Eingabetext unangetastet -- vor allem eine Zusammenziehung mit der Praeposition:
+                # "fuers Erste" wurde sonst zu "fuerdas Erste".
+                pass
+            elif self.parse_list[pos][-2] in ("r", "m", "s"):
+                # split_prepositions hat die Zusammenziehung zerlegt und die neue Artikelform passt
+                # nicht mehr hinein; die Praeposition muss wieder vollstaendig werden.
                 self.restore_split_preposition(pos)
-                self.parse_list[pos][-2] = "derm"
+                self.parse_list[pos][-2] = neutralized_word
             else:
                 self.parse_list[pos][-2] = neutralized_word
         if was_artificially_capitalized and self.parse_list[pos][-2][:1].isupper():
@@ -435,9 +442,16 @@ class Marking_Tool:
             if feminized_word == "der" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "r"
-            elif feminized_word == "der" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
+            elif feminized_word == self.parse_list[pos][1]:
+                # Der Artikel selbst aendert sich nicht. Dann bleibt auch seine Schreibung aus dem
+                # Eingabetext unangetastet -- vor allem eine Zusammenziehung mit der Praeposition:
+                # "fuers Erste" wurde sonst zu "fuerdas Erste".
+                pass
+            elif self.parse_list[pos][-2] in ("r", "m", "s"):
+                # split_prepositions hat die Zusammenziehung zerlegt und die neue Artikelform passt
+                # nicht mehr hinein; die Praeposition muss wieder vollstaendig werden.
                 self.restore_split_preposition(pos)
-                self.parse_list[pos][-2] = "der"
+                self.parse_list[pos][-2] = feminized_word
             else:
                 self.parse_list[pos][-2] = feminized_word
 
@@ -463,9 +477,16 @@ class Marking_Tool:
             if neuter_word == "dem" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "m"
-            elif neuter_word == "dem" and (self.parse_list[pos][-2] == "r" or self.parse_list[pos][-2] == "m"):
+            elif neuter_word == self.parse_list[pos][1]:
+                # Der Artikel selbst aendert sich nicht. Dann bleibt auch seine Schreibung aus dem
+                # Eingabetext unangetastet -- vor allem eine Zusammenziehung mit der Praeposition:
+                # "fuers Erste" wurde sonst zu "fuerdas Erste".
+                pass
+            elif self.parse_list[pos][-2] in ("r", "m", "s"):
+                # split_prepositions hat die Zusammenziehung zerlegt und die neue Artikelform passt
+                # nicht mehr hinein; die Praeposition muss wieder vollstaendig werden.
                 self.restore_split_preposition(pos)
-                self.parse_list[pos][-2] = "dem"
+                self.parse_list[pos][-2] = neuter_word
             else:
                 self.parse_list[pos][-2] = neuter_word
 
