@@ -219,6 +219,12 @@ class Marking_Tool:
     # Realisierungen ("vo" und "m") ergeben sie von selbst wieder.
     DATIVE_CONTRACTIONS = {"an": "am", "bei": "beim", "in": "im", "von": "vom", "zu": "zum"}
 
+    # Dasselbe fuer den Akkusativ mit "das". Hier bleibt die Praeposition vollstaendig, es kommt
+    # nur das "s" des Artikels hinzu. "vors", "uebers", "unters" und "hinters" fehlen wieder als
+    # umgangssprachliche Formen.
+    ACCUSATIVE_CONTRACTIONS = {"an": "ans", "in": "ins", "auf": "aufs", "für": "fürs",
+                               "um": "ums", "durch": "durchs"}
+
     # Der Kasus steht je nach Wortart an unterschiedlicher Stelle der Merkmalsliste:
     # "Fem|Dat|Sg" und "_|_|_" haben ihn an Position 1, "Def|Fem|Dat|Sg" und
     # "Pos|Neut|Acc|Sg|St|" an Position 2.
@@ -490,14 +496,18 @@ class Marking_Tool:
             print("neuter_word:",neuter_word)
             contraction = None
             if pos > 0 and self.parse_list[pos-1][3] == "PREP":
-                contraction = Marking_Tool.DATIVE_CONTRACTIONS.get(self.parse_list[pos-1][2].lower())
-            if neuter_word == "dem" and contraction:
+                preposition = self.parse_list[pos-1][2].lower()
+                if neuter_word == "dem":
+                    contraction = Marking_Tool.DATIVE_CONTRACTIONS.get(preposition)
+                elif neuter_word == "das":
+                    contraction = Marking_Tool.ACCUSATIVE_CONTRACTIONS.get(preposition)
+            if contraction:
                 if self.parse_list[pos-1][1][:1].isupper():
                     contraction = contraction.capitalize()
-                # Die Zusammenziehung endet stets auf "m"; der Rest gehoert zur Praeposition.
+                # Vom Artikel bleibt nur der letzte Buchstabe, der Rest gehoert zur Praeposition.
                 self.parse_list[pos-1][-2] = contraction[:-1]
                 self.parse_list[pos-1][-1] = ""
-                self.parse_list[pos][-2] = "m"
+                self.parse_list[pos][-2] = contraction[-1]
             elif neuter_word == self.parse_list[pos][1]:
                 # Der Artikel selbst aendert sich nicht. Dann bleibt auch seine Schreibung aus dem
                 # Eingabetext unangetastet -- vor allem eine Zusammenziehung mit der Praeposition:

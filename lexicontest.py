@@ -436,6 +436,15 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich ging zu der Tochter.","Ich ging zum Kind."))
         # ... aber nicht zu den umgangssprachlichen Formen "vorm", "überm", "unterm", "hinterm".
         test_sentences.append(("Vor der Tochter stand er.","Vor dem Kind stand en."))
+        # Im Akkusativ ziehen sich "an", "in", "auf", "für", "um" und "durch" mit "das" zusammen.
+        test_sentences.append(("Ich gab es an die Tochter.","Ich gab es ans Kind."))
+        test_sentences.append(("Ich denke an den Sohn.","Ich denke ans Kind."))
+        test_sentences.append(("Er wartet auf die Tochter.","En wartet aufs Kind."))
+        test_sentences.append(("Das ist für die Tochter.","Das ist fürs Kind."))
+        test_sentences.append(("Er sorgt sich um den Sohn.","En sorgt sich ums Kind."))
+        test_sentences.append(("Sie glaubt an den Sohn.","En glaubt ans Kind."))
+        # "vors" und "übers" sind umgangssprachlich und bleiben aus.
+        test_sentences.append(("Er stellte sich vor die Tochter.","En stellte sich vor das Kind."))
         # Der Ersatztext von hack_for_ordinal_numbers darf nicht in die Ausgabe gelangen.
         test_sentences.append(("Am 1. 2. 2020 kam der Lehrer.","Am 1. 2. 2020 kam de Lehrere."))
         test_sentences.append(("Der 43. und der 44. Präsident kamen.","Der 43. und de 44. Präsidente kamen."))
@@ -830,6 +839,18 @@ def neutralize_all(text: str, select=None) -> str:
             if i == address[0]:
                 marking_tool.parse_list[address[1]][2] = marking_tool.parse_list[address[1]][2].lower()
                 marking_tool.parse_list[address[1]][-2] = marking_tool.parse_list[address[1]][-2].lower()
+        # search_lonely_adjectives ersetzt "glauben" durch "schreiben" und "zeigen" durch "sagen",
+        # weil ParZu deren Dativobjekte sonst nicht erkennt. mark_nouns macht das wieder rueckgaengig;
+        # ohne dieselbe Umkehr hier lieferte der Helfer "En schreibt ans Kind." statt "En glaubt ...".
+        for address in glauben:
+            if i == address[0]:
+                word = marking_tool.parse_list[address[1]]
+                for feld in (1, 2, -2):
+                    word[feld] = re.sub(r"eschrieben", "eglaubt", word[feld])
+                    word[feld] = re.sub(r"schreib", "glaub", word[feld])
+                    word[feld] = re.sub(r"Schreib", "Glaub", word[feld])
+                    word[feld] = re.sub(r"sag", "zeig", word[feld])
+                    word[feld] = re.sub(r"Sag", "Zeig", word[feld])
         marking_tools.append(marking_tool)
         marked += marking_tool.get_marking_form(i)
     selected = [(int(a), int(b), int(c)) for a, b, c
