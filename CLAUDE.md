@@ -163,6 +163,14 @@ Nato`). `Lexicon.PROPER_NAMES` is the curated override for names the generator d
 `frank und frei` makes it look like an adjective in the corpus); `AMBIGUOUS_NAMES`,
 `MASCULINE_NAMES` and `NO_PERSON_NAMES` still take precedence over the list.
 
+`static/nachnamen.txt` holds the phonet4n surname list **unpruned** (9999 entries). It is used
+for one thing only: a noun that hangs as an apposition off `Herr`/`Herrn`/`Herren`/`Frau` and is a
+known surname is left alone, so `Herr Müller kennt Frau Richter nicht.` keeps both names instead of
+becoming `Person Müllere kennt Person Richterne nicht.` The pruned `personennamen.txt` cannot serve
+here — it drops exactly the surnames that are also ordinary words (`Richter`, `Weber`, `Bauer`),
+since outside that context `der Bauer` must still become `de Bauere`. Titles are absent from both
+lists, so `Herr Doktor` keeps neutralizing `Doktor`.
+
 `static/namen_auf_mann.txt` (~1800 entries) blocks `person_pattern` for names ending in `-mann`
 that are not ordinary words, so `Hermann` no longer becomes `Herperson`. `Zimmermann`, `Bergmann`
 and `Kaufmann` are deliberately **absent** — they are real common nouns and must keep turning into

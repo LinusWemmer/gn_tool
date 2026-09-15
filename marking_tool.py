@@ -733,6 +733,29 @@ class Marking_Tool:
         head = self.parse_list[int(first_noun[6])-1]
         return head[3] == "V" and "Pl" in head[5]
 
+    # Ein Nachname nach "Herr" oder "Frau" ist ein Name, auch wenn er zugleich ein gewoehnliches
+    # Wort ist: "Herr Richter" ist keine richtende Person. ParZu haengt ihn als Apposition an die
+    # Anrede -- bei "Herr Doktor Richter" ueber den Titel hinweg, deshalb wird die Kette
+    # hochgelaufen. Ohne diese Pruefung wurde aus "Herr Müller kennt Frau Richter nicht." ein
+    # "Person Müllere kennt Person Richterne nicht."
+    # ParZu fuehrt "Herrn" nicht auf "Herr" zurueck, deshalb stehen die flektierten Formen mit
+    # in der Liste; geprueft werden Wortform und Grundform.
+    TITLES = ("Herr", "Herrn", "Herren", "Frau")
+
+    def is_surname_after_title(self, pos:int) -> bool:
+        word_parse = self.parse_list[pos]
+        if not (word_parse[1] in Lexicon.SURNAMES or word_parse[2] in Lexicon.SURNAMES
+                or word_parse[1] in Lexicon.PERSON_NAMES or word_parse[2] in Lexicon.PERSON_NAMES):
+            return False
+        current = word_parse
+        for _ in range(4):
+            if current[7] != "app" or not current[6].isdigit() or int(current[6]) == 0:
+                return False
+            current = self.parse_list[int(current[6])-1]
+            if current[1] in Marking_Tool.TITLES or current[2] in Marking_Tool.TITLES:
+                return True
+        return False
+
     # Erkennt Beinamen wie "Peter dem Großen" oder "Katharina die Große": ein grossgeschriebenes
     # Adjektiv, dem unmittelbar ein Artikel und davor ein Eigenname vorangeht. ParZu hängt solche
     # Adjektive als Attribut an ein späteres Substantiv, sodass sie sonst unmarkiert blieben.
@@ -1396,7 +1419,7 @@ class Marking_Tool:
                 # Hängt ein grossgeschriebenes Adjektiv als Genitivattribut ("gmod") an einem Nomen,
                 # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
                 # Adjektiv trägt dort "attr".
-                elif word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod")):
+                elif (word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod"))) and not self.is_surname_after_title(pos):
                     # Ein grossgeschriebenes Adjektiv ohne Nomen darüber ist substantiviert. ParZu
                     # gibt es aber nicht immer als Nomen aus -- "liebe Kim" wird beim Reparse zu
                     # einem Nomen, "liebe Juli" wegen des Monatsnamens nicht. Die Zeile wird deshalb

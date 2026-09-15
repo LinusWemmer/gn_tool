@@ -240,6 +240,16 @@ class Lexicon:
             if not line.startswith("#"):
                 NAMES_IN_MANN.add(line.rstrip())
 
+    # Die haeufigsten deutschen Nachnamen, unbeschnitten. PERSON_NAMES enthaelt sie nur, soweit
+    # sie nicht zugleich gewoehnliche Woerter sind -- "Richter", "Weber" und "Bauer" fehlen dort,
+    # weil sonst aus "der Bauer" ein "de Bauer" wuerde. Nach "Herr" oder "Frau" ist die Lesart
+    # dagegen eindeutig, und nur dort wird diese Liste herangezogen.
+    SURNAMES = set()
+    with open("static/nachnamen.txt") as f_surnames:
+        for line in f_surnames:
+            if not line.startswith("#"):
+                SURNAMES.add(line.rstrip())
+
     UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
 
     # Substantive, die im Inklusivum-Plural keinen Umlaut bekommen, obwohl eine der beiden

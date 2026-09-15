@@ -94,6 +94,12 @@ vornamen_csv = list(csv.reader(io.StringIO(hole(VORNAMEN_CSV).decode('utf-8')), 
 winkelmann = {zeile[0].strip(): zeile[1].strip() for zeile in vornamen_csv[1:] if zeile[0].strip()}
 nachnamen = {zeile.strip() for zeile in hole(NACHNAMEN_TXT).decode('latin-1').splitlines()
              if zeile.strip()}
+# Diese Liste wird unbeschnitten als nachnamen.txt abgelegt. personennamen.txt sortiert gerade
+# die Nachnamen aus, die zugleich gewoehnliche Woerter sind ("Richter", "Weber", "Bauer") --
+# sonst wuerde aus "der Bauer" ein "de Bauer". Nach "Herr" oder "Frau" ist die Lesart aber
+# eindeutig, und dort wird diese Liste gebraucht. Sie stammt allein aus dem statischen
+# phonet4n-Download, nicht aus Wikidata, damit sie ohne Netzstoerungen reproduzierbar bleibt.
+nachnamen_phonet4n = sorted(nachnamen)
 
 for name, (bedingung, mindestens) in WIKIDATA_KLASSEN.items():
     treffer = wikidata(bedingung)
@@ -161,7 +167,14 @@ with open('personennamen.txt', 'w', encoding='utf-8') as datei:
     datei.write(kopf + '\n'.join(namen) + '\n')
 with open('namen_auf_mann.txt', 'w', encoding='utf-8') as datei:
     datei.write(kopf + '\n'.join(namen_auf_mann) + '\n')
+with open('nachnamen.txt', 'w', encoding='utf-8') as datei:
+    datei.write('# Erzeugt von Namen-Skript.py -- nicht von Hand bearbeiten.\n'
+                '# Quelle: phonet4n-Nachnamen (die 9999 haeufigsten deutschen Nachnamen),\n'
+                '# unbeschnitten. Wird nur gebraucht, um nach "Herr" oder "Frau" einen Nachnamen\n'
+                '# zu erkennen, der zugleich ein gewoehnliches Wort ist ("Herr Richter").\n'
+                + '\n'.join(nachnamen_phonet4n) + '\n')
 neutral = {name for name, genus in winkelmann.items() if genus.startswith('?')}
 print('personennamen.txt : %d Namen (davon %d geschlechtsneutral)'
       % (len(namen), len(neutral & set(namen))))
 print('namen_auf_mann.txt: %d Namen' % len(namen_auf_mann))
+print('nachnamen.txt     : %d Nachnamen' % len(nachnamen_phonet4n))

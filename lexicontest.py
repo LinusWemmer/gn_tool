@@ -415,6 +415,17 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Wir laden Schülerinnen und Schüler, Lehrerinnen und Lehrer ein.","Wir laden Schülerne, Lehrerne ein."))
         # ... und hier mit "und" statt Komma davor.
         test_sentences.append(("Die Lehrer, die Ärzte und die Bürgerinnen und Bürger kamen.","Die Lehrerne, die Ärzterne und die Bürgerne kamen."))
+        # Ein Nachname nach "Herr" oder "Frau" bleibt ein Name, auch wenn er zugleich ein
+        # gewöhnliches Wort ist.
+        test_sentences.append(("Herr Müller kennt Frau Richter nicht.","Person Müller kennt Person Richter nicht."))
+        test_sentences.append(("Frau Weber ist Bäuerin.","Person Weber ist Bauere."))
+        test_sentences.append(("Ich sprach mit Herrn Bauer.","Ich sprach mit Person Bauer."))
+        test_sentences.append(("Sehr geehrte Frau König!","Sehr geehrte Person König!"))
+        # Auch über einen Titel hinweg ("Herr Doktor Richter"), der selbst neutralisiert wird.
+        test_sentences.append(("Herr Doktor Richter kam.","Person Doktore Richter kam."))
+        # Dieselben Wörter ohne Anrede bleiben gewöhnliche Substantive.
+        test_sentences.append(("Der Richter sprach das Urteil.","De Richtere sprach das Urteil."))
+        test_sentences.append(("Der Bauer pflügt das Feld.","De Bauere pflügt das Feld."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))
