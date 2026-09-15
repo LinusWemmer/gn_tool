@@ -405,6 +405,16 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Lehrer und die Lehrerin sind da.","De Lehrere und de Lehrere sind da."))
         test_sentences.append(("Der Lehrer und die Schüler kamen.","De Lehrere und die Schülerne kamen."))
         test_sentences.append(("Der Lehrer, die Lehrerin und der Schüler kamen.","De Lehrere, de Lehrere und de Schülere kamen."))
+        # In einer Aufzählung verbindet das "und" die beiden letzten Glieder, es ist also keine
+        # Doppelnennung. Erkennbar an zwei Merkmalen zusammen: Das erste Substantiv hängt mit "kon"
+        # (also über ein Komma) an einem vorangehenden, und das zweite hat einen eigenen Artikel.
+        test_sentences.append(("Der Lehrer, die Lehrerin, der Arzt und die Ärztin kamen.","De Lehrere, de Lehrere, de Arzte und de Arzte kamen."))
+        # Fehlt eines der beiden Merkmale, bleibt die Doppelnennung erhalten: hier ohne eigenen
+        # Artikel am zweiten Substantiv ...
+        test_sentences.append(("Die Ärzte, die Bürgerinnen und Bürger kamen.","Die Ärzterne, die Bürgerne kamen."))
+        test_sentences.append(("Wir laden Schülerinnen und Schüler, Lehrerinnen und Lehrer ein.","Wir laden Schülerne, Lehrerne ein."))
+        # ... und hier mit "und" statt Komma davor.
+        test_sentences.append(("Die Lehrer, die Ärzte und die Bürgerinnen und Bürger kamen.","Die Lehrerne, die Ärzterne und die Bürgerne kamen."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))

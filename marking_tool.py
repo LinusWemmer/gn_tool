@@ -1118,6 +1118,17 @@ class Marking_Tool:
                 if second is None:
                     continue
                 second_noun = self.parse_list[second]
+                # "Der Lehrer, die Lehrerin, der Arzt und die Ärztin kamen." ist eine Aufzählung,
+                # keine Doppelnennung: Das "und" verbindet die beiden letzten Glieder einer Reihe.
+                # Zwei Merkmale zusammen zeigen das an. Erstens die Relation des ersten
+                # Substantivs: "kon" heisst, dass es selbst durch ein Komma an ein vorangehendes
+                # Substantiv angeschlossen wurde; bei "cj" war es ein "und", und dann bleibt eine
+                # Doppelnennung am Ende einer Reihe erhalten ("die Ärzte und die Bürgerinnen und
+                # Bürger"). Zweitens ein eigener Artikel am zweiten Substantiv: Eine Doppelnennung
+                # teilt sich sonst einen ("Lehrerinnen und Lehrer"), waehrend die Glieder einer
+                # Aufzaehlung jedes fuer sich determiniert sind.
+                if self.parse_list[pos-1][7] == "kon" and second > pos + 1:
+                    continue
                 # Zwei Einzelpersonen als Subjekt eines pluralischen Verbs werden nicht zusammengezogen.
                 if self.is_plural_subject_pair(pos, second):
                     continue
