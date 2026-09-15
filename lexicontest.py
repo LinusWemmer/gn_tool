@@ -423,6 +423,19 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Ich habe es zum Sohn gesagt.","Ich habe es zum Kind gesagt."))
         test_sentences.append(("Fürs Erste kam der Lehrer.","Fürs Erste kam de Lehrere."))
         test_sentences.append(("Vorm Lehrer stand sie.","Vor derm Lehrere stand en."))
+        # ParZu gibt "von" keinen Kasus mit. Ohne Ergänzung ging der Dativ verloren, und der
+        # Kasus des Kopfes erreichte die abhängigen Wörter auf dem "-kind"- und dem
+        # "-person"-Zweig ohnehin nicht.
+        test_sentences.append(("Das Buch von der Tochter ist kaputt.","Das Buch vom Kind ist kaputt."))
+        test_sentences.append(("Das Buch von der Lehrerin ist kaputt.","Das Buch von derm Lehrere ist kaputt."))
+        test_sentences.append(("Das Buch von der Kauffrau ist kaputt.","Das Buch von der Kaufperson ist kaputt."))
+        test_sentences.append(("Er sprach von der Tochter.","En sprach vom Kind."))
+        # Präposition und dativisches "dem" ziehen sich zusammen ...
+        test_sentences.append(("Bei der Tochter war es schön.","Beim Kind war es schön."))
+        test_sentences.append(("In der Tochter steckt viel.","Im Kind steckt viel."))
+        test_sentences.append(("Ich ging zu der Tochter.","Ich ging zum Kind."))
+        # ... aber nicht zu den umgangssprachlichen Formen "vorm", "überm", "unterm", "hinterm".
+        test_sentences.append(("Vor der Tochter stand er.","Vor dem Kind stand en."))
         # Der Ersatztext von hack_for_ordinal_numbers darf nicht in die Ausgabe gelangen.
         test_sentences.append(("Am 1. 2. 2020 kam der Lehrer.","Am 1. 2. 2020 kam de Lehrere."))
         test_sentences.append(("Der 43. und der 44. Präsident kamen.","Der 43. und de 44. Präsidente kamen."))

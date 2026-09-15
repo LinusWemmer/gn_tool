@@ -205,6 +205,20 @@ class Marking_Tool:
     # Akkusativ; siehe die Kasusergänzung in neutralize_nounphrase.
     DATIVE_PREPOSITIONS = ("zwischen", "unter", "vor", "hinter", "neben", "von", "bei")
 
+    # Praepositionen, die ausschliesslich den Dativ regieren. ParZu laesst bei "von" den Kasus
+    # offen; weil "von" zugleich in DATIVE_PREPOSITIONS steht, unterblieb die Kasus-Ergaenzung
+    # ersatzlos und der Dativ ging verloren: "Das Buch von der Tochter" wurde zu "von das Kind",
+    # "von der Lehrerin" zu "von de Lehrere" statt "von derm Lehrere".
+    DATIVE_ONLY_PREPOSITIONS = ("von", "bei", "aus", "mit", "nach", "seit", "zu",
+                                "außer", "gegenüber", "entgegen", "gemäß")
+
+    # Praeposition und dativisches "dem" ziehen sich im Deutschen zusammen. Bisher tat das nur
+    # "zu" + "dem"; "von dem Kind" blieb stehen, statt zu "vom Kind" zu werden. "vorm", "ueberm",
+    # "unterm" und "hinterm" fehlen hier mit Absicht -- sie sind umgangssprachlich. Steht die
+    # Zusammenziehung schon im Eingabetext, hat split_prepositions sie zerlegt und die
+    # Realisierungen ("vo" und "m") ergeben sie von selbst wieder.
+    DATIVE_CONTRACTIONS = {"an": "am", "bei": "beim", "in": "im", "von": "vom", "zu": "zum"}
+
     # Der Kasus steht je nach Wortart an unterschiedlicher Stelle der Merkmalsliste:
     # "Fem|Dat|Sg" und "_|_|_" haben ihn an Position 1, "Def|Fem|Dat|Sg" und
     # "Pos|Neut|Acc|Sg|St|" an Position 2.
@@ -474,7 +488,14 @@ class Marking_Tool:
         else:
             neuter_word = Lexicon_Neuter.neuterize_word(self.parse_list[pos],has_article)
             print("neuter_word:",neuter_word)
-            if neuter_word == "dem" and (self.parse_list[pos-1][1] == "Zu" or self.parse_list[pos-1][1] == "zu"):
+            contraction = None
+            if pos > 0 and self.parse_list[pos-1][3] == "PREP":
+                contraction = Marking_Tool.DATIVE_CONTRACTIONS.get(self.parse_list[pos-1][2].lower())
+            if neuter_word == "dem" and contraction:
+                if self.parse_list[pos-1][1][:1].isupper():
+                    contraction = contraction.capitalize()
+                # Die Zusammenziehung endet stets auf "m"; der Rest gehoert zur Praeposition.
+                self.parse_list[pos-1][-2] = contraction[:-1]
                 self.parse_list[pos-1][-1] = ""
                 self.parse_list[pos][-2] = "m"
             elif neuter_word == self.parse_list[pos][1]:
@@ -784,6 +805,10 @@ class Marking_Tool:
             if inferred_case:
                 self.set_missing_case(pos, inferred_case)
             elif (self.parse_list[pos][7] == "pn" and int(self.parse_list[pos][6]) != 0
+                    and self.parse_list[int(self.parse_list[pos][6])-1][2].lower()
+                        in Marking_Tool.DATIVE_ONLY_PREPOSITIONS):
+                self.set_missing_case(pos, "Dat")
+            elif (self.parse_list[pos][7] == "pn" and int(self.parse_list[pos][6]) != 0
                     and self.parse_list[int(self.parse_list[pos][6])-1][2]
                         not in Marking_Tool.DATIVE_PREPOSITIONS):
                 # Ein Substantiv, das von einer Präposition regiert wird, steht nie im Nominativ.
@@ -921,8 +946,14 @@ class Marking_Tool:
                 # "Mädchen" ist neutrum, muss aber wie "Junge" feminine Kongruenz bekommen.
                 if (feats[0] == "Masc" or feats[0] == "_" or junge_person) and feats[2] != "Pl":
                     print("about to feminize dependent words", self.parse_list[pos][1], self.nounphrases.get(pos+1))
+                    # Der Kasus des Kopfes wird an die abhängigen Wörter weitergereicht -- genau
+                    # wie beim Neutralisieren. Ohne das verloren sie ihn, wo ParZu ihn nicht
+                    # erkannt hat ("von der Tochter" ergab "von das Kind" statt "von dem Kind").
+                    head_case = self.get_case(pos)
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
+                        if head_case != "_":
+                            self.set_missing_case(child-1, head_case)
                         child_parse = self.parse_list[child-1]
                         # Aus "junges Mädchen" wird "sehr junge Person", damit das Adjektiv
                         # nicht doppelt erscheint ("junge junge Person"). Steigerungsformen
@@ -939,8 +970,11 @@ class Marking_Tool:
                 plural = True
                 if feats[2] != "Pl":
                     print("about to make dependent words neuter", self.parse_list[pos][1], self.nounphrases.get(pos+1))
+                    head_case = self.get_case(pos)
                     for child in self.nounphrases.get(pos+1):
                         article_pos = min(self.nounphrases.get(pos+1))
+                        if head_case != "_":
+                            self.set_missing_case(child-1, head_case)
                         self.neuterize_word(child-1, has_non_ein_article, article_pos)
         # Neutralized attributive pronoun
         elif self.parse_list[pos][1].lower() in ["dessen","deren"]:
