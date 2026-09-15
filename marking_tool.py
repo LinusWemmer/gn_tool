@@ -786,6 +786,23 @@ class Marking_Tool:
         return (word_parse[2] in Lexicon.PERSON_NAMES or form in Lexicon.PERSON_NAMES
                 or word_parse[2] in Lexicon.PROPER_NAMES)
 
+    # "Sachsen" und "Preussen" bezeichnen mal das Gebiet, mal seine Einwohnerschaft. Eine Person
+    # ist gemeint, wenn ein Artikel dabeisteht UND das Wort im Plural oder in einem anderen Kasus
+    # als dem Nominativ steht ("die Sachsen kamen", "er half dem Sachsen"). Im artikellosen
+    # Singular und im Nominativ Singular ist das Gebiet gemeint ("Sachsen liegt im Osten", "das
+    # heutige Sachsen", "1568 verfuegte Preussen ein Verbot").
+    # Die Pruefung steht hier und nicht in check_noun, weil das dortige has_article nur
+    # singularische Artikel im Maskulinum und Femininum zaehlt und fuer den Plural nichts hergibt.
+    def means_place_not_people(self, pos:int) -> bool:
+        word_parse = self.parse_list[pos]
+        if not (word_parse[1] in Lexicon.PEOPLE_OR_PLACE_NAMES
+                or word_parse[2] in Lexicon.PEOPLE_OR_PLACE_NAMES):
+            return False
+        if not any(other[6] == word_parse[0] and other[3] == "ART" for other in self.parse_list):
+            return True
+        feats = word_parse[5].split("|")
+        return not (len(feats) > 2 and (feats[2] == "Pl" or feats[1] not in ("Nom", "_")))
+
     def is_surname_after_name_or_title(self, pos:int) -> bool:
         word_parse = self.parse_list[pos]
         if not (word_parse[1] in Lexicon.SURNAMES or word_parse[2] in Lexicon.SURNAMES
@@ -1470,7 +1487,7 @@ class Marking_Tool:
                 # Hängt ein grossgeschriebenes Adjektiv als Genitivattribut ("gmod") an einem Nomen,
                 # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
                 # Adjektiv trägt dort "attr".
-                elif (word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod"))) and not self.is_surname_after_name_or_title(pos):
+                elif (word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod"))) and not self.is_surname_after_name_or_title(pos) and not self.means_place_not_people(pos):
                     # Ein grossgeschriebenes Adjektiv ohne Nomen darüber ist substantiviert. ParZu
                     # gibt es aber nicht immer als Nomen aus -- "liebe Kim" wird beim Reparse zu
                     # einem Nomen, "liebe Juli" wegen des Monatsnamens nicht. Die Zeile wird deshalb
@@ -1519,15 +1536,28 @@ class Marking_Tool:
                         feats[0] = "_"
                     if feats[2] == "_":
                         self.determine_number(pos,feats)
-                    # The following hack is needed, because ParZu often misinterprets "Pole" as "Pol":
-                    if word_parse[2] == "Pol" and (word_parse[1] == "Pole" or word_parse[1] == "Polen"):
-                        word_parse[2] = "Pole"
+                    # ParZu lemmatisiert einige Einwohnerbezeichnungen falsch, sodass die
+                    # Wortliste sie nicht findet. An dieser Stelle steht durch
+                    # means_place_not_people schon fest, dass nicht das Gebiet gemeint ist, die
+                    # Grundform kann also gefahrlos gesetzt werden. Die beiden Sonderfaelle fuer
+                    # "Pole" und "Ungarn", die hier frueher standen, gehen darin auf.
+                    correct_lemma = Lexicon.INHABITANT_LEMMAS.get(word_parse[1])
+                    if correct_lemma:
+                        word_parse[2] = correct_lemma
                         word_parse[4] = "N"
-                        feats[0] = "Masc"
-                    # The following is needed, because ParZu often misinterprets plural "Ungarn" as the country, not the people:
-                    if word_parse[1] == "Ungarn" and feats[2] == "Pl":
-                        word_parse[2] = "Ungar"
-                        word_parse[4] = "N"
+                        # ParZu haelt "dem Sachsen" fuer das Gebiet und meldet dazu ein
+                        # Neutrum. Am Substantiv waere damit die maskuline Wortliste gesperrt,
+                        # und am Artikel bliebe "dem" stehen, weil ein neutraler Artikel
+                        # unveraendert durchlaeuft.
+                        if feats[0] in ("_", "Neut"):
+                            feats[0] = "Masc"
+                        for other_word_parse in self.parse_list:
+                            if other_word_parse[6] != word_parse[0] or other_word_parse[3] != "ART":
+                                continue
+                            article_feats = other_word_parse[5].split("|")
+                            if len(article_feats) >= 4 and article_feats[1] in ("_", "Neut"):
+                                article_feats[1] = "Masc"
+                                other_word_parse[5] = "|".join(article_feats)
                     # The following looks for articles that are relevant for proper nouns, i.e. masculine and feminine article in the singular:
                     has_article = False
                     for other_word_parse in self.parse_list:

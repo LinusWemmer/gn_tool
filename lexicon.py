@@ -250,6 +250,43 @@ class Lexicon:
             if not line.startswith("#"):
                 SURNAMES.add(line.rstrip())
 
+    # Woerter, die in den Wortlisten stehen, weil ihr Kopf eine Personenbezeichnung ist, die aber
+    # nie eine Person bezeichnen. Aufnahmekriterium: Das Wort bezeichnet ausschliesslich ein
+    # Gremium oder eine Sache, niemals auch eines seiner Mitglieder. "Betriebsrat", "Gemeinderat",
+    # "Stadtrat", "Aufsichtsrat" und die uebrigen Woerter auf "-rat" gehoeren deshalb NICHT hierher
+    # -- sie bezeichnen beides. Zusammensetzungen ohne eigenen Eintrag in
+    # movierbare_Substantive.txt sind ohnehin gesperrt ("Sicherheitsrat", "Ethikrat"), hier stehen
+    # nur die Woerter mit eigenem Eintrag.
+    NEVER_PERSON_NOUNS = {
+        "Bundesrat",
+        # Der blosse "Rat" ist weit ueberwiegend der Ratschlag oder das Gremium; als Amtstitel
+        # ("Rat am Landgericht") ist er veraltet. Ohne diesen Eintrag wurde aus "ein guter Rat"
+        # ein "ein gute Rate".
+        "Rat",
+    }
+
+    # Laender- und Landschaftsnamen, die zugleich der Plural einer Einwohnerbezeichnung sind.
+    # Eine Person ist gemeint, wenn ein Artikel dabeisteht UND das Wort im Plural oder in einem
+    # anderen Kasus als dem Nominativ steht: "die Sachsen kamen", "er half dem Sachsen". Im
+    # artikellosen Singular und im Nominativ Singular bezeichnet es das Gebiet: "Sachsen liegt im
+    # Osten", "das heutige Sachsen", "1568 verfuegte Preussen". Gefuehrt werden die Formen auf
+    # "-en"; der Singular ("der Sachse") ist eindeutig eine Person und laeuft normal durch.
+    PEOPLE_OR_PLACE_NAMES = {
+        "Sachsen", "Preußen", "Hessen", "Franken", "Bayern", "Schwaben", "Westfalen",
+        "Pommern", "Polen", "Ungarn", "Schweden",
+    }
+
+    # ParZu lemmatisiert einige dieser Einwohnerbezeichnungen falsch: "Sachsen" und "Sachse"
+    # beide zu "Sachs", "Pole" und "Polen" zu "Pol", "Hessen", "Bayern", "Pommern" und "Ungarn"
+    # gar nicht. Die Wortliste findet sie dann nicht. Hier steht zu jeder betroffenen Wortform die
+    # richtige Grundform. "Preuße", "Franke", "Schwabe", "Westfale" und "Schwede" fehlen, weil
+    # ParZu sie richtig zurueckfuehrt.
+    INHABITANT_LEMMAS = {
+        "Sachse": "Sachse", "Sachsen": "Sachse",
+        "Hessen": "Hesse", "Bayern": "Bayer", "Pommern": "Pommer",
+        "Pole": "Pole", "Polen": "Pole", "Ungarn": "Ungar",
+    }
+
     UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
 
     # Substantive, die im Inklusivum-Plural keinen Umlaut bekommen, obwohl eine der beiden
@@ -647,6 +684,10 @@ class Lexicon:
         # von "Sinn", "Grad", "Mann", "Wahl" und "Ecke".
         name_form = word_parse[1] if word_parse[1] in (noun, noun + "s") else None
 
+        # Bezeichnungen, die nie eine Person meinen, bekommen kein Kaestchen.
+        if noun in Lexicon.NEVER_PERSON_NOUNS or word_parse[1] in Lexicon.NEVER_PERSON_NOUNS:
+            return False, "", []
+
         # search_lonely_adjectives schreibt allein stehende Adjektive vor dem Reparse gross, damit
         # ParZu sie als substantiviert erkennt. Steht die Wortform gross, die Realisierung aus dem
         # Eingabetext aber klein, ist die Grossschreibung künstlich: Das Wort ist ein Adjektiv und
@@ -933,8 +974,11 @@ class Lexicon:
                        and (has_article or has_adjective)
                        and noun.lower() not in Lexicon.NO_PERSON_NAMES)
         if is_name and not (len(noun) > 1 and noun.isupper()):
-            capitalized = noun[0].isupper()
-            return True, "", [[0, noun, noun, "", "proper noun", capitalized]]
+            capitalized = word_parse[1][0].isupper()
+            # Die Wortform statt der Grundform: Ein Eigenname bleibt unveraendert stehen, und
+            # sonst ginge im Genitiv das "-s" verloren ("des bekannten Eulers" ergaebe "Eulers"
+            # -> "Euler"). Wo ParZu falsch lemmatisiert, ist der Schaden groesser.
+            return True, "", [[0, word_parse[1], word_parse[1], "", "proper noun", capitalized]]
 
         prefix, list = Lexicon.check_composite_noun(word_parse[1],True)
         return False, prefix, list

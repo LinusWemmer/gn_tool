@@ -469,6 +469,27 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Er änderte den Abtreibungsparagrafen.","En änderte den Abtreibungsparagrafen."))
         test_sentences.append(("Der Landgraf kam.","De Landgrafe kam."))
         test_sentences.append(("Der Fotograf kam.","De Fotografe kam."))
+        # Bezeichnungen, die nie eine Person meinen, stehen in Lexicon.NEVER_PERSON_NOUNS ...
+        test_sentences.append(("Der Bundesrat stimmte zu.","Der Bundesrat stimmte zu."))
+        test_sentences.append(("Er gab mir einen guten Rat.","En gab mir einen guten Rat."))
+        # ... die uebrigen Wörter auf "-rat" koennen sehr wohl Amtstraeger bezeichnen.
+        test_sentences.append(("Der Betriebsrat wurde gewählt.","De Betriebsrate wurde gewählt."))
+        test_sentences.append(("Der Gemeinderat tagte.","De Gemeinderate tagte."))
+        # Gebiet oder Einwohnerschaft: Artikel plus Numerus und Kasus entscheiden.
+        test_sentences.append(("1568 verfügte Preußen ein Verbot.","1568 verfügte Preußen ein Verbot."))
+        test_sentences.append(("Die Preußen gewannen die Schlacht.","Die Preußerne gewannen die Schlacht."))
+        test_sentences.append(("Er sprach mit dem Preußen.","En sprach mit derm Preußere."))
+        test_sentences.append(("Sachsen liegt im Osten.","Sachsen liegt im Osten."))
+        test_sentences.append(("Das heutige Sachsen ist reich.","Das heutige Sachsen ist reich."))
+        test_sentences.append(("Die Sachsen kamen.","Die Sachserne kamen."))
+        test_sentences.append(("Er half dem Sachsen.","En half derm Sachsere."))
+        test_sentences.append(("Der Sachse kam.","De Sachsere kam."))
+        test_sentences.append(("Bayern ist ein Bundesland.","Bayern ist ein Bundesland."))
+        test_sentences.append(("Die Bayern feierten.","Die Bayerne feierten."))
+        test_sentences.append(("Polen wurde geteilt.","Polen wurde geteilt."))
+        test_sentences.append(("Die Polen protestierten.","Die Polerne protestierten."))
+        test_sentences.append(("Ungarn liegt in Europa.","Ungarn liegt in Europa."))
+        test_sentences.append(("Die Ungarn kamen.","Die Ungarne kamen."))
         # Ein Adjektiv ohne eigenen Determinierer ist in einer Reihung blosses Attribut und darf
         # nicht als substantiviert gelten; frueher wurde das letzte Glied grossgeschrieben.
         test_sentences.append(("Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen.","Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen."))
