@@ -426,6 +426,14 @@ class Sentence_Test(unittest.TestCase):
         # Dieselben Wörter ohne Anrede bleiben gewöhnliche Substantive.
         test_sentences.append(("Der Richter sprach das Urteil.","De Richtere sprach das Urteil."))
         test_sentences.append(("Der Bauer pflügt das Feld.","De Bauere pflügt das Feld."))
+        # Titel wirken wie eine Anrede: Der Titel wird neutralisiert, der Name bleibt stehen.
+        test_sentences.append(("Doktor Richter kommt.","Doktore Richter kommt."))
+        test_sentences.append(("Professorin Weber kommt.","Professore Weber kommt."))
+        test_sentences.append(("Kommissarin Bauer ermittelt.","Kommissare Bauer ermittelt."))
+        test_sentences.append(("Trainer Koch gewann.","Trainere Koch gewann."))
+        test_sentences.append(("Die Herren Richter und Weber kamen.","Die Leute Richter und Webere kamen."))
+        # Eine durch ein Komma abgetrennte Apposition ist keine Titelanrede, sondern ein Beruf.
+        test_sentences.append(("Ein Herr, Richter von Beruf, kam.","Eine Person, Richterne von Beruf, kam."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))

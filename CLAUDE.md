@@ -166,7 +166,10 @@ Nato`). `Lexicon.PROPER_NAMES` is the curated override for names the generator d
 `static/nachnamen.txt` holds the phonet4n surname list **unpruned** (9999 entries). It is used
 for one thing only: a noun that hangs as an apposition off `Herr`/`Herrn`/`Herren`/`Frau` and is a
 known surname is left alone, so `Herr Müller kennt Frau Richter nicht.` keeps both names instead of
-becoming `Person Müllere kennt Person Richterne nicht.` The pruned `personennamen.txt` cannot serve
+becoming `Person Müllere kennt Person Richterne nicht.` The same applies after a title from
+`Marking_Tool.TITLES` (`Doktor Richter kommt.` → `Doktore Richter kommt.`) — the title itself stays
+markable, only the name is blocked. An apposition set off by a comma is excluded: in `Ein Herr,
+Richter von Beruf, kam.` the word is an occupation, not a name. The pruned `personennamen.txt` cannot serve
 here — it drops exactly the surnames that are also ordinary words (`Richter`, `Weber`, `Bauer`),
 since outside that context `der Bauer` must still become `de Bauere`. Titles are absent from both
 lists, so `Herr Doktor` keeps neutralizing `Doktor`.

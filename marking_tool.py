@@ -738,9 +738,21 @@ class Marking_Tool:
     # Anrede -- bei "Herr Doktor Richter" ueber den Titel hinweg, deshalb wird die Kette
     # hochgelaufen. Ohne diese Pruefung wurde aus "Herr Müller kennt Frau Richter nicht." ein
     # "Person Müllere kennt Person Richterne nicht."
-    # ParZu fuehrt "Herrn" nicht auf "Herr" zurueck, deshalb stehen die flektierten Formen mit
-    # in der Liste; geprueft werden Wortform und Grundform.
-    TITLES = ("Herr", "Herrn", "Herren", "Frau")
+    # Woerter, nach denen ein folgender Nachname als Name zu lesen ist: die Anredeformen und
+    # Titel, die unmittelbar vor einem Nachnamen stehen ("Doktor Richter", "Kommissarin Bauer").
+    # Geprueft werden Wortform und Grundform, weil ParZu "Herrn" nicht auf "Herr" zurueckfuehrt.
+    # Die Titel selbst bleiben markierbar und werden neutralisiert -- gesperrt wird nur der Name.
+    TITLES = ("Herr", "Herrn", "Herren", "Frau", "Frauen",
+              "Doktor", "Doktorin", "Professor", "Professorin",
+              "Pfarrer", "Pfarrerin", "Pastor", "Pastorin", "Bischof", "Bischöfin", "Kardinal",
+              "Kommissar", "Kommissarin", "Hauptkommissar", "Hauptkommissarin",
+              "Inspektor", "Inspektorin", "General", "Hauptmann",
+              "Minister", "Ministerin", "Präsident", "Präsidentin",
+              "Kanzler", "Kanzlerin", "Bundeskanzler", "Bundeskanzlerin",
+              "Senator", "Senatorin", "Gouverneur", "Gouverneurin",
+              "Botschafter", "Botschafterin", "Direktor", "Direktorin",
+              "Trainer", "Trainerin", "Kollege", "Kollegin",
+              "Graf", "Gräfin", "Baron", "Baronin", "Fürst", "Fürstin", "Prinz", "Prinzessin")
 
     def is_surname_after_title(self, pos:int) -> bool:
         word_parse = self.parse_list[pos]
@@ -751,7 +763,14 @@ class Marking_Tool:
         for _ in range(4):
             if current[7] != "app" or not current[6].isdigit() or int(current[6]) == 0:
                 return False
-            current = self.parse_list[int(current[6])-1]
+            head_index = int(current[6]) - 1
+            # Eine durch ein Komma abgetrennte Apposition ist keine Titelanrede, sondern eine
+            # eigene Kennzeichnung: In "Eine Frau, Bauer von Beruf, kam." ist "Bauer" ein Beruf
+            # und soll zu "Bauere" werden.
+            erst, zuletzt = sorted((int(current[0]) - 1, head_index))
+            if any(other[3] == "$," for other in self.parse_list[erst+1:zuletzt]):
+                return False
+            current = self.parse_list[head_index]
             if current[1] in Marking_Tool.TITLES or current[2] in Marking_Tool.TITLES:
                 return True
         return False
