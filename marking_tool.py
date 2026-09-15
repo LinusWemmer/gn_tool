@@ -748,11 +748,10 @@ class Marking_Tool:
         head = self.parse_list[int(first_noun[6])-1]
         return head[3] == "V" and "Pl" in head[5]
 
-    # Ein Nachname nach "Herr" oder "Frau" ist ein Name, auch wenn er zugleich ein gewoehnliches
-    # Wort ist: "Herr Richter" ist keine richtende Person. ParZu haengt ihn als Apposition an die
-    # Anrede -- bei "Herr Doktor Richter" ueber den Titel hinweg, deshalb wird die Kette
-    # hochgelaufen. Ohne diese Pruefung wurde aus "Herr Müller kennt Frau Richter nicht." ein
-    # "Person Müllere kennt Person Richterne nicht."
+    # Ein Nachname nach einer Anrede, einem Titel oder einem Vornamen ist ein Name, auch wenn er
+    # zugleich ein gewoehnliches Wort ist: "Herr Richter" ist keine richtende Person und "Kurt
+    # Schumacher" kein Schuhmacher. ParZu haengt ihn als Apposition an das vorangehende Wort --
+    # bei "Herr Doktor Richter" ueber den Titel hinweg, deshalb wird die Kette hochgelaufen.
     # Woerter, nach denen ein folgender Nachname als Name zu lesen ist: die Anredeformen und
     # Titel, die unmittelbar vor einem Nachnamen stehen ("Doktor Richter", "Kommissarin Bauer").
     # Geprueft werden Wortform und Grundform, weil ParZu "Herrn" nicht auf "Herr" zurueckfuehrt.
@@ -777,7 +776,17 @@ class Marking_Tool:
               # ("Onkel Fischer", "Schwester Bauer").
               "Schwester", "Bruder", "Onkel", "Tante", "Opa", "Oma")
 
-    def is_surname_after_title(self, pos:int) -> bool:
+    # Ein Wort, an dem eine Apposition haengt und das selbst schon einen Namen bezeichnet: eine
+    # Anrede, ein Titel oder ein Vorname. personennamen.txt fuehrt nur Namen, die nicht zugleich
+    # gewoehnliche Woerter sind, taugt hier also als Probe "das ist ein Name".
+    def heads_a_name(self, word_parse) -> bool:
+        if word_parse[1] in Marking_Tool.TITLES or word_parse[2] in Marking_Tool.TITLES:
+            return True
+        form = word_parse[1] if word_parse[1] in (word_parse[2], word_parse[2] + "s") else None
+        return (word_parse[2] in Lexicon.PERSON_NAMES or form in Lexicon.PERSON_NAMES
+                or word_parse[2] in Lexicon.PROPER_NAMES)
+
+    def is_surname_after_name_or_title(self, pos:int) -> bool:
         word_parse = self.parse_list[pos]
         if not (word_parse[1] in Lexicon.SURNAMES or word_parse[2] in Lexicon.SURNAMES
                 or word_parse[1] in Lexicon.PERSON_NAMES or word_parse[2] in Lexicon.PERSON_NAMES):
@@ -794,7 +803,7 @@ class Marking_Tool:
             if any(other[3] == "$," for other in self.parse_list[erst+1:zuletzt]):
                 return False
             current = self.parse_list[head_index]
-            if current[1] in Marking_Tool.TITLES or current[2] in Marking_Tool.TITLES:
+            if self.heads_a_name(current):
                 return True
         return False
 
@@ -1461,7 +1470,7 @@ class Marking_Tool:
                 # Hängt ein grossgeschriebenes Adjektiv als Genitivattribut ("gmod") an einem Nomen,
                 # ist es ebenfalls substantiviert ("das Buch meiner Lieben"); ein attributives
                 # Adjektiv trägt dort "attr".
-                elif (word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod"))) and not self.is_surname_after_title(pos):
+                elif (word_parse[3] == "N" or self.is_name_epithet(pos) or (word_parse[3] == "ADJA" and Lexicon.starts_uppercase(word_parse[1]) and (not self.parse_list[int(word_parse[6])-1][3] == "N" or word_parse[7] == "gmod"))) and not self.is_surname_after_name_or_title(pos):
                     # Ein grossgeschriebenes Adjektiv ohne Nomen darüber ist substantiviert. ParZu
                     # gibt es aber nicht immer als Nomen aus -- "liebe Kim" wird beim Reparse zu
                     # einem Nomen, "liebe Juli" wegen des Monatsnamens nicht. Die Zeile wird deshalb

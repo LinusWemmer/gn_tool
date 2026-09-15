@@ -639,6 +639,14 @@ class Lexicon:
         print("word_parse:", word_parse)
         noun = word_parse[2]
 
+        # Neben der Grundform wird an mehreren Stellen die Wortform gegen Namenslisten geprüft,
+        # weil ParZu Namen gelegentlich falsch lemmatisiert. Ein Eigenname wird aber nicht
+        # gebeugt -- ausser im Genitiv auf "-s". Weicht die Wortform sonst von der Grundform ab,
+        # ist sie eine Beugung und taugt nicht als Beleg: "Sinne", "Grade", "Männer", "Wahlen"
+        # und "Ecken" sind zwar alle Nachnamen, in einem Satz aber weit häufiger Beugungsformen
+        # von "Sinn", "Grad", "Mann", "Wahl" und "Ecke".
+        name_form = word_parse[1] if word_parse[1] in (noun, noun + "s") else None
+
         # search_lonely_adjectives schreibt allein stehende Adjektive vor dem Reparse gross, damit
         # ParZu sie als substantiviert erkennt. Steht die Wortform gross, die Realisierung aus dem
         # Eingabetext aber klein, ist die Grossschreibung künstlich: Das Wort ist ein Adjektiv und
@@ -659,7 +667,7 @@ class Lexicon:
             for j, line in enumerate(Lexicon.MALE_NOUNS):
                 if noun.lower().endswith(line.lower()):
                     prenoun = noun[:-len(line)]
-                    if len(prenoun) != 1 and not (prenoun.endswith("c") and line.lower().startswith("h")) and not (len(prenoun) != 0 and (line == "Tor" or line == "Rat" or line == "Ire" or line == "Ahn" or line == "Erbe" or line == "Same" or line == "Ober" or line == "Elfe")) and not (prenoun.endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
+                    if len(prenoun) != 1 and not (prenoun.endswith("c") and line.lower().startswith("h")) and not (len(prenoun) != 0 and (line == "Tor" or line == "Rat" or line == "Ire" or line == "Ahn" or line == "Erbe" or line == "Same" or line == "Ober" or line == "Elfe" or line == "Graf")) and not (prenoun.endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
                         prefix, list = Lexicon.check_composite_noun(prenoun,False)
                         original = word_parse[1][-len(line)-noun_suffix_length:]
                         capitalized = noun[-len(line)].isupper()
@@ -758,7 +766,7 @@ class Lexicon:
         match = re.search(person_pattern, noun.lower())
         # Namen wie "Hermann" oder "Pellmann" enden zwar auf "-mann", sind aber keine
         # Komposita mit einer Personenbezeichnung.
-        if noun in Lexicon.NAMES_IN_MANN or word_parse[1] in Lexicon.NAMES_IN_MANN:
+        if noun in Lexicon.NAMES_IN_MANN or name_form in Lexicon.NAMES_IN_MANN:
             match = None
         if match:
             match_position = match.start()
@@ -914,12 +922,13 @@ class Lexicon:
         # Länder-, Gewässer- und Organisationsnamen. Namen aus AMBIGUOUS_NAMES sind zugleich
         # gebräuchliche Substantive und zählen nur mit einem Anrede-Adjektiv.
         # Abkürzungen wie "DDR" oder "USA" bezeichnen keine Personen und bleiben unmarkiert.
-        if noun in Lexicon.MASCULINE_NAMES or word_parse[1] in Lexicon.MASCULINE_NAMES:
+        # Aus "im engeren Sinne" wurde ohne die Prüfung von name_form "in derm engeren Sinn".
+        if noun in Lexicon.MASCULINE_NAMES or name_form in Lexicon.MASCULINE_NAMES:
             is_name = has_masculine_modifier
-        elif noun in Lexicon.AMBIGUOUS_NAMES or word_parse[1] in Lexicon.AMBIGUOUS_NAMES:
+        elif noun in Lexicon.AMBIGUOUS_NAMES or name_form in Lexicon.AMBIGUOUS_NAMES:
             is_name = has_person_adjective
         else:
-            is_name = ((noun in Lexicon.PERSON_NAMES or word_parse[1] in Lexicon.PERSON_NAMES
+            is_name = ((noun in Lexicon.PERSON_NAMES or name_form in Lexicon.PERSON_NAMES
                         or noun in Lexicon.PROPER_NAMES)
                        and (has_article or has_adjective)
                        and noun.lower() not in Lexicon.NO_PERSON_NAMES)

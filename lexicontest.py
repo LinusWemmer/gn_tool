@@ -453,6 +453,22 @@ class Sentence_Test(unittest.TestCase):
         # "Meister" und "Bürgermeister" stehen zwar in der Liste, doch ParZu liest sie nie als
         # Apposition; der Nachname bleibt dort vorerst ungeschützt.
         test_sentences.append(("Meister Richter arbeitet.","Meistey Richtere arbeitet."))
+        # Ein Nachname nach einem Vornamen ist ein Name, auch wenn er ein gewöhnliches Wort ist.
+        test_sentences.append(("1949 wurde Kurt Schumacher ausgeschlossen.","1949 wurde Kurt Schumacher ausgeschlossen."))
+        test_sentences.append(("Annegret Kramp-Karrenbauer wurde vereidigt.","Annegret Kramp-Karrenbauer wurde vereidigt."))
+        test_sentences.append(("Thomas Mann schrieb Romane.","Thomas Mann schrieb Romane."))
+        test_sentences.append(("Der Schumacher arbeitet.","De Schumachere arbeitet."))
+        # Eine Beugungsform, die zufällig auch ein Nachname ist, bleibt ein gewöhnliches Wort:
+        # "Sinne", "Grade", "Männer", "Wahlen" und "Ecken" stehen alle in der Namensliste.
+        test_sentences.append(("Das ist im engeren Sinne richtig.","Das ist im engeren Sinne richtig."))
+        test_sentences.append(("Die akademischen Grade werden verliehen.","Die akademischen Grade werden verliehen."))
+        test_sentences.append(("Die Wahl der deutschen Männer war frei.","Die Wahl der deutschen Leute war frei."))
+        test_sentences.append(("Die Männer kamen.","Die Leute kamen."))
+        test_sentences.append(("Der bekannte Hermann kam.","De bekannte Hermann kam."))
+        # "Graf" zählt nur ohne Vorderglied; die Komposita stehen einzeln in der Wortliste.
+        test_sentences.append(("Er änderte den Abtreibungsparagrafen.","En änderte den Abtreibungsparagrafen."))
+        test_sentences.append(("Der Landgraf kam.","De Landgrafe kam."))
+        test_sentences.append(("Der Fotograf kam.","De Fotografe kam."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))
@@ -913,7 +929,8 @@ class Sentence_Test(unittest.TestCase):
 def neutralize_all(text: str, select=None) -> str:
     """select entscheidet je (Satznummer, Position), ob das Kästchen ausgewählt wird.
     Ohne Angabe wird alles ausgewählt -- wie /translate_directly."""
-    input_text = hack_for_ordinal_numbers(text)
+    # Wie in /parse: fuehrender Leerraum und weiche Trennzeichen fallen vor dem Parsen weg.
+    input_text = hack_for_ordinal_numbers(text.lstrip().replace("\u00ad", ""))
     parse = get_parse(remove_special_character_gendering(split_prepositions(input_text)))
     modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse, input_text)
     if change:
