@@ -825,23 +825,32 @@ class Lexicon:
                         list.append([match_position, original, original, "", "neutral", capitalized])
                         return True, prefix, list
                 
-            for j, subadj in enumerate(Lexicon.SUBST_ADJ):
-                subadj = "(" + subadj + ")(r|n)?$"
-                match = re.search(subadj.lower(), noun.lower())
-                if match:
-                    # Im Genitiv und Dativ trägt ein substantiviertes Adjektiv immer eine Endung
-                    # ("der Jugendlichen", "meiner Verlobten"). Steht dort die blosse Grundform,
-                    # handelt es sich um ein gewöhnliches Substantiv ("aus Liebe").
-                    if len(feats) > 1 and feats[1] in ("Gen", "Dat") and word_parse[1].lower().endswith(match.group(1).lower()):
-                        continue
-                    match_position = match.start()
-                    prenoun = noun[:match_position]
-                    if len(prenoun) != 1 and not (prenoun.endswith("c") and noun[match_position:].lower().startswith("h")):
-                        prefix, list = Lexicon.check_composite_noun(prenoun,False)
-                        original = word_parse[1][match_position:]
-                        capitalized = noun[match_position].isupper()
-                        list.append([match_position, original, match.group(1).capitalize(), "", "substantivized adjective", capitalized])
-                        return True, prefix, list
+            # Ein substantiviertes Adjektiv im Neutrum bezeichnet keine Person ("das Gute",
+            # "fürs Erste") und braucht daher nie markiert zu werden. Im Genitiv und Dativ, wo
+            # Maskulinum und Neutrum formal zusammenfallen, lässt ParZu das Genus offen und meldet
+            # gar kein "Neut"; die kuratierte Liste bleibt dort also zuständig.
+            # Wo ParZu fälschlich "Neut" meldet -- etwa weil es ein Relativpronomen als Artikel
+            # liest ("ein Geschenk, das Zweiterer schon besaß") --, verrät die Endung den Irrtum:
+            # Im Neutrum endet die Form auf "-e" ("das Gute") oder "-es" ("ein Gutes"), nie auf
+            # "-er", "-en" oder "-em".
+            if not (feats[0] == "Neut" and noun.lower().endswith(("e", "es"))):
+                for j, subadj in enumerate(Lexicon.SUBST_ADJ):
+                    subadj = "(" + subadj + ")(r|n)?$"
+                    match = re.search(subadj.lower(), noun.lower())
+                    if match:
+                        # Im Genitiv und Dativ trägt ein substantiviertes Adjektiv immer eine Endung
+                        # ("der Jugendlichen", "meiner Verlobten"). Steht dort die blosse Grundform,
+                        # handelt es sich um ein gewöhnliches Substantiv ("aus Liebe").
+                        if len(feats) > 1 and feats[1] in ("Gen", "Dat") and word_parse[1].lower().endswith(match.group(1).lower()):
+                            continue
+                        match_position = match.start()
+                        prenoun = noun[:match_position]
+                        if len(prenoun) != 1 and not (prenoun.endswith("c") and noun[match_position:].lower().startswith("h")):
+                            prefix, list = Lexicon.check_composite_noun(prenoun,False)
+                            original = word_parse[1][match_position:]
+                            capitalized = noun[match_position].isupper()
+                            list.append([match_position, original, match.group(1).capitalize(), "", "substantivized adjective", capitalized])
+                            return True, prefix, list
             
             # Über die kuratierte Liste hinaus zählt jedes Adjektiv als substantiviert, sofern
             # ParZu ein eindeutiges Genus liefert: Ein neutrum substantiviertes Adjektiv bezeichnet

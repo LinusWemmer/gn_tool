@@ -749,6 +749,30 @@ class Sentence_Test(unittest.TestCase):
         # Der Wechsel auf lila haengt daran, dass das Label unmittelbar auf sein Kaestchen folgt.
         self.assertRegex(form, r'<input type="checkbox"[^>]*>\s*<label ')
 
+    # Ein substantiviertes Adjektiv im Neutrum bezeichnet keine Person ("das Gute", "fürs Erste")
+    # und braucht daher kein Kästchen. Die kuratierte Liste in substantivierte_adjektive.txt prüfte
+    # als einzige Stelle das Genus nicht.
+    def test_neuter_substantivized_adjective_is_not_markable(self):
+        def markierbar(text):
+            parse = get_parse(remove_special_character_gendering(split_prepositions(text)))
+            marking_tool = Marking_Tool(parse[0], {}, [])
+            Marking_Tool.find_realizations(marking_tool, text)
+            return re.findall(r'<span class="markable">([^<]*)</span>',
+                              marking_tool.get_marking_form(0))
+        for text, wort in [("Fürs Erste gebe ich auf.", "Erste"),
+                           ("Das Erste kommt noch.", "Erste"),
+                           ("Das Neue gefällt mir.", "Neue"),
+                           ("Das Betroffene kam.", "Betroffene"),
+                           ("Das Verwandte kam.", "Verwandte")]:
+            self.assertNotIn(wort, markierbar(text), f"\"{wort}\" ist im Neutrum markierbar")
+        # Maskulinum und Femininum bleiben markierbar, ebenso Genitiv und Dativ, wo ParZu das
+        # Genus offen lässt.
+        for text, wort in [("Der Betroffene kam.", "Betroffene"),
+                           ("Die Betroffene kam.", "Betroffene"),
+                           ("Ich half dem Betroffenen.", "Betroffenen"),
+                           ("Das Buch des Jugendlichen ist da.", "Jugendlichen")]:
+            self.assertIn(wort, markierbar(text), f"\"{wort}\" ist nicht mehr markierbar")
+
     def test_neuter_relative_pronoun_is_not_markable(self):
         # "was" bezeichnet keine Person. ParZu bindet es hier an keine Nominalphrase an, wodurch
         # es in den Zweig für freistehende Relativpronomen fiel -- der prüfte das Genus nicht.
