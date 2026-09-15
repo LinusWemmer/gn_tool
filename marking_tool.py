@@ -209,6 +209,21 @@ class Marking_Tool:
     # offen; weil "von" zugleich in DATIVE_PREPOSITIONS steht, unterblieb die Kasus-Ergaenzung
     # ersatzlos und der Dativ ging verloren: "Das Buch von der Tochter" wurde zu "von das Kind",
     # "von der Lehrerin" zu "von de Lehrere" statt "von derm Lehrere".
+    # Woerter, die einen Teilungsgenitiv regieren. Was von ihnen abhaengt, ist eine Teilmenge und
+    # steht damit im Plural: "13 Prozent der Waehlenden", "die Haelfte der Studierenden", "einer
+    # der Waehlenden". Gefuehrt werden die Grundformen; bei den Pronomen liefert ParZu "eine",
+    # "keine", "jede" und so fort.
+    PARTITIVE_HEADS = (
+        # Mengen- und Bruchteilsangaben
+        "Prozent", "Hälfte", "Drittel", "Viertel", "Fünftel", "Sechstel", "Siebtel", "Achtel",
+        "Neuntel", "Zehntel", "Hundertstel", "Dutzend",
+        # Anteils- und Anzahlangaben
+        "Mehrheit", "Minderheit", "Mehrzahl", "Vielzahl", "Anzahl", "Großteil", "Löwenanteil",
+        # Pronomen
+        "eine", "keine", "jede", "viele", "manche", "einige", "mehrere", "beide", "wenige",
+        "alle", "meiste",
+    )
+
     DATIVE_ONLY_PREPOSITIONS = ("von", "bei", "aus", "mit", "nach", "seit", "zu",
                                 "außer", "gegenüber", "entgegen", "gemäß")
 
@@ -521,6 +536,18 @@ class Marking_Tool:
             else:
                 self.parse_list[pos][-2] = neuter_word
 
+    # Haengt das Substantiv an position als Genitivattribut an einer Mengenangabe? Dann ist es
+    # ein Teilungsgenitiv und steht im Plural.
+    def has_partitive_head(self, position:int) -> bool:
+        word_parse = self.parse_list[position]
+        if word_parse[7] != "gmod" or not word_parse[6].isdigit() or int(word_parse[6]) == 0:
+            return False
+        head = self.parse_list[int(word_parse[6]) - 1]
+        # Auch eine blosse Zahl regiert einen Teilungsgenitiv: "zwei der Waehlenden".
+        if head[3] == "CARD":
+            return True
+        return head[2] in Marking_Tool.PARTITIVE_HEADS or head[1] in Marking_Tool.PARTITIVE_HEADS
+
     # Der Index des Bezugsworts, wenn das Substantiv an position eine Apposition zu einem anderen
     # Substantiv ist -- sonst None.
     def apposition_head(self, position:int):
@@ -577,6 +604,13 @@ class Marking_Tool:
                 and len(self.parse_list[self.apposition_head(pos)][5].split("|")) > 2
                 and self.parse_list[self.apposition_head(pos)][5].split("|")[2] in ("Sg", "Pl")):
             feats[2] = self.parse_list[self.apposition_head(pos)][5].split("|")[2]
+        # Ein Teilungsgenitiv steht im Plural: "13 Prozent der Wählenden", "die Hälfte der
+        # Studierenden", "einer der Wählenden". ParZu lässt den Numerus substantivierter Adjektive
+        # offen, und die Schätzung unten fiel dort auf ihre Voreinstellung Singular zurück
+        # ("ders Wählenden"). Die Prüfung steht vor jener Schätzung, aber hinter den
+        # morphologischen Regeln darüber, die aus der Wortform selbst ablesbar sind.
+        elif self.has_partitive_head(pos):
+            feats[2] = "Pl"
         else:
             print("Else case of determining number for noun without number")
             article = False

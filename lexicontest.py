@@ -504,6 +504,16 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Stiefmutter kam.","De Stiefelter kam."))
         # Ein Bindestrich-Name, dessen erster Teil ein Gebietsname ist, meint immer das Gebiet.
         test_sentences.append(("Der Landesverband in Sachsen-Anhalt wächst.","Der Landesverband in Sachsen-Anhalt wächst."))
+        # Ein Teilungsgenitiv steht im Plural und ist damit nicht markierbar. ParZu lässt den
+        # Numerus substantivierter Adjektive offen; die Schätzung riet dort sonst auf Singular.
+        test_sentences.append(("Nur für 13 Prozent der AfD-Wählenden war der Kandidat ausschlaggebend.","Nur für 13 Prozent der AfD-Wählenden war de Kandidate ausschlaggebend."))
+        test_sentences.append(("Die Hälfte der Studierenden kam.","Die Hälfte der Studierenden kam."))
+        test_sentences.append(("Die Mehrheit der Wählenden entschied sich anders.","Die Mehrheit der Wählenden entschied sich anders."))
+        test_sentences.append(("Viele der Studierenden kamen.","Viele der Studierenden kamen."))
+        test_sentences.append(("Zwei der Wählenden sprachen.","Zwei der Wählenden sprachen."))
+        # Ohne Mengenangabe bleibt die Nominalphrase mehrdeutig und damit markierbar -- die
+        # Entscheidung trifft dann die lesende Person.
+        test_sentences.append(("Die Stimmen der Wählenden zählen.","Die Stimmen ders Wählenden zählen."))
         # Ein Adjektiv ohne eigenen Determinierer ist in einer Reihung blosses Attribut und darf
         # nicht als substantiviert gelten; frueher wurde das letzte Glied grossgeschrieben.
         test_sentences.append(("Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen.","Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen."))
