@@ -504,6 +504,17 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Stiefmutter kam.","De Stiefelter kam."))
         # Ein Bindestrich-Name, dessen erster Teil ein Gebietsname ist, meint immer das Gebiet.
         test_sentences.append(("Der Landesverband in Sachsen-Anhalt wächst.","Der Landesverband in Sachsen-Anhalt wächst."))
+        # Im Genitiv lautet der Artikel im Maskulinum und Neutrum "des"; "der" bleibt dem Femininum
+        # Singular und dem Plural. Bei einem substantivierten Adjektiv ist der Plural gemeint, und
+        # der ist nicht markierbar -- ParZu lässt den Numerus dort offen, und die Schätzung riet
+        # vorher auf Singular ("ders Wählenden").
+        test_sentences.append(("Die Stimmen der Wählenden zählen.","Die Stimmen der Wählenden zählen."))
+        test_sentences.append(("Nur für 13 Prozent der AfD-Wählenden war der Kandidat ausschlaggebend.","Nur für 13 Prozent der AfD-Wählenden war de Kandidate ausschlaggebend."))
+        test_sentences.append(("Das Buch der Studierenden ist da.","Das Buch der Studierenden ist da."))
+        # Der Genitiv Singular mit "des" bleibt markierbar.
+        test_sentences.append(("Das Buch des Wählenden ist da.","Das Buch ders Wählenden ist da."))
+        # Wo ParZu den Numerus selbst liefert, aendert sich nichts.
+        test_sentences.append(("Die Stimmen der Wähler zählen.","Die Stimmen der Wählerne zählen."))
         # Ein Adjektiv ohne eigenen Determinierer ist in einer Reihung blosses Attribut und darf
         # nicht als substantiviert gelten; frueher wurde das letzte Glied grossgeschrieben.
         test_sentences.append(("Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen.","Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen."))

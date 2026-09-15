@@ -604,6 +604,17 @@ class Marking_Tool:
                 elif (self.parse_list[article_position][1].endswith("e")
                       and self.parse_list[pos][1] == self.parse_list[pos][2] + "n"):
                     feats[2] = "Pl"
+                # Im Genitiv lautet der bestimmte Artikel im Maskulinum und Neutrum "des"; "der"
+                # bleibt dem Femininum Singular und dem Plural. Endet die Wortform auf die
+                # Grundform plus "n", scheidet das Femininum Singular meist aus, denn dort stünde
+                # die blosse Grundform ("der Straße", "der Kundin") -- also Plural. Bei einem
+                # substantivierten Adjektiv sind beide Lesarten formgleich ("der Wählenden"), aber
+                # der Plural ist die häufigere und zugleich die sichere: Er ist nicht markierbar,
+                # sodass im Zweifel nichts geändert wird statt etwas Falsches.
+                elif (feats[1] == "Gen"
+                      and self.parse_list[article_position][1].lower() == "der"
+                      and self.parse_list[pos][1] == self.parse_list[pos][2] + "n"):
+                    feats[2] = "Pl"
                 # Ansonsten ist ein Substantiv mit Artikel und einem nicht erkannten Numerus im Singular.
                 else:
                     feats[2] = "Sg"
