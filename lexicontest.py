@@ -469,6 +469,11 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Er änderte den Abtreibungsparagrafen.","En änderte den Abtreibungsparagrafen."))
         test_sentences.append(("Der Landgraf kam.","De Landgrafe kam."))
         test_sentences.append(("Der Fotograf kam.","De Fotografe kam."))
+        # Ein Adjektiv ohne eigenen Determinierer ist in einer Reihung blosses Attribut und darf
+        # nicht als substantiviert gelten; frueher wurde das letzte Glied grossgeschrieben.
+        test_sentences.append(("Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen.","Es kam zu häufigen, teilweise gewaltsamen Auseinandersetzungen."))
+        test_sentences.append(("Die Vertretung ihrer wirtschaftlichen, sozialen und kulturellen Interessen ist wichtig.","Die Vertretung enser wirtschaftlichen, sozialen und kulturellen Interessen ist wichtig."))
+        test_sentences.append(("Sie sind für die Vermittlung der fachtheoretischen und fachpraktischen sowie der allgemeinbildenden Lerninhalte verantwortlich.","Sie sind für die Vermittlung der fachtheoretischen und fachpraktischen sowie der allgemeinbildenden Lerninhalte verantwortlich."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))

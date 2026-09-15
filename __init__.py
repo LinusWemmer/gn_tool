@@ -137,10 +137,25 @@ def mistagged_verb(parse_list, word_number) -> bool:
     following = parse_list[word_number + 1] if word_number + 1 < len(parse_list) else None
     return following is None or following[3] not in ("N", "ADJA")
 
-def lonely_adjective(parse: list, sentence_number: int, word_number: int):
+# Ein Adjektiv mit eigenem Determinierer bildet eine eigene Nominalphrase, in der das Substantiv
+# weggelassen ist ("die echte Alternative und die einzige"); fuer sie gelten die beiden Pruefungen
+# unten. Ohne eigenen Determinierer ist ein Adjektiv in einer Reihung dagegen blosses Attribut
+# dessen, woran die Reihung haengt -- unmittelbar an einem anderen Adjektiv ("zu häufigen,
+# teilweise gewaltsamen Auseinandersetzungen") oder ueber eine Konjunktion ("wirtschaftlichen,
+# sozialen und kulturellen Interessen"). Dort wird die Kette hochgelaufen. Ohne diese
+# Unterscheidung galt das letzte Glied einer Reihe als einsam, wurde grossgeschrieben, als
+# substantiviert gelesen und zu "gewaltsamerm".
+def lonely_adjective(parse: list, sentence_number: int, word_number: int, depth: int = 0):
     parse_list = parse[sentence_number]
     word = parse_list[word_number]
     print("determining status of adjective:", word)
+    head = int(word[6]) if word[6].isdigit() else 0
+    own_determiner = any(other[6] == word[0]
+                         and (other[3] == "ART" or other[4] in ("PPOSAT", "PIDAT", "PDAT"))
+                         for other in parse_list)
+    if (not own_determiner and head != 0 and depth < 6 and head - 1 != word_number
+            and parse_list[head-1][3] in ("ADJA", "KON")):
+        return lonely_adjective(parse, sentence_number, head - 1, depth + 1)
     if int(word[6]) == 0 or not parse_list[int(word[6])-1][3] in ["N", "KON"]:
         print("adjective is lonely, case 1")
         return True
