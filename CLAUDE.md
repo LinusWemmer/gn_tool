@@ -83,6 +83,11 @@ selecting every checkbox automatically.
    with the count in `sentence_number`.
 5. **Neutralizing** — `/mark` rebuilds the `Marking_Tool`s from the session and calls
    `neutralize_nounphrase` for each checked box, then joins the result with `get_sentence`.
+   The rebuild passes `parse_list`, `nounphrases`, `nounlist` **and `noun_pair_spans`** back into
+   the constructor; anything else the marking phase computed is lost. `noun_pair_spans` holds, per
+   double naming, the positions that its checkbox swallows (conjunction, second article, second
+   noun). They are emptied out of the output only in `absorb_noun_pair`, i.e. when the box is
+   actually selected — doing it earlier made unselected double namings lose their second half.
 
 ### The parse_list row convention (important)
 
