@@ -768,7 +768,11 @@ class Marking_Tool:
               "Botschafter", "Botschafterin", "Direktor", "Direktorin",
               "Trainer", "Trainerin", "Kollege", "Kollegin",
               "Graf", "Gräfin", "Baron", "Baronin", "Fürst", "Fürstin", "Prinz", "Prinzessin",
-              "Richter", "Richterin", "Kapitän", "Kapitänin",
+              "Richter", "Richterin", "Kapitän", "Kapitänin", "Oberst",
+              # "Meister" und "Bürgermeister" liest ParZu nie als Apposition -- die beiden
+              # Eintraege bleiben derzeit wirkungslos. Sie stehen hier, weil die femininen Formen
+              # danebenstehen und die Regel greifen soll, sobald ein Parse sie hergibt.
+              "Meister", "Meisterin", "Bürgermeister", "Bürgermeisterin",
               # Verwandtschafts- und Ordensbezeichnungen, die ebenso vor einem Nachnamen stehen
               # ("Onkel Fischer", "Schwester Bauer").
               "Schwester", "Bruder", "Onkel", "Tante", "Opa", "Oma")

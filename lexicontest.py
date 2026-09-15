@@ -448,6 +448,11 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Opa Richter schläft.","Owa Richter schläft."))
         test_sentences.append(("Richter Bauer urteilt.","Richtere Bauer urteilt."))
         test_sentences.append(("Kapitän Koch segelt.","Kapitäne Koch segelt."))
+        test_sentences.append(("Meisterin Bauer arbeitet.","Meistere Bauer arbeitet."))
+        test_sentences.append(("Gestern kam Oberst Richter.","Gestern kam Oberste Richter."))
+        # "Meister" und "Bürgermeister" stehen zwar in der Liste, doch ParZu liest sie nie als
+        # Apposition; der Nachname bleibt dort vorerst ungeschützt.
+        test_sentences.append(("Meister Richter arbeitet.","Meistey Richtere arbeitet."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))
