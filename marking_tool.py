@@ -521,6 +521,15 @@ class Marking_Tool:
             else:
                 self.parse_list[pos][-2] = neuter_word
 
+    # Der Index des Bezugsworts, wenn das Substantiv an position eine Apposition zu einem anderen
+    # Substantiv ist -- sonst None.
+    def apposition_head(self, position:int):
+        word_parse = self.parse_list[position]
+        if word_parse[7] != "app" or not word_parse[6].isdigit() or int(word_parse[6]) == 0:
+            return None
+        head_index = int(word_parse[6]) - 1
+        return head_index if self.parse_list[head_index][3] == "N" else None
+
     # Numerus des zweiten Substantivs einer schon zusammengezogenen Doppelnennung, sofern an pos
     # deren erstes Substantiv steht. Erkennbar ist die Zusammenziehung daran, dass die Konjunktion
     # im Ausgabetext bereits geleert wurde.
@@ -562,6 +571,12 @@ class Marking_Tool:
         # (Überprüfe dabei auch, ob das Substantiv vorher als Teil einer Doppelnennung erkannt wurde, also der Output der Konjunktion auf "" gesetzt wurde.)
         elif self.paired_noun_number(pos) is not None:
             feats[2] = self.paired_noun_number(pos)
+        # Eine Apposition teilt den Numerus mit ihrem Bezugswort. Ohne diese Regel riet die
+        # Schaetzung unten bei "Ein Herr, Richter von Beruf, kam." auf den Plural ("Richterne").
+        elif (self.apposition_head(pos) is not None
+                and len(self.parse_list[self.apposition_head(pos)][5].split("|")) > 2
+                and self.parse_list[self.apposition_head(pos)][5].split("|")[2] in ("Sg", "Pl")):
+            feats[2] = self.parse_list[self.apposition_head(pos)][5].split("|")[2]
         else:
             print("Else case of determining number for noun without number")
             article = False
@@ -752,7 +767,11 @@ class Marking_Tool:
               "Senator", "Senatorin", "Gouverneur", "Gouverneurin",
               "Botschafter", "Botschafterin", "Direktor", "Direktorin",
               "Trainer", "Trainerin", "Kollege", "Kollegin",
-              "Graf", "Gräfin", "Baron", "Baronin", "Fürst", "Fürstin", "Prinz", "Prinzessin")
+              "Graf", "Gräfin", "Baron", "Baronin", "Fürst", "Fürstin", "Prinz", "Prinzessin",
+              "Richter", "Richterin", "Kapitän", "Kapitänin",
+              # Verwandtschafts- und Ordensbezeichnungen, die ebenso vor einem Nachnamen stehen
+              # ("Onkel Fischer", "Schwester Bauer").
+              "Schwester", "Bruder", "Onkel", "Tante", "Opa", "Oma")
 
     def is_surname_after_title(self, pos:int) -> bool:
         word_parse = self.parse_list[pos]
@@ -1475,6 +1494,16 @@ class Marking_Tool:
                     feats = self.parse_list[pos][5].split("|")
                     if len(feats) == 1:
                         feats = ["_","_","_"]
+                    # ParZu uebertraegt bei einer Apposition das Genus des Bezugsworts: In "Eine
+                    # Frau, Bauer von Beruf, kam." erscheint "Bauer" als Femininum. Ueber das Wort
+                    # selbst sagt das nichts. Bliebe das Genus stehen, wuerde "Bauer" nicht
+                    # gefunden, denn die maskuline Wortliste wird nur bei "Masc" oder unbekanntem
+                    # Genus durchsucht. Die feminine Liste wird ohnehin immer durchsucht, sodass
+                    # ein echtes Femininum nichts verliert.
+                    apposition_head = self.apposition_head(pos)
+                    if (apposition_head is not None
+                            and feats[0] == self.parse_list[apposition_head][5].split("|")[0]):
+                        feats[0] = "_"
                     if feats[2] == "_":
                         self.determine_number(pos,feats)
                     # The following hack is needed, because ParZu often misinterprets "Pole" as "Pol":

@@ -433,7 +433,21 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Trainer Koch gewann.","Trainere Koch gewann."))
         test_sentences.append(("Die Herren Richter und Weber kamen.","Die Leute Richter und Webere kamen."))
         # Eine durch ein Komma abgetrennte Apposition ist keine Titelanrede, sondern ein Beruf.
-        test_sentences.append(("Ein Herr, Richter von Beruf, kam.","Eine Person, Richterne von Beruf, kam."))
+        # Numerus und Genus kommen dabei vom Bezugswort, sagen über das Wort selbst aber nichts:
+        # ParZu liess den Numerus von "Richter" offen (die Schätzung riet auf "Richterne") und
+        # übertrug auf "Bauer" das Femininum von "Frau" (womit es die maskuline Wortliste verfehlte).
+        test_sentences.append(("Ein Herr, Richter von Beruf, kam.","Eine Person, Richtere von Beruf, kam."))
+        test_sentences.append(("Ein Mann, Richter von Beruf, kam.","Eine Person, Richtere von Beruf, kam."))
+        test_sentences.append(("Eine Frau, Bauer von Beruf, kam.","Eine Person, Bauere von Beruf, kam."))
+        # Echte feminine Appositionen bleiben unberührt.
+        test_sentences.append(("Die Ärztin, meine Nachbarin, kam.","De Arzte, mein Nachbare, kam."))
+        test_sentences.append(("Die Chefin, eine Lehrerin, kam.","De Chefe, ein Lehrere, kam."))
+        # Weitere Titel, nach denen ein Nachname ein Name bleibt.
+        test_sentences.append(("Onkel Fischer kam.","Tonke Fischer kam."))
+        test_sentences.append(("Schwester Bauer pflegt sie.","Geschwister Bauer pflegt en."))
+        test_sentences.append(("Opa Richter schläft.","Owa Richter schläft."))
+        test_sentences.append(("Richter Bauer urteilt.","Richtere Bauer urteilt."))
+        test_sentences.append(("Kapitän Koch segelt.","Kapitäne Koch segelt."))
         # Zusammengezogen wird nur, wenn beide Nennungen dieselben Attribute tragen.
         test_sentences.append(("Der alte kluge Lehrer oder die alte kluge Lehrerin kommt.","De alte kluge Lehrere kommt."))
         test_sentences.append(("Der gute Lehrer oder die schlechte Lehrerin kommt gleich.","De gute Lehrere oder de schlechte Lehrere kommt gleich."))
