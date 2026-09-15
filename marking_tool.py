@@ -17,7 +17,7 @@ class Marking_Tool:
     # der Arbeitsprozess der App über Anfragen hinweg lebt, sogar über Anfragen hinweg.
     # Übergebene Objekte werden weiterhin per Referenz gehalten -- die Wiederherstellung aus der
     # Session gibt Objekte herein, die die Instanz anschliessend verändert.
-    def __init__(self, parse_list, nounphrases = None, nounlist = None):
+    def __init__(self, parse_list, nounphrases = None, nounlist = None, noun_pair_spans = None):
     
         # List of the conll parse strings split into a list 
         # The format of the list is as follows (conll format):
@@ -30,6 +30,11 @@ class Marking_Tool:
         # Indizes der Substantive, die ein Kästchen bekommen haben. nounlist taugt dafür nicht:
         # Dort landet für jedes Substantiv ein "prefix"-Eintrag, auch für nicht markierbare.
         self.marked_nouns = []
+        # Zu jeder Doppelnennung die Positionen, die in ihrem Kästchen aufgehen: die Konjunktion,
+        # ein etwaiger zweiter Artikel und das zweite Substantiv. Schlüssel ist die 1-basierte
+        # Position des ersten Substantivs. Diese Wörter dürfen erst dann aus dem Ausgabetext
+        # verschwinden, wenn das Kästchen auch ausgewählt wurde.
+        self.noun_pair_spans = {} if noun_pair_spans is None else noun_pair_spans
         self.repair_pronominal_articles()
         self.repair_detached_articles()
         self.repair_detached_possessives()
@@ -470,10 +475,10 @@ class Marking_Tool:
     def paired_noun_number(self, pos:int):
         if pos + 1 >= len(self.parse_list):
             return None
+        if pos + 1 not in self.noun_pair_spans:
+            return None
         conjunction = self.parse_list[pos+1]
         if conjunction[1] not in ("und", "oder", "/", "bzw.", "bzw", "+"):
-            return None
-        if conjunction[-2] != "" or conjunction[-1] != "":
             return None
         second = self.second_noun_position(pos+1)
         if second is None or self.parse_list[second][3] != "N":
@@ -730,9 +735,26 @@ class Marking_Tool:
 
 
     # This function neutralizes the word that has been selected. Then, all dependent words in the sentence are neutralized.
+    # Lässt die Wörter verschwinden, die im Kästchen einer Doppelnennung aufgegangen sind. Das
+    # geschieht erst hier und nicht schon beim Erzeugen des Formulars: Sonst fehlten sie auch dann
+    # im Ausgabetext, wenn der Benutzer das Kästchen gar nicht ausgewählt hat -- aus "Die
+    # Bürgerinnen und Bürger stimmen ab." wurde so "Die Bürgerinnen stimmen ab."
+    def absorb_noun_pair(self, pos:int):
+        span = self.noun_pair_spans.get(pos+1)
+        if not span:
+            return
+        self.parse_list[pos][-1] = ""
+        for other in span:
+            self.parse_list[other][-2] = ""
+            # Der Leerraum hinter dem letzten Wort trennt die Doppelnennung vom Rest des Satzes
+            # und muss im Ausgabetext stehenbleiben.
+            if other != span[-1]:
+                self.parse_list[other][-1] = ""
+
     def neutralize_nounphrase(self, pos:int, selected_components):
         print("about to neutralize nounphrase")
         print(self.parse_list[pos])
+        self.absorb_noun_pair(pos)
         # Fehlt der Kasus, wird er aus der Dependenzrelation ergänzt. Das muss vor der
         # Neutralisierung geschehen, damit sowohl der Kopf als auch die abhängigen Wörter ihn
         # kennen: "meiner Lieben" ist ein Dativ und ergibt "meinerm Lieben", nicht "meinerm Liebe".
@@ -1212,13 +1234,7 @@ class Marking_Tool:
                 marked_text += escape(self.parse_list[end][-2])
                 input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{'<span class="markable">' + marked_text + '</span>'}</label></div>{escape(self.parse_list[end][-1])}"""
                 nouns += input_form
-                self.parse_list[pos][-1] = ""
-                for other in range(pos+1, end+1):
-                    self.parse_list[other][-2] = ""
-                    # Der Leerraum hinter dem letzten Wort der Doppelnennung trennt sie vom Rest
-                    # des Satzes und muss im Ausgabetext stehenbleiben.
-                    if other != end:
-                        self.parse_list[other][-1] = ""
+                self.noun_pair_spans[int(word_parse[0])] = list(range(pos+1, end+1))
                 prefix = noun_pair_prefixes[pos]
                 if prefix == "":
                     is_capitalized = True
@@ -1451,26 +1467,26 @@ class Marking_Tool:
                         if (other_word_parse[6] == word_parse[0] and other_word_parse[4] == "ART"
                                 and other_word_parse[5].startswith("Def")):
                             has_definite_article = True
-                    head_identified, prefix, list = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier,is_epithet,has_definite_article,inferred_gender)
-                    print(list)
-                    if list == []:
+                    head_identified, prefix, components = Lexicon.check_noun(word_parse,feats,has_article,has_possessive,has_adjective,has_person_adjective,has_masculine_modifier,is_epithet,has_definite_article,inferred_gender)
+                    print(components)
+                    if components == []:
                         nouns += escape(word_parse[-2])
                         nouns += escape(word_parse[-1])
-                    elif len(list) == 1 and list[0][3] == "":
+                    elif len(components) == 1 and components[0][3] == "":
                         input_form = f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{1}" name="{sentence_number}|{word_parse[0]}|{1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{1}">{'<span class="markable">' + escape(word_parse[-2]) + '</span>'}</label></div>{escape(word_parse[-1])}"""
                         nouns += input_form
                     else:
-                        input_form = Marking_Tool.create_input_form(self, sentence_number, word_parse, list)
+                        input_form = Marking_Tool.create_input_form(self, sentence_number, word_parse, components)
                         nouns += escape(prefix) + input_form + escape(word_parse[-1])
-                    if list != []:
+                    if components != []:
                         self.marked_nouns.append(int(word_parse[0]))
-                    for i in range(len(list)):
-                        list[i].insert(0, int(word_parse[0]))
-                        list[i].append(False)
-                    if list != []:
-                        list[-1][-1] = head_identified
-                    list.insert(0, [int(word_parse[0]), 0, "", "", prefix, "prefix", False, False])
-                    self.nounlist.extend(list)
+                    for i in range(len(components)):
+                        components[i].insert(0, int(word_parse[0]))
+                        components[i].append(False)
+                    if components != []:
+                        components[-1][-1] = head_identified
+                    components.insert(0, [int(word_parse[0]), 0, "", "", prefix, "prefix", False, False])
+                    self.nounlist.extend(components)
                 # Case: Pronoun
                 elif word_parse[3] == "PRO" and (word_parse[5][0] == "3" or (word_parse[4] == "PPER" and word_parse[5][0] == "_" and word_parse[2] != "du") or word_parse[4] == "PIS" or word_parse[4] == "PDS") and not word_parse[4] == "PRF" and ("Neut" not in word_parse[5])  and ("Pl" not in word_parse[5]) and not word_parse[2] == "viel" and not word_parse[2] == "viele" and not word_parse[2] == "mehr" and not word_parse[2] == "wenig" and not word_parse[2] == "wenige" and not word_parse[2] == "alle" and not word_parse[2] == "etwas" and not word_parse[2] == "was" and not word_parse[2] == "sowas" and not word_parse[2] == "nichts" and not word_parse[1].startswith("das") and not word_parse[1] == "d." and not word_parse[1] == "s" and not (word_parse[1] == "Sie" and not word_parse[0] == "1") and not word_parse[2] == "einige" and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not (word_parse[1] == "anderem" and self.parse_list[pos-1][2] == "unter") and not word_parse[2] == "a."  and not (word_parse[2].startswith("andere") and self.parse_list[pos-1][2] == "alle") and not self.plural_by_verb(pos): # The last three cases are there to avoid the second part of "alles andere", "unter anderem" and "u. a." from being markable.
                     print("found pronoun:",word_parse)
@@ -1544,13 +1560,13 @@ class Marking_Tool:
         return nouns
     
     # Generates the html form for a single (possibly compund) noun, with checkboxes next to the components.
-    def create_input_form(self, sentence_number, word_parse, list):
-        print("list")
-        print(list)
+    def create_input_form(self, sentence_number, word_parse, components):
+        print("components")
+        print(components)
         input_form = ""
-        for i in range(len(list)):
-            input_form += f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{i+1}" name="{sentence_number}|{word_parse[0]}|{i+1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{i+1}">{'<span class="markable">' + escape(list[i][1]) + '</span>'}</label></div>{escape(list[i][3])}"""
-            if i == len(list)-1 and list[i][3] == "":
+        for i in range(len(components)):
+            input_form += f"""<div class="checkbox-container"><input type="checkbox" id="{sentence_number}|{word_parse[0]}|{i+1}" name="{sentence_number}|{word_parse[0]}|{i+1}" value="select"><label for="{sentence_number}|{word_parse[0]}|{i+1}">{'<span class="markable">' + escape(components[i][1]) + '</span>'}</label></div>{escape(components[i][3])}"""
+            if i == len(components)-1 and components[i][3] == "":
                 input_form += escape(word_parse[-1])
         return input_form
 

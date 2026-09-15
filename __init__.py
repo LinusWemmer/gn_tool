@@ -498,7 +498,9 @@ def neutralize_marked(selected_nouns={}):
             nounphrases = marking_tool_dict["nounphrases"]
             nounlist = marking_tool_dict["nounlist"]
             nounphrases = {int(k):v for k,v in nounphrases.items()}
-            marking_tool = Marking_Tool(parse_list, nounphrases, nounlist)
+            # Die Session macht aus den Schlüsseln Zeichenketten.
+            noun_pair_spans = {int(k):v for k,v in marking_tool_dict.get("noun_pair_spans", {}).items()}
+            marking_tool = Marking_Tool(parse_list, nounphrases, nounlist, noun_pair_spans)
             marking_tool_list.append(marking_tool)
         # Die Wortformen vor der Neutralisierung festhalten, damit im Ausgabetext hervorgehoben
         # werden kann, was sich geändert hat. Die Realisierung eines Wortes steht in row[-2] und

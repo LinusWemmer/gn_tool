@@ -723,6 +723,28 @@ class Sentence_Test(unittest.TestCase):
     # betroffene Schwächen ("Bürgermeister" wird zerlegt). Geprüft wird deshalb nur die Stelle,
     # um die es geht: ParZu macht "Soldaten" zum Dativobjekt von "sein", woraus der Dativ Plural
     # "Soldaternen" wurde.
+    # Die Wörter, die im Kästchen einer Doppelnennung aufgehen, wurden früher schon beim Erzeugen
+    # des Formulars aus dem Ausgabetext entfernt. Wählte der Benutzer das Kästchen nicht aus, fehlte
+    # die halbe Doppelnennung: "Die Bürgerinnen und Bürger stimmen ab." wurde zu "Die Bürgerinnen
+    # stimmen ab."
+    def test_unselected_double_naming_stays_complete(self):
+        for sentence in ["Die Bürgerinnen und Bürger stimmen ab.",
+                         "Der Lehrer oder die Lehrerin ist da.",
+                         "Der Sohn oder die Tochter kommt.",
+                         "Der Kaufmann oder die Kauffrau kommt.",
+                         "Liebe Kolleginnen und Kollegen!"]:
+            self.assertEqual(neutralize_all(sentence, select=lambda *_: False), sentence,
+                             "Ohne Auswahl muss der Text unverändert bleiben")
+
+    def test_double_naming_survives_partial_selection(self):
+        # Nur das zweite Kästchen ("Lehrer") auswählen; die Doppelnennung davor bleibt stehen.
+        text = "Die Bürgerinnen und Bürger trafen den Lehrer."
+        self.assertEqual(neutralize_all(text, select=lambda satz, pos: pos > 3),
+                         "Die Bürgerinnen und Bürger trafen de Lehrere.")
+        # Nur die Doppelnennung auswählen; "den Lehrer" bleibt stehen.
+        self.assertEqual(neutralize_all(text, select=lambda satz, pos: pos <= 3),
+                         "Die Bürgerne trafen den Lehrer.")
+
     def test_predicate_after_sein_is_nominative(self):
         text = ("Damals waren es Soldaten aus den USA, Italien, Polen und Ungarn, die zwischen "
                 "den Fronten standen, als gewalttätige Hooligans, aufgepeitscht auch von lokalen "
@@ -772,7 +794,9 @@ class Sentence_Test(unittest.TestCase):
 # Übersetzt einen Text vollständig, so wie es /translate_directly tut: markieren, alle Kästchen
 # auswählen, neutralisieren. Anders als die Satzpaar-Schleife oben verarbeitet die Funktion auch
 # mehrsätzige Eingaben und gibt nur den Ausgabetext zurück.
-def neutralize_all(text: str) -> str:
+def neutralize_all(text: str, select=None) -> str:
+    """select entscheidet je (Satznummer, Position), ob das Kästchen ausgewählt wird.
+    Ohne Angabe wird alles ausgewählt -- wie /translate_directly."""
     input_text = hack_for_ordinal_numbers(text)
     parse = get_parse(remove_special_character_gendering(split_prepositions(input_text)))
     modified_text, capitalized_words, glauben, change = search_lonely_adjectives(parse, input_text)
@@ -796,6 +820,8 @@ def neutralize_all(text: str) -> str:
     done = set()
     for sentence_number, position, _ in selected:
         if (sentence_number, position) in done:
+            continue
+        if select is not None and not select(sentence_number, position):
             continue
         done.add((sentence_number, position))
         components = [c for s, p, c in selected if s == sentence_number and p == position]
