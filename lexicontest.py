@@ -448,6 +448,11 @@ class Sentence_Test(unittest.TestCase):
         # bleibt die Zusammenziehung an einem typografischen Zeichen kleben und wird nicht zerlegt.
         test_sentences.append(("Er sprach ›vom Lehrer‹ gerne.","En sprach ›von derm Lehrere‹ gerne."))
         test_sentences.append(("‚Zur Lehrerin‘ sagte er.","‚Zurm Lehrere‘ sagte en."))
+        # Dasselbe gilt für die Nachschau auf das Wortende in
+        # remove_special_character_gendering: "»Kolleg(inn)en«" muss wie "Kolleg(inn)en " erkannt
+        # werden.
+        test_sentences.append(("Er grüßte ‚Kolleg(inn)en‘ herzlich.","En grüßte ‚Kollegerne‘ herzlich."))
+        test_sentences.append(("Er grüßte die Kolleg(inn)en herzlich.","En grüßte die Kollegerne herzlich."))
         # Der Ersatztext von hack_for_ordinal_numbers darf nicht in die Ausgabe gelangen.
         test_sentences.append(("Am 1. 2. 2020 kam der Lehrer.","Am 1. 2. 2020 kam de Lehrere."))
         test_sentences.append(("Der 43. und der 44. Präsident kamen.","Der 43. und de 44. Präsidente kamen."))
@@ -636,6 +641,16 @@ class Sentence_Test(unittest.TestCase):
 
     # Bei ungrammatischer Eingabe lässt ParZu den Kasus offen. Der Zugriff auf die Paradigmen
     # lieferte dann None, und die Übersetzung brach ab, statt einen Nominativ anzunehmen.
+    # "Lehrer*e" wird zu "Lehrere" normalisiert; ohne ein passendes Muster in find_realizations
+    # liess sich das Wort nicht mehr auf den Eingabetext zurueckfuehren und die Anfrage brach ab.
+    def test_star_before_final_e_does_not_crash(self):
+        for sentence in ["Er grüßte die Lehrer*e herzlich.",
+                         "Er grüßte »Lehrer*e« herzlich.",
+                         "Er sprach mit der Lehrer:e darüber.",
+                         "Er sah eine*r und ging."]:
+            self.assertEqual(neutralize_all(sentence, select=lambda *_: False), sentence,
+                             "Der Eingabetext muss unveraendert wieder herauskommen")
+
     def test_ungrammatical_input_does_not_crash(self):
         for text in ("Sie ist ein dumme Frau.",
                      "Er ist ein dumme Mann.",

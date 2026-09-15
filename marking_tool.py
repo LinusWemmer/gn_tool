@@ -1677,7 +1677,12 @@ class Marking_Tool:
             elif re.match(re.compile(r"[mdks]?einer$", re.IGNORECASE),word[1]):
                 pattern = r"([mdks]?)eine(r[*_:/][ms]|[ms][*_:/]r|r[*_:/]\1eine[ms]|r)|([mdks]?)eine[ms][*_:/]\3einer"
             elif word[1].endswith("e"):
-                pattern = re.escape(word[1]) + "([*_:/][rn]|\([rn]\))?(?=($|" + Marking_Tool.WORD_DELIMITERS + "))|" + re.escape(word[1][:-1]) + "\(e\)(?=($|" + Marking_Tool.WORD_DELIMITERS + "))"
+                # "[*_:/]?" vor dem letzten "e": remove_special_character_gendering macht aus
+                # "Lehrer*e" ein "Lehrere", und ohne diese Stelle liess sich das Wort nicht mehr
+                # auf den Eingabetext zurueckfuehren -- die Funktion brach mit einer Ausnahme ab.
+                pattern = (re.escape(word[1][:-1]) + "[*_:/]?e"
+                           + "([*_:/][rn]|\([rn]\))?(?=($|" + Marking_Tool.WORD_DELIMITERS + "))|"
+                           + re.escape(word[1][:-1]) + "\(e\)(?=($|" + Marking_Tool.WORD_DELIMITERS + "))")
             elif word[1].endswith("er"):
                 pattern = re.escape(word[1]) + "([*_:/][ms])?(?=($|" + Marking_Tool.WORD_DELIMITERS + "))|" + re.escape(word[1][:-1]) + "([ms])[*_:/]r(?=($|" + Marking_Tool.WORD_DELIMITERS + "))"
             # elif re.match(r"(.*[a-zA-ZäöüßÄÖÜẞ])in(.*)" , word[1]):

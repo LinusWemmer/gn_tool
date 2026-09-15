@@ -269,13 +269,18 @@ def split_prepositions(input_text: str) ->str:
             output += word
     return output
 
+# Wortende: Textende oder ein Trennzeichen. Dieselbe Klasse wie in Marking_Tool.find_realizations
+# und in split_prepositions -- fehlten hier die typografischen Zeichen, wurde "»Lehrer*e«" nicht
+# als gegenderte Form erkannt, "Lehrer*e " dagegen schon.
+WORD_END = "(?=($|" + Marking_Tool.WORD_DELIMITERS + "))"
+
 # The following function removes forms of gendering involving special characters, such as "Lehrer*innen" and "er/sie".
 # They are replaced by the corresponding female form, e.g. "Lehrerinnen" and "sie".
 def remove_special_character_gendering(input_text: str) ->str:
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})[*_:/]in", r"\1in", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})/-in", r"\1in", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(in\)", r"\1in", input_text)
-    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(inn\)(?=en($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"\1inn", input_text)
+    input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(inn\)(?=en($|" + Marking_Tool.WORD_DELIMITERS + "))", r"\1inn", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ]{3})\(innen\)", r"\1innen", input_text)
     input_text = re.sub(r"er[/*_:]sie", "sie", input_text)
     input_text = re.sub(r"sie[/*_:]er", "sie", input_text)
@@ -320,15 +325,15 @@ def remove_special_character_gendering(input_text: str) ->str:
     input_text = re.sub(re.compile(ein_start + r"iner[/*_:]\1[eE]ine[sm]" + ein_end, re.IGNORECASE), r"\1\2iner", input_text)
     input_text = re.sub(re.compile(ein_start + r"in(er|en)?[/*_:]\1[eE]ine" + ein_end, re.IGNORECASE), r"\1\2ine", input_text)
     input_text = re.sub(re.compile(ein_start + r"ine[/*_:]\1[eE]in(er|en)?" + ein_end, re.IGNORECASE), r"\1\2ine", input_text)
-    input_text = re.sub(r"[*_:/]e(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"e[*_:/][rn](?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"er[*_:/]s(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"es[*_:/]r(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"er[*_:/]m(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"em[*_:/]r(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"er", input_text)
-    input_text = re.sub(r"\(e\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"e\(r\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
-    input_text = re.sub(r"e\(n\)(?=($|[\s.,!?;:‑„“'’\"(){}<>|\[\]+/*_]))", r"e", input_text)
+    input_text = re.sub(r"[*_:/]e" + WORD_END, r"e", input_text)
+    input_text = re.sub(r"e[*_:/][rn]" + WORD_END, r"e", input_text)
+    input_text = re.sub(r"er[*_:/]s" + WORD_END, r"er", input_text)
+    input_text = re.sub(r"es[*_:/]r" + WORD_END, r"er", input_text)
+    input_text = re.sub(r"er[*_:/]m" + WORD_END, r"er", input_text)
+    input_text = re.sub(r"em[*_:/]r" + WORD_END, r"er", input_text)
+    input_text = re.sub(r"\(e\)" + WORD_END, r"e", input_text)
+    input_text = re.sub(r"e\(r\)" + WORD_END, r"e", input_text)
+    input_text = re.sub(r"e\(n\)" + WORD_END, r"e", input_text)
     input_text = re.sub(r"[sS]eine?[rsmn]?[/*_:]([iI]hre?[rsmn]?)", r"\1", input_text)
     input_text = re.sub(r"([iI]hr)e?[rsmn]?[/*_:][sS]ein(e?[rsmn]?)", r"\1\2", input_text)
     input_text = re.sub(r"([a-zA-ZäöüßÄÖÜẞ])In", r"\1in", input_text)
