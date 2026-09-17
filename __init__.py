@@ -5,6 +5,7 @@ from flask_session import Session
 
 import parzu_class as parzu
 from html import escape
+import copy
 import re
 import sys
 import os
@@ -526,7 +527,13 @@ def neutralize_marked(selected_nouns={}):
         marking_tool_list = []
         neutralized_text = ""
         for i in range(sentence_number):
-            marking_tool_dict = session[f"markingtool{i}"]
+            # Der Zustand aus der Session wird kopiert, bevor er angefasst wird. Die
+            # Neutralisierung schreibt in parse_list, und flask-session legt die Sitzung am Ende
+            # jeder Anfrage wieder in Redis ab -- die Änderung überlebte damit den Aufruf. Ein
+            # zweiter Klick auf "Ausgewählte Wörter geschlechtsneutral machen" arbeitete dann auf
+            # dem bereits neutralisierten Text: Die Hervorhebung blieb aus, weil sich nichts mehr
+            # änderte, und eine abgewählte Neutralisierung liess sich nicht zurücknehmen.
+            marking_tool_dict = copy.deepcopy(session[f"markingtool{i}"])
             parse_list = marking_tool_dict["parse_list"]
             nounphrases = marking_tool_dict["nounphrases"]
             nounlist = marking_tool_dict["nounlist"]

@@ -8,6 +8,7 @@ from __init__ import remove_special_character_gendering
 from __init__ import search_lonely_adjectives
 from __init__ import hack_for_ordinal_numbers
 from __init__ import undo_hack_for_ordinal_numbers
+from __init__ import app as flask_app
 
 
 class Sentence_Test(unittest.TestCase):
@@ -869,6 +870,31 @@ class Sentence_Test(unittest.TestCase):
     # Eine Leerzeile trennt Abschnitte und damit auch Saetze. ParZu sieht das nicht: Fehlt am Ende
     # einer Ueberschrift der Punkt, zog es sie mit dem folgenden Absatz zu einem Satz zusammen.
     # "Eine" blieb darin als unangebundener Artikel haengen und wurde zu "Einey".
+    # /mark baute die Marking_Tools aus der Session auf und neutralisierte darin; flask-session
+    # legte die veraenderte Sitzung am Ende der Anfrage wieder in Redis ab. Ein zweiter Klick auf
+    # "Ausgewaehlte Woerter geschlechtsneutral machen" arbeitete deshalb auf dem schon
+    # neutralisierten Text: Die Hervorhebung blieb aus, und eine abgewaehlte Neutralisierung liess
+    # sich nicht zuruecknehmen.
+    def test_marking_can_be_repeated_and_undone(self):
+        def ausgabe(antwort):
+            treffer = re.search(r'<p class="output">(.*?)</p>',
+                                antwort.get_data(as_text=True), re.S)
+            return treffer.group(1).strip() if treffer else ""
+        beide = {"0|2|1": "select", "0|5|1": "select"}
+        with flask_app.test_client() as client:
+            client.post("/parse", data={"inputText": "Der Lehrer traf die Ärztin."})
+            erste = ausgabe(client.post("/mark", data=beide))
+            nur_eins = ausgabe(client.post("/mark", data={"0|2|1": "select"}))
+            ohne = ausgabe(client.post("/mark", data={}))
+            wieder = ausgabe(client.post("/mark", data=beide))
+        self.assertIn('<span class="changed">', erste, "Beim ersten Mal fehlt die Hervorhebung")
+        self.assertIn('<span class="changed">', nur_eins,
+                      "Beim zweiten Mal fehlt die Hervorhebung")
+        self.assertNotIn("Arzte", nur_eins, "Die abgewaehlte Neutralisierung steht noch")
+        self.assertEqual(re.sub(r"<[^>]+>", "", ohne), "Der Lehrer traf die Ärztin.",
+                         "Ohne Auswahl muss wieder der Eingabetext erscheinen")
+        self.assertEqual(erste, wieder, "Dieselbe Auswahl muss dasselbe Ergebnis liefern")
+
     def test_blank_line_separates_sentences(self):
         text = ("Eine Analyse von Holger Schwesinger \n"
                 "\n"

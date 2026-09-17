@@ -88,6 +88,10 @@ selecting every checkbox automatically.
    with the count in `sentence_number`.
 5. **Neutralizing** — `/mark` rebuilds the `Marking_Tool`s from the session and calls
    `neutralize_nounphrase` for each checked box, then joins the result with `get_sentence`.
+   It **deep-copies** the session entry first: neutralizing writes into `parse_list`, and
+   flask-session stores the session back into Redis at the end of every request, so the change
+   outlived the call. A second click on "Ausgewählte Wörter geschlechtsneutral machen" then worked
+   on the already neutralized text — no highlighting, and a deselected word could not be restored.
    The rebuild passes `parse_list`, `nounphrases`, `nounlist` **and `noun_pair_spans`** back into
    the constructor; anything else the marking phase computed is lost. `noun_pair_spans` holds, per
    double naming, the positions that its checkbox swallows (conjunction, second article, second
