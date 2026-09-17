@@ -546,6 +546,9 @@ class Sentence_Test(unittest.TestCase):
         # Person, "der Patron" schon.
         test_sentences.append(("Die Patrone war leer.","Die Patrone war leer."))
         test_sentences.append(("Der Patron half.","De Patrone half."))
+        # "Jugendwarte" stand als Grundform in den Wortlisten, richtig ist "Jugendwart".
+        test_sentences.append(("Der Jugendwart kam.","De Jugendwarte kam."))
+        test_sentences.append(("Die Jugendwartin kam.","De Jugendwarte kam."))
         # Ein Teilungsgenitiv steht im Plural und ist damit nicht markierbar. ParZu lässt den
         # Numerus substantivierter Adjektive offen; die Schätzung riet dort sonst auf Singular.
         test_sentences.append(("Nur für 13 Prozent der AfD-Wählenden war der Kandidat ausschlaggebend.","Nur für 13 Prozent der AfD-Wählenden war de Kandidate ausschlaggebend."))
