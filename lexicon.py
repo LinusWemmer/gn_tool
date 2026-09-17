@@ -269,6 +269,16 @@ class Lexicon:
         "Rat",
     }
 
+    # Woerter, deren Ende eine Personenbezeichnung ist, die aber keine Person bezeichnen. Anders
+    # als bei NEVER_PERSON_NOUNS wird am Wortende verglichen, damit Zusammensetzungen mitabgedeckt
+    # sind ("Tiefausläufer" ueber "ausläufer").
+    # Warum hier eine Sperrliste und nicht umgekehrt eine Liste der erlaubten Komposita: Bei
+    # "-läufer" ist die Personenklasse die offene -- jede Sportart bildet neue ("Hindernisläufer",
+    # "Staffelläufer") --, waehrend die Nicht-Personen abzaehlbar sind. Bei "-kunde" laege es
+    # umgekehrt, dort trennt aber schon das Genus ("die Erdkunde" gegen "der Kunde"), und bei
+    # "-zeuge" und "-bote" die Grundform ("Fahrzeuge" wird zu "Fahrzeug" lemmatisiert).
+    NO_PERSON_COMPOUNDS = ("ausläufer", "irrläufer", "küstenläufer", "freiläufer", "nachläufer")
+
     # Laender- und Landschaftsnamen, die zugleich der Plural einer Einwohnerbezeichnung sind.
     # Eine Person ist gemeint, wenn ein Artikel dabeisteht UND das Wort im Plural oder in einem
     # anderen Kasus als dem Nominativ steht: "die Sachsen kamen", "er half dem Sachsen". Im
@@ -700,6 +710,9 @@ class Lexicon:
 
         # Bezeichnungen, die nie eine Person meinen, bekommen kein Kaestchen.
         if noun in Lexicon.NEVER_PERSON_NOUNS or word_parse[1] in Lexicon.NEVER_PERSON_NOUNS:
+            return False, "", []
+        if (noun.lower().endswith(Lexicon.NO_PERSON_COMPOUNDS)
+                or word_parse[1].lower().endswith(Lexicon.NO_PERSON_COMPOUNDS)):
             return False, "", []
 
         # search_lonely_adjectives schreibt allein stehende Adjektive vor dem Reparse gross, damit

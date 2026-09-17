@@ -1149,7 +1149,7 @@ Initiantin
 Keltin
 Wegbereiterin
 Grundeigentümerin
-Ausläuferin
+%Ausläuferin
 Matchwinnerin
 Zerstörerin
 Baudezernentin

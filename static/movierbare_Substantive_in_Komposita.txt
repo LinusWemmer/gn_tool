@@ -1149,7 +1149,7 @@ Initianten
 Kelten
 Wegbereiter
 Grundeigentümer
-Ausläufer
+%Ausläufer
 Matchwinner
 Zerstörer
 Baudezernenten

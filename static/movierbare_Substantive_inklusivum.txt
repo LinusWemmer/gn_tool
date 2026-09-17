@@ -1149,7 +1149,7 @@ Initiante
 Keltere
 Wegbereitere
 Grundeigentümere
-Ausläufere
+%Ausläufere
 Matchwinnere
 Zerstörere
 Baudezernente

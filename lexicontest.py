@@ -516,6 +516,22 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Augenzeuge sagte aus.","De Augenzeugere sagte aus."))
         test_sentences.append(("Der Stammkunde kam.","De Stammkundere kam."))
         test_sentences.append(("Der Marathonläufer gewann.","De Marathonläufere gewann."))
+        # Bei "-läufer" ist die Personenklasse die offene, die Nicht-Personen sind abzählbar --
+        # deshalb eine Sperrliste (Lexicon.NO_PERSON_COMPOUNDS) statt einer Positivliste.
+        test_sentences.append(("Der Ausläufer brachte Regen.","Der Ausläufer brachte Regen."))
+        test_sentences.append(("Der Tiefausläufer zog weiter.","Der Tiefausläufer zog weiter."))
+        test_sentences.append(("Der Irrläufer landete falsch.","Der Irrläufer landete falsch."))
+        test_sentences.append(("Der Nachläufer folgte.","Der Nachläufer folgte."))
+        test_sentences.append(("Der Mitläufer schwieg.","De Mitläufere schwieg."))
+        # "-kunde" braucht keine Regel: Das Genus trennt die Lesarten.
+        test_sentences.append(("Die Urkunde lag vor.","Die Urkunde lag vor."))
+        test_sentences.append(("Die Altertumskunde ist ein Fach.","Die Altertumskunde ist ein Fach."))
+        test_sentences.append(("Der Kunde beschwerte sich.","De Kundere beschwerte sich."))
+        # "-zeuge" und "-bote" brauchen keine Regel: ParZu führt sie auf "Fahrzeug" und "Angebot"
+        # zurück, sodass die Endung gar nicht erst passt.
+        test_sentences.append(("Die Fahrzeuge standen dort.","Die Fahrzeuge standen dort."))
+        test_sentences.append(("Die Angebote waren gut.","Die Angebote waren gut."))
+        test_sentences.append(("Der Postbote kam.","De Postbotere kam."))
         # Ein Teilungsgenitiv steht im Plural und ist damit nicht markierbar. ParZu lässt den
         # Numerus substantivierter Adjektive offen; die Schätzung riet dort sonst auf Singular.
         test_sentences.append(("Nur für 13 Prozent der AfD-Wählenden war der Kandidat ausschlaggebend.","Nur für 13 Prozent der AfD-Wählenden war de Kandidate ausschlaggebend."))
