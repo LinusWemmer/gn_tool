@@ -36,16 +36,36 @@ You can run the program locally by running __init__.py. You should then find the
 Docker:
 ------
 
+Before building, make sure `external/` holds the two Zmorge files, because `install.sh` can no
+longer download them: the University of Zurich answers 403 for the directory and 404 for the files,
+and the old host `kitt.ifi.uzh.ch` does not resolve at all. Copy them in by hand:
+```console
+~$: mkdir -p external
+~$: cp /wherever/you/keep/zmorge-20150315-smor_newlemma.ca external/
+~$: cp /wherever/you/keep/hdt_ab.zmorge-20140521-smor_newlemma.model external/
+```
+`install.sh` skips the download when the files are already there, and aborts with a clear message
+when they are missing — do not ignore that, because an image built without them starts and then
+dies on every request with `Cannot open transducer file`.
+
 You can build the docker image by calling:
 ```console
-~$: sudo docker build -t docker_image .
+~$: docker build -t docker_image .
 ```
 
 To then run the image in a container, you can call:
 ```console
-~$: sudo docker run -p 80:80 -v /path/to/file/reports:/app/reports docker_image
+~$: docker run -p 80:80 -v /absolute/path/to/gn_tool/reports:/app/reports docker_image
 ```
+The `-v` argument needs an **absolute path to the reports directory** (not to `reports.txt`);
+a relative path is read as the name of a docker volume and rejected.
 You will then find the app running on http://localhost:80.
+
+If port 80 is already taken — a local Apache or nginx will hold it, and docker then reports
+`failed to bind host port 0.0.0.0:80/tcp: address already in use` — either stop that server or map
+the container to a free port instead, for example `-p 8080:80` and then http://localhost:8080.
+
+`sudo` is only needed when your user is not in the `docker` group.
 
 In order to transfer the docker image to a server, you need to pack it into a tar file and then copy to the server using scp:
 ```console

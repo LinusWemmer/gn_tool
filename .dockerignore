@@ -1,0 +1,11 @@
+# Ohne diese Liste wird der Build-Kontext gut 2 GB gross, obwohl davon fast nichts ins Image
+# gehoert -- allein reports/docker_image.tar ist 1,1 GB.
+# Nicht aufnehmen: external/ (der Zmorge-Transducer muss mit ins Image) und key_config.py
+# (haelt den SECRET_KEY, ohne den die App nicht startet).
+.git
+.gitignore
+reports/*.tar
+*.tar
+__pycache__/
+*.pyc
+.venv/

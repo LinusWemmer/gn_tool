@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir flask pexpect gunicorn Flask-Session redis
 
 RUN (bash install.sh)
 
-ENV EXECUTION_ENVIRONMENT docker
+ENV EXECUTION_ENVIRONMENT=docker
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
