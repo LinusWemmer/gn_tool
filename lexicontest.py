@@ -505,6 +505,17 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Stiefmutter kam.","De Stiefelter kam."))
         # Ein Bindestrich-Name, dessen erster Teil ein Gebietsname ist, meint immer das Gebiet.
         test_sentences.append(("Der Landesverband in Sachsen-Anhalt wächst.","Der Landesverband in Sachsen-Anhalt wächst."))
+        # Kurze Listeneinträge schlagen sonst mitten in gewöhnlichen Wörtern an. "Angel" war
+        # obendrein ein Fehleintrag -- die Personenbezeichnung lautet "Angler" -- und ist jetzt
+        # über die %-Konvention abgeschaltet.
+        test_sentences.append(("Der Benzinmangel führt zu Problemen.","Der Benzinmangel führt zu Problemen."))
+        test_sentences.append(("Die Wohnhäuser stehen leer.","Die Wohnhäuser stehen leer."))
+        test_sentences.append(("Der Zylinder war defekt.","Der Zylinder war defekt."))
+        test_sentences.append(("Die Bremsstrecke war zu kurz.","Die Bremsstrecke war zu kurz."))
+        # Die echten Personenbezeichnungen mit denselben Endungen bleiben markierbar.
+        test_sentences.append(("Der Augenzeuge sagte aus.","De Augenzeugere sagte aus."))
+        test_sentences.append(("Der Stammkunde kam.","De Stammkundere kam."))
+        test_sentences.append(("Der Marathonläufer gewann.","De Marathonläufere gewann."))
         # Ein Teilungsgenitiv steht im Plural und ist damit nicht markierbar. ParZu lässt den
         # Numerus substantivierter Adjektive offen; die Schätzung riet dort sonst auf Singular.
         test_sentences.append(("Nur für 13 Prozent der AfD-Wählenden war der Kandidat ausschlaggebend.","Nur für 13 Prozent der AfD-Wählenden war de Kandidate ausschlaggebend."))

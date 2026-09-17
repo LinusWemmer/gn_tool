@@ -551,7 +551,7 @@ Prophet
 %Obere
 Gemeindepräsident
 Legionär
-Angel
+%Angel
 Dekan
 %Taube
 %Rate

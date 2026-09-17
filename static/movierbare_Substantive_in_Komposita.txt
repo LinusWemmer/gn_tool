@@ -551,7 +551,7 @@ Propheten
 %Oberen
 Gemeindepräsidenten
 Legionären
-Angelen
+%Angelen
 Dekanen
 %Tauben
 %Raten

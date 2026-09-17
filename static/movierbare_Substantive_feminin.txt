@@ -551,7 +551,7 @@ Prophetin
 %Oberin
 Gemeindepräsidentin
 Legionärin
-Angelin
+%Angelin
 Dekanin
 %Taube (?)
 % Rate (?)

@@ -722,7 +722,8 @@ class Lexicon:
             for j, line in enumerate(Lexicon.MALE_NOUNS):
                 if noun.lower().endswith(line.lower()):
                     prenoun = noun[:-len(line)]
-                    if len(prenoun) != 1 and not (prenoun.endswith("c") and line.lower().startswith("h")) and not (len(prenoun) != 0 and (line == "Tor" or line == "Rat" or line == "Ire" or line == "Ahn" or line == "Erbe" or line == "Same" or line == "Ober" or line == "Elfe" or line == "Graf")) and not (prenoun.endswith("h") and line.lower().startswith("enkel")): # The last case is to avoid false positives with "Henkel" and "Schenkel"
+                    if len(prenoun) != 1 and not (prenoun.endswith("c") and line.lower().startswith("h")) and not (len(prenoun) != 0 and (line == "Tor" or line == "Rat" or line == "Ire" or line == "Ahn" or line == "Erbe" or line == "Same" or line == "Ober" or line == "Elfe" or line == "Graf"
+                                                       or line == "Inder" or line == "Recke")) and not (prenoun.endswith("h") and line.lower().startswith("enkel")) and not (prenoun.endswith("hä") and line == "User"): # The last case is to avoid false positives with "Henkel" and "Schenkel"
                         prefix, list = Lexicon.check_composite_noun(prenoun,False)
                         original = word_parse[1][-len(line)-noun_suffix_length:]
                         capitalized = noun[-len(line)].isupper()

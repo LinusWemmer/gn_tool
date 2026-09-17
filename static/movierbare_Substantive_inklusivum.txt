@@ -551,7 +551,7 @@ Prophete
 %Oberre
 Gemeindepräsidente
 Legionäre
-Angele
+%Angele
 Dekane
 %Taube (?)
 % Rate (?)
