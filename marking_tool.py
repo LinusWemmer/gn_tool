@@ -1580,6 +1580,20 @@ class Marking_Tool:
                     # means_place_not_people schon fest, dass nicht das Gebiet gemeint ist, die
                     # Grundform kann also gefahrlos gesetzt werden. Die beiden Sonderfaelle fuer
                     # "Pole" und "Ungarn", die hier frueher standen, gehen darin auf.
+                    # ParZu verfehlt bei einigen Woertern die Grundform. Bei schwachen
+                    # Maskulina auf "-e" schneidet es das "-e" ab und trifft dabei ein anderes,
+                    # echtes Wort: "Zeuge" wird zu "Zeug", "Bürge" zu "Burg", "Schütze" zu
+                    # "Schütz". Bei anderen haengt es umgekehrt ein "-e" an ("Handlanger" zu
+                    # "Handlange"). Die Wortliste findet das Wort dann nicht mehr -- "Der Zeuge
+                    # sagte aus." war gar nicht markierbar -- oder den falschen Eintrag, woraus
+                    # "De Handlange" wurde.
+                    # Steht die Wortform selbst in den Wortlisten, die Grundform aber nicht, ist
+                    # die Wortform die verlaesslichere Angabe. Stehen beide darin ("Ahne" und
+                    # "Ahn", "Patrone" und "Patron"), bleibt es bei ParZus Grundform.
+                    if (word_parse[1] != word_parse[2]
+                            and word_parse[1] in Lexicon.WORD_LIST_ENTRIES
+                            and word_parse[2] not in Lexicon.WORD_LIST_ENTRIES):
+                        word_parse[2] = word_parse[1]
                     correct_lemma = Lexicon.INHABITANT_LEMMAS.get(word_parse[1])
                     if correct_lemma:
                         word_parse[2] = correct_lemma

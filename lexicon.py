@@ -311,6 +311,11 @@ class Lexicon:
     # Wortlisten nicht verrutscht.
     KRANKENPFLEGE_INDEX = NEUTRAL_NOUNS.index("Krankenpflegere")
 
+    # Alle Grundformen der Wortlisten in einem Satz, um schnell pruefen zu koennen, ob ein Wort
+    # dort gefuehrt wird. Mit "%" abgeschaltete Zeilen bleiben draussen.
+    WORD_LIST_ENTRIES = {eintrag for eintrag in MALE_NOUNS + FEMALE_NOUNS
+                         if eintrag and not eintrag.startswith("%")}
+
     UMLAUTS = {"a": "ä", "o": "ö", "u": "ü"}
 
     # Substantive, die im Inklusivum-Plural keinen Umlaut bekommen, obwohl eine der beiden

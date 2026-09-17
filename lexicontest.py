@@ -532,6 +532,20 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Fahrzeuge standen dort.","Die Fahrzeuge standen dort."))
         test_sentences.append(("Die Angebote waren gut.","Die Angebote waren gut."))
         test_sentences.append(("Der Postbote kam.","De Postbotere kam."))
+        # ParZu verfehlt bei einigen Wörtern die Grundform: Bei schwachen Maskulina auf "-e"
+        # schneidet es das "-e" ab und trifft ein anderes echtes Wort ("Zeuge" -> "Zeug",
+        # "Bürge" -> "Burg"), bei anderen hängt es eines an ("Handlanger" -> "Handlange").
+        # Steht die Wortform selbst in den Wortlisten, die Grundform aber nicht, gilt die Wortform.
+        test_sentences.append(("Der Zeuge sagte aus.","De Zeugere sagte aus."))
+        test_sentences.append(("Der Bürge zahlte.","De Bürgere zahlte."))
+        test_sentences.append(("Der Schütze traf.","De Schützere traf."))
+        test_sentences.append(("Der Russe kam.","De Russere kam."))
+        test_sentences.append(("Der Handlanger schwieg.","De Handlangere schwieg."))
+        test_sentences.append(("Der Stifter spendete.","De Stiftere spendete."))
+        # Stehen beide in den Listen, bleibt es bei ParZus Grundform: "die Patrone" ist keine
+        # Person, "der Patron" schon.
+        test_sentences.append(("Die Patrone war leer.","Die Patrone war leer."))
+        test_sentences.append(("Der Patron half.","De Patrone half."))
         # Ein Teilungsgenitiv steht im Plural und ist damit nicht markierbar. ParZu lässt den
         # Numerus substantivierter Adjektive offen; die Schätzung riet dort sonst auf Singular.
         test_sentences.append(("Nur für 13 Prozent der AfD-Wählenden war der Kandidat ausschlaggebend.","Nur für 13 Prozent der AfD-Wählenden war de Kandidate ausschlaggebend."))
