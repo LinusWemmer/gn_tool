@@ -181,7 +181,7 @@ class Lexicon:
     NEOLOGISMS = [r"(Br(u|ü)der)|(Schwester)", r"(V(a|ä)ter)|(M(u|ü)tter)", r"O(p|m)a", r"Uro(p|m)a", r"Ururo(p|m)a", r"(Onkel)|(Tanten?)", r"Cousin(e|en)?|Vetter|Base", r"Jungfrau(en)?", r"Mädchen|Jung(e|en|s)", r"Neffen?|Nichten?", r"O(p|m)i", r"Uro(p|m)i", r"Ururo(p|m)i", r"(Mam|Pap)a", r"(Mam|Pap)i", r"Wasserm(a|ä)nn(er)?", r"Sohnem(a|ä)nn(er)?"]  
     NEOLOGISMS_NEUTRAL = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonke", "Couse", "Jungfere", "Kid", "Nifte", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist", "Sprössling"]
     NEOLOGISMS_PLURAL = ["Geschwister", "Eltern", "Owas", "Urowas", "Ururowas", "Tonken", "Cousen", "Jungferne", "Kids", "Niften", "Owis", "Urowis", "Ururowis", "Sasas", "Sasis", "Wassergeister", "Sprösslinge"]
-    NEOLOGISMS_COMPOUND = ["Geschwister", "Elter", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist", "Sprössling"]
+    NEOLOGISMS_COMPOUND = ["Geschwister", "Eltern", "Owa", "Urowa", "Ururowa", "Tonken", "Cousen", "Jungferne", "Kid", "Niften", "Owi", "Urowi", "Ururowi", "Sasa", "Sasi", "Wassergeist", "Sprössling"]
 
     # The next section generates List of Male/Female role nouns an their corresponding neutral forms
     # from the corresponding text files (also for substanivized adjectives, e.g. "Jugendliche")
@@ -269,15 +269,18 @@ class Lexicon:
         "Rat",
     }
 
-    # Woerter, deren Ende eine Personenbezeichnung ist, die aber keine Person bezeichnen. Anders
+    # Woerter, in denen eine Personenbezeichnung steckt, die aber keine Person bezeichnen. Anders
     # als bei NEVER_PERSON_NOUNS wird am Wortende verglichen, damit Zusammensetzungen mitabgedeckt
-    # sind ("Tiefausläufer" ueber "ausläufer").
+    # sind ("Tiefausläufer" ueber "ausläufer", "Notkaiserschnitt" ueber "kaiserschnitt").
     # Warum hier eine Sperrliste und nicht umgekehrt eine Liste der erlaubten Komposita: Bei
     # "-läufer" ist die Personenklasse die offene -- jede Sportart bildet neue ("Hindernisläufer",
     # "Staffelläufer") --, waehrend die Nicht-Personen abzaehlbar sind. Bei "-kunde" laege es
     # umgekehrt, dort trennt aber schon das Genus ("die Erdkunde" gegen "der Kunde"), und bei
     # "-zeuge" und "-bote" die Grundform ("Fahrzeuge" wird zu "Fahrzeug" lemmatisiert).
-    NO_PERSON_COMPOUNDS = ("ausläufer", "irrläufer", "küstenläufer", "freiläufer", "nachläufer")
+    # Bei "Kaiserschnitt" und "Kaiserschmarrn" steckt die Personenbezeichnung nicht im Grundwort,
+    # sondern im Bestimmungswort; markierbar war deshalb nur dieses ("Kaiserneschnitt").
+    NO_PERSON_COMPOUNDS = ("ausläufer", "irrläufer", "küstenläufer", "freiläufer", "nachläufer",
+                           "kaiserschnitt", "kaiserschmarrn")
 
     # Laender- und Landschaftsnamen, die zugleich der Plural einer Einwohnerbezeichnung sind.
     # Eine Person ist gemeint, wenn ein Artikel dabeisteht UND das Wort im Plural oder in einem
@@ -300,12 +303,6 @@ class Lexicon:
         "Hessen": "Hesse", "Bayern": "Bayer", "Pommern": "Pommer",
         "Pole": "Pole", "Polen": "Pole", "Ungarn": "Ungar",
     }
-
-    # Hinterglieder, bei denen die Vater/Mutter-Komponente als "Eltern" und nicht als "Elter"
-    # erscheint, weil das Deutsche dafuer bereits ein Wort mit "Eltern" kennt: "Mutterschutz"
-    # ergibt "Elternschutz". Bei den uebrigen Zusammensetzungen bleibt es bei "Elter"
-    # ("Vaterland" -> "Elterland", "Muttersprache" -> "Eltersprache").
-    ELTERN_COMPOUNDS = ("schutz",)
 
     # Zeilennummer von "Krankenpflegere"; sie wird berechnet, damit sie beim Bearbeiten der
     # Wortlisten nicht verrutscht.
@@ -1095,9 +1092,6 @@ class Lexicon:
                         if match_position != 1 and not (noun[:match_position].endswith("c") and found_neologism.lower().startswith("h")) and not (noun[j:].lower().startswith("ch") and found_neologism.endswith("s")) and not found_neologism.lower() in ("base", "opa", "oma", "opi", "omi"):
                             neutral_core = Lexicon.NEOLOGISMS_COMPOUND[i]
                             later_part = noun[j:]
-                            if (neutral_core == "Elter"
-                                    and later_part.lower() in Lexicon.ELTERN_COMPOUNDS):
-                                neutral_core = "Eltern"
                             if not noun[match_position].isupper():
                                 neutral_core = neutral_core.lower()
                             prefix, list = Lexicon.check_composite_noun(noun[:match_position],False)

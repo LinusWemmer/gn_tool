@@ -127,6 +127,11 @@ initialized at import. It holds the Inklusivum paradigms (`PRONOUNS`, `ARTIKEL_*
 `EIN_PARADIGM`), irregular/neologism tables (`Oma`/`Opa`→`Owa`, `Bruder`/`Schwester`→`Geschwister`,
 …), and the compound-noun analysis (`check_noun`, `check_composite_noun`, `make_neutralized_noun`).
 
+As a modifier, `Vater` and `Mutter` always become `Eltern-`, never `Elter-` (`Vaterland` →
+`Elternland`, `Muttersprache` → `Elternsprache`) — a team decision of 2026-09-19 that replaced the
+earlier `ELTERN_COMPOUNDS` exception list, under which only `Mutterschutz` → `Elternschutz` used the
+`-n` form. Standing alone the word is still `Elter` (`meiner Mutter` → `meinerm Elter`).
+
 `lexicon_fem.py` / `lexicon_neuter.py` mirror its structure for two special cases: when a noun is
 rewritten to `-person` (`Feuerwehrmann` → `Feuerwehrperson`) the dependent words must become
 **feminine**; when a `-sohn`/`-tochter` compound is rewritten (to `-kind`) they must become
@@ -154,7 +159,10 @@ is a separate, non-parallel list of nominalized adjectives (`Verlobte`, `Jugendl
 Two small lists in `lexicon.py` correct the word lists from the other side.
 `NEVER_PERSON_NOUNS` holds words that are only in `movierbare_Substantive.txt` because their head is
 a person noun but that never denote a person (`Bundesrat`, the bare `Rat`); the other `-rat` words
-stay out, since `Betriebsrat` and `Gemeinderat` do denote office-holders.
+stay out, since `Betriebsrat` and `Gemeinderat` do denote office-holders. `NO_PERSON_COMPOUNDS` does
+the same by word ending, so compounds are covered: `-ausläufer` and friends, and `Kaiserschnitt` /
+`Kaiserschmarrn`, where the person noun sits in the modifier rather than the head and only it was
+markable (`Kaiserneschnitt`).
 `PEOPLE_OR_PLACE_NAMES` holds names that are a territory and the plural of an inhabitant noun at
 once (`Sachsen`, `Preußen`, `Polen`). `Marking_Tool.means_place_not_people` decides per sentence: a
 person is meant only with an article **and** plural or a case other than nominative (`die Sachsen`,

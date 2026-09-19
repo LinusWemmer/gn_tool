@@ -68,8 +68,8 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Jeder hilft jedem anderen.", "Jedey hilft jederm anderen."))
         test_sentences.append(("Der Bruder meiner Mutter hilft der Cousine meines Sohnes.", "De Geschwister meiners Elters hilft derm Couse meines Kindes."))
         test_sentences.append(("Die Supermutter spielt mit ihrem Minisohn.", "De Superelter spielt mit ensem Minikind."))
-        test_sentences.append(("Hat er das aus Brüderliebe oder aus Liebe zum Vaterland gemacht?", "Hat en das aus Geschwisterliebe oder aus Liebe zum Elterland gemacht?"))
-        test_sentences.append(("Was ist Deine Muttersprache?", "Was ist Deine Eltersprache?"))
+        test_sentences.append(("Hat er das aus Brüderliebe oder aus Liebe zum Vaterland gemacht?", "Hat en das aus Geschwisterliebe oder aus Liebe zum Elternland gemacht?"))
+        test_sentences.append(("Was ist Deine Muttersprache?", "Was ist Deine Elternsprache?"))
         test_sentences.append(("Er hat für mich eine Onkelrolle eingenommen.", "En hat für mich eine Tonkenrolle eingenommen."))
         test_sentences.append(("Ich habe es meiner Mutter gegeben.", "Ich habe es meinerm Elter gegeben."))
         test_sentences.append(("Der Hauptcharakter bleibt.", "De Hauptcharakter bleibt."))
@@ -491,9 +491,16 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Die Polen protestierten.","Die Polerne protestierten."))
         test_sentences.append(("Ungarn liegt in Europa.","Ungarn liegt in Europa."))
         test_sentences.append(("Die Ungarn kamen.","Die Ungarne kamen."))
-        # "Mutterschutz" wird zu "Elternschutz", weil das Deutsche dieses Wort bereits kennt;
-        # bei den uebrigen Zusammensetzungen bleibt es bei "Elter-".
+        # Als Bestimmungswort werden "Vater" und "Mutter" immer zu "Eltern-", nie zu "Elter-".
         test_sentences.append(("Der Mutterschutz gilt weiter.","Der Elternschutz gilt weiter."))
+        test_sentences.append(("Die Vaterfigur fehlt.","Die Elternfigur fehlt."))
+        test_sentences.append(("Sie besuchte das Mutterhaus.","En besuchte das Elternhaus."))
+        # "Kaiserschnitt" und "Kaiserschmarrn" enthalten zwar "Kaiser", meinen aber keine Person.
+        test_sentences.append(("Der Kaiserschnitt verlief gut.","Der Kaiserschnitt verlief gut."))
+        test_sentences.append(("Der Kaiserschmarrn schmeckt.","Der Kaiserschmarrn schmeckt."))
+        test_sentences.append(("Der Notkaiserschnitt rettete beide.","Der Notkaiserschnitt rettete beide."))
+        # Der blosse "Kaiser" bleibt selbstverstaendlich markierbar.
+        test_sentences.append(("Der Kaiser dankte ab.","De Kaisere dankte ab."))
         # "Hauptperson" ist schon belegt und meint etwas anderes, deshalb "-mensch".
         test_sentences.append(("Der Dienstgrad Hauptmann wird verliehen.","Der Dienstgrad Hauptmensch wird verliehen."))
         test_sentences.append(("Der Stabshauptmann kam.","Der Stabshauptmensch kam."))
