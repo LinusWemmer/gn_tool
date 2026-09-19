@@ -162,7 +162,11 @@ a person noun but that never denote a person (`Bundesrat`, the bare `Rat`); the 
 stay out, since `Betriebsrat` and `Gemeinderat` do denote office-holders. `NO_PERSON_COMPOUNDS` does
 the same by word ending, so compounds are covered: `-ausläufer` and friends, and `Kaiserschnitt` /
 `Kaiserschmarrn`, where the person noun sits in the modifier rather than the head and only it was
-markable (`Kaiserneschnitt`).
+markable (`Kaiserneschnitt`). Its largest group is devices: German builds instrument names exactly
+like agent nouns (`Kugelschreiber`, `Taschenrechner`, `Lautsprecher`, `Halbleiter`, `Datenträger`),
+so the head is a word-list entry and the compound was markable. Only words that cannot be a person
+are listed; where both readings live (`Leiter`, `Träger`, `Jäger`, `Läufer`, `Springer`, `Bauer`,
+`Segler`, `Zerstörer`, `Mixer`, `Schlepper`) the word stays markable so the reader decides.
 `PEOPLE_OR_PLACE_NAMES` holds names that are a territory and the plural of an inhabitant noun at
 once (`Sachsen`, `Preußen`, `Polen`). `Marking_Tool.means_place_not_people` decides per sentence: a
 person is meant only with an article **and** plural or a case other than nominative (`die Sachsen`,

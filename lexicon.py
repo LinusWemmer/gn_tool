@@ -279,8 +279,57 @@ class Lexicon:
     # "-zeuge" und "-bote" die Grundform ("Fahrzeuge" wird zu "Fahrzeug" lemmatisiert).
     # Bei "Kaiserschnitt" und "Kaiserschmarrn" steckt die Personenbezeichnung nicht im Grundwort,
     # sondern im Bestimmungswort; markierbar war deshalb nur dieses ("Kaiserneschnitt").
-    NO_PERSON_COMPOUNDS = ("ausläufer", "irrläufer", "küstenläufer", "freiläufer", "nachläufer",
-                           "kaiserschnitt", "kaiserschmarrn")
+    # Die dritte Gruppe sind Geraete, Werkzeuge und andere Dinge: Das Deutsche bildet Geraetenamen
+    # regelmaessig wie Personenbezeichnungen auf "-er" ("Kugelschreiber", "Taschenrechner",
+    # "Lautsprecher"), und das Grundwort steht dann in movierbare_Substantive.txt. Aufgenommen ist
+    # nur, was eindeutig kein Mensch sein kann; wo beide Lesarten leben ("Leiter", "Traeger",
+    # "Jaeger", "Laeufer", "Springer", "Bauer", "Segler", "Zerstoerer"), bleibt das Wort markierbar,
+    # damit de Nutzere entscheidet.
+    NO_PERSON_COMPOUNDS = (
+        # Personenbezeichnung im Grundwort, aber keine Person gemeint
+        "ausläufer", "irrläufer", "küstenläufer", "freiläufer", "nachläufer",
+        # Personenbezeichnung im Bestimmungswort
+        "kaiserschnitt", "kaiserschmarrn",
+        # Schreib- und Bueromaterial
+        "kugelschreiber", "fernschreiber", "fahrtenschreiber", "locher", "aktenordner",
+        # Bildschirm, Funk, Rechentechnik
+        "fernseher", "lautsprecher", "rechner", "radioempfänger", "rundfunkempfänger",
+        "fernsehempfänger", "peilempfänger", "mikrocontroller", "entpacker",
+        "gerätetreiber", "druckertreiber", "softwaretreiber", "grafiktreiber", "tastaturtreiber",
+        "schnittstellentreiber",
+        # Messgeraete und Sensoren
+        "zeiger", "stromzähler", "gaszähler", "wasserzähler", "geigerzähler", "kilometerzähler",
+        "tourenzähler", "durchflusszähler", "impulszähler", "betriebsstundenzähler",
+        "taktgeber", "impulsgeber", "signalgeber", "drehgeber", "schallgeber", "druckgeber",
+        "messgeber",
+        # Werkzeug
+        "bohrer", "schraubendreher", "feldstecher", "wagenheber", "tortenheber", "stechheber",
+        # Halterungen und Kleidung
+        "büstenhalter", "füllhalter", "federhalter", "strumpfhalter", "sockenhalter",
+        "kerzenhalter", "flaschenhalter", "becherhalter", "handyhalter", "kabelhalter",
+        "abstandhalter", "abstandshalter", "platzhalter", "gepäckhalter", "hosenträger",
+        # "Leiter" als Sprosse oder als Stoff, der etwas leitet
+        "halbleiter", "kaltleiter", "heißleiter", "lichtleiter", "wärmeleiter", "stromleiter",
+        "nullleiter", "außenleiter", "innenleiter", "schutzleiter", "erdleiter", "harnleiter",
+        "samenleiter", "eileiter", "blitzableiter", "strickleiter", "trittleiter", "stufenleiter",
+        "tonleiter", "drehleiter", "feuerleiter", "karriereleiter", "hühnerleiter", "seilleiter",
+        # "Traeger" als Bauteil oder Speichermedium
+        "datenträger", "tonträger", "bildträger", "objektträger", "energieträger",
+        "ladungsträger", "informationsträger", "aufzeichnungsträger", "eisenträger",
+        "stahlträger", "querträger", "längsträger", "antennenträger",
+        # Waffen, Sportgeraete, Fahrzeugteile
+        "scheinwerfer", "flammenwerfer", "granatwerfer", "raketenwerfer", "wasserwerfer",
+        "minenwerfer", "tennisschläger", "golfschläger", "federballschläger", "querschläger",
+        "staubfänger", "blickfänger", "stoßfänger", "tropfenfänger", "hirschfänger",
+        "sattelschlepper", "zündverteiler", "wohnanhänger", "kettenanhänger", "kickstarter",
+        # Schiffe und Flugzeuge
+        "frachter", "zweimaster", "dreimaster", "flugzeugträger",
+        "abfangjäger", "düsenjäger", "nachtjäger",
+        # Teppiche
+        "teppichläufer", "treppenläufer",
+        # Sonstiges
+        "fußabtreter", "fußabstreicher", "hamster", "pillendreher", "aussetzer", "zubringer",
+    )
 
     # Laender- und Landschaftsnamen, die zugleich der Plural einer Einwohnerbezeichnung sind.
     # Eine Person ist gemeint, wenn ein Artikel dabeisteht UND das Wort im Plural oder in einem

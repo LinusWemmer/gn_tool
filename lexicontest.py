@@ -495,6 +495,27 @@ class Sentence_Test(unittest.TestCase):
         test_sentences.append(("Der Mutterschutz gilt weiter.","Der Elternschutz gilt weiter."))
         test_sentences.append(("Die Vaterfigur fehlt.","Die Elternfigur fehlt."))
         test_sentences.append(("Sie besuchte das Mutterhaus.","En besuchte das Elternhaus."))
+        # Geraetenamen sind im Deutschen wie Personenbezeichnungen auf "-er" gebaut; das Grundwort
+        # steht deshalb in den Wortlisten, das Kompositum meint aber ein Ding.
+        test_sentences.append(("Der Kugelschreiber liegt auf dem Tisch.","Der Kugelschreiber liegt auf dem Tisch."))
+        test_sentences.append(("Der Fernseher ist kaputt.","Der Fernseher ist kaputt."))
+        test_sentences.append(("Der Lautsprecher rauscht.","Der Lautsprecher rauscht."))
+        test_sentences.append(("Der Taschenrechner fehlt.","Der Taschenrechner fehlt."))
+        test_sentences.append(("Der Halbleiter erwärmt sich.","Der Halbleiter erwärmt sich."))
+        test_sentences.append(("Der Datenträger ist voll.","Der Datenträger ist voll."))
+        test_sentences.append(("Der Büstenhalter passt nicht.","Der Büstenhalter passt nicht."))
+        test_sentences.append(("Der Tennisschläger ist neu.","Der Tennisschläger ist neu."))
+        test_sentences.append(("Der Scheinwerfer blendet.","Der Scheinwerfer blendet."))
+        test_sentences.append(("Der Schraubendreher liegt daneben.","Der Schraubendreher liegt daneben."))
+        test_sentences.append(("Der Gerätetreiber fehlt.","Der Gerätetreiber fehlt."))
+        test_sentences.append(("Der Hamster schläft.","Der Hamster schläft."))
+        # Personenbezeichnungen mit denselben Grundwoertern bleiben markierbar.
+        test_sentences.append(("Der Geschichtsschreiber irrte.","De Geschichtsschreibere irrte."))
+        test_sentences.append(("Der Abteilungsleiter kam.","De Abteilungsleitere kam."))
+        test_sentences.append(("Der Würdenträger schwieg.","De Würdenträgere schwieg."))
+        test_sentences.append(("Der Tierhalter haftet.","De Tierhaltere haftet."))
+        test_sentences.append(("Der Erzähler stockte.","De Erzählere stockte."))
+        test_sentences.append(("Der Arbeitgeber zahlte.","De Arbeitgebere zahlte."))
         # "Kaiserschnitt" und "Kaiserschmarrn" enthalten zwar "Kaiser", meinen aber keine Person.
         test_sentences.append(("Der Kaiserschnitt verlief gut.","Der Kaiserschnitt verlief gut."))
         test_sentences.append(("Der Kaiserschmarrn schmeckt.","Der Kaiserschmarrn schmeckt."))
