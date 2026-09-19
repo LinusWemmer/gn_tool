@@ -67,16 +67,58 @@ the container to a free port instead, for example `-p 8080:80` and then http://l
 
 `sudo` is only needed when your user is not in the `docker` group.
 
-In order to transfer the docker image to a server, you need to pack it into a tar file and then copy to the server using scp:
+Deploying to the server
+-----------------------
+
+Pack the image into a tar file and copy it over with scp:
 ```console
-~$: sudo docker save -o docker_image.tar docker_image
-~$: sudo scp -i ~/.ssh/id_rsa docker_image.tar root@<server-ip>:/root/ 
+~$: docker build -t docker_image .
+~$: docker save -o docker_image.tar docker_image
+~$: scp -i ~/.ssh/id_rsa docker_image.tar root@<server-ip>:/root/
 ```
-On the server, you need to unpack the docker image and then run it:
+
+### First deployment
+
+On the server, load the image and start it. Give the container a **name** — every later update
+needs it to address the running container:
 ```console
-~$: docker load -i docker_image.tar
-~$: docker run --restart always -d -p 8080:80 -v /var/app/reports:/app/reports docker_image
+~#: docker load -i docker_image.tar
+~#: docker run --restart always -d --name inklusivomat \
+      -p 8080:80 -v /var/app/reports:/app/reports docker_image
+~#: curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080/
 ```
+
+### Updating a running server
+
+`docker load` only replaces the *image*. The running container keeps its own copy of the old one and
+serves the old code, and it still holds port 8080 — so starting the new one before removing the old
+one fails with `Bind for 0.0.0.0:8080 failed: port is already allocated`. Run these five steps in
+order:
+```console
+~#: docker load -i docker_image.tar                     # 1. bring in the new image
+~#: docker stop inklusivomat                            # 2. stop the old container
+~#: docker rm inklusivomat                              # 3. remove it -- "stop" alone is not
+                                                        #    enough: --restart always brings a
+                                                        #    stopped container back on reboot
+~#: docker run --restart always -d --name inklusivomat \
+      -p 8080:80 -v /var/app/reports:/app/reports docker_image     # 4. start the new one
+~#: docker ps                                           # 5. check: "Up", 0.0.0.0:8080->80/tcp
+~#: curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8080/   #    and answers with 200
+```
+
+Only once the new container is up and answering, clean up. `docker load` leaves the previous image
+behind without a tag (it says `renaming the old one with ID sha256:… to empty string`), and each one
+costs about 1.4 GB:
+```console
+~#: docker image prune                                  # 6. removes untagged images
+```
+Do not prune earlier — until the new container runs, the untagged image is what you fall back to
+(`docker run … <image-id>`).
+
+If a container from an older deployment has no name, `docker ps -a` shows which one publishes
+`0.0.0.0:8080->80/tcp`; use its ID in steps 2 and 3, and remove any leftover container in state
+`Created` from a failed `docker run` the same way. If `docker ps -a` lists nothing on that port,
+something outside docker holds it — `ss -ltnp | grep 8080` names the process.
 
 
 Possible Errors:
