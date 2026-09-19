@@ -37,10 +37,14 @@
             <button type="submit" class="yellow-button" formaction="/translate_directly" style="margin-left: 1.5em;">Direkt übersetzen</button>
         </form>
         <br/>
-        <div class="output">
+        {% if dataToRender %}
+        <div class="output text-card markable-card">
         {{ dataToRender|safe }}
         </div>
-        <p class="output">{{ outputText|safe }}</p>
+        {% endif %}
+        {% if outputText %}
+        <p class="output text-card result-card">{{ outputText|safe }}</p>
+        {% endif %}
         <br/><br/>
         <form action="/report" method="POST">
             <button type="submit" class="grey-button">Problem melden</button>

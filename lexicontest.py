@@ -949,7 +949,7 @@ class Sentence_Test(unittest.TestCase):
     # sich nicht zuruecknehmen.
     def test_marking_can_be_repeated_and_undone(self):
         def ausgabe(antwort):
-            treffer = re.search(r'<p class="output">(.*?)</p>',
+            treffer = re.search(r'<p class="output[^"]*">(.*?)</p>',
                                 antwort.get_data(as_text=True), re.S)
             return treffer.group(1).strip() if treffer else ""
         beide = {"0|2|1": "select", "0|5|1": "select"}

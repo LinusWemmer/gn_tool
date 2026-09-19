@@ -88,6 +88,31 @@ textarea {
     white-space: nowrap;
 }
 
+/* Der auswählbare Eingabetext und der Ausgabetext stehen auf je einer eigenen Fläche, damit bei
+   langen Texten auf einen Blick zu sehen ist, wo der eine aufhört und der andere anfängt. Der
+   Balken links trägt die Unterscheidung: gedecktes Grau für den Text, an dem noch gearbeitet wird,
+   das Lila des Inklusivomaten für das Ergebnis. Die Flächen selbst sind sehr blass gehalten, damit
+   die gelben und lila Markierungen im Text unvermindert darauf stehen. */
+.text-card {
+    padding: 14px 18px 14px 15px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.markable-card {
+    background-color: #f7f6f3;
+    border: 1px solid #e6e2da;
+    border-left: 3px solid #bdb8ac;
+}
+
+.result-card {
+    background-color: #f8f4fe;
+    border: 1px solid #ded0f4;
+    border-left: 3px solid #7A3DC5;
+    margin-top: 18px;
+    margin-bottom: 0;
+}
+
 /* Auswählbare Wörter im Markierungsformular sind gelb hinterlegt und wechseln nach dem
    Auswählen auf lila. Der Wechsel läuft allein über CSS, damit er auch dem Button
    "Alle auswählbaren Wörter auswählen" folgt, ohne dass dieser etwas davon wissen muss. */
@@ -173,6 +198,10 @@ button {
 
     .text-area {
         padding-right: 0; /* Resets padding for mobile view */
+    }
+
+    .text-card {
+        padding: 11px 13px 11px 10px;
     }
 
     .container {
